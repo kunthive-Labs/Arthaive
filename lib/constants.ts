@@ -82,3 +82,8 @@ export const SORT_OPTIONS = [
   { label: "Highest Amount", value: "amount-desc" },
   { label: "Lowest Amount", value: "amount-asc" },
 ] as const
+
+
+export const PAGINATION_SIZES = [10, 20, 50, 100] as const
+
+export const DEFAULT_PAGE_SIZE = 20
