@@ -41,3 +41,7 @@ export function isFundingDisclosed(amount: number): boolean {
 export function formatDate(d: string): string {
   return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
 }
+
+export function formatDateShort(d: string): string {
+  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+}
