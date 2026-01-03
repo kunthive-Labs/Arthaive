@@ -134,3 +134,11 @@ export interface ApiResponse<T> {
   error?: string
   status: number
 }
+
+
+export interface InvestorFilter {
+  type?: string
+  minDeals?: number
+  sector?: string
+  stage?: string
+}
