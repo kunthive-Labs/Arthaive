@@ -45,3 +45,7 @@ export function formatDate(d: string): string {
 export function formatDateShort(d: string): string {
   return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
 }
+
+export function slugify(str: string): string {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+}
