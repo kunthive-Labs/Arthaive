@@ -142,3 +142,11 @@ export interface InvestorFilter {
   sector?: string
   stage?: string
 }
+
+
+export interface SearchResult {
+  deals: Deal[]
+  investors: Investor[]
+  total: number
+  query: string
+}
