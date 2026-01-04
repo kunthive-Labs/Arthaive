@@ -105,3 +105,10 @@ export const NAV_ITEMS = [
   { label: "Analytics", href: "/analytics" },
   { label: "Submit Deal", href: "/submit" },
 ] as const
+
+
+export const META_DEFAULTS = {
+  title: "IndiaFundTrack — Indian Startup Funding Intelligence",
+  description: "Discover, analyze and track startup funding across India. 1600+ deals, 200+ investors, real-time insights.",
+  keywords: ["startup", "funding", "india", "vc", "angel", "seed", "series a"],
+} as const
