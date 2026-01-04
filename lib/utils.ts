@@ -49,3 +49,7 @@ export function formatDateShort(d: string): string {
 export function slugify(str: string): string {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
 }
+
+export function truncateText(text: string, maxLen = 80): string {
+  return text.length > maxLen ? text.slice(0, maxLen) + "…" : text
+}
