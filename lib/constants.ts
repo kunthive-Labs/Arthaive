@@ -119,3 +119,11 @@ export const DATE_FORMATS = {
   short: { day: "numeric" as const, month: "short" as const },
   monthYear: { month: "long" as const, year: "numeric" as const },
 } as const
+
+
+export const FISCAL_QUARTERS: Record<string, { label: string; months: number[] }> = {
+  Q1: { label: "Q1 (Apr–Jun)", months: [3, 4, 5] },
+  Q2: { label: "Q2 (Jul–Sep)", months: [6, 7, 8] },
+  Q3: { label: "Q3 (Oct–Dec)", months: [9, 10, 11] },
+  Q4: { label: "Q4 (Jan–Mar)", months: [0, 1, 2] },
+}
