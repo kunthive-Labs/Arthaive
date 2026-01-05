@@ -112,3 +112,10 @@ export const META_DEFAULTS = {
   description: "Discover, analyze and track startup funding across India. 1600+ deals, 200+ investors, real-time insights.",
   keywords: ["startup", "funding", "india", "vc", "angel", "seed", "series a"],
 } as const
+
+
+export const DATE_FORMATS = {
+  display: { day: "numeric" as const, month: "long" as const, year: "numeric" as const },
+  short: { day: "numeric" as const, month: "short" as const },
+  monthYear: { month: "long" as const, year: "numeric" as const },
+} as const
