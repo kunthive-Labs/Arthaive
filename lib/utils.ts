@@ -53,3 +53,7 @@ export function slugify(str: string): string {
 export function truncateText(text: string, maxLen = 80): string {
   return text.length > maxLen ? text.slice(0, maxLen) + "…" : text
 }
+
+export function isValidUrl(url: string): boolean {
+  try { new URL(url); return true } catch { return false }
+}
