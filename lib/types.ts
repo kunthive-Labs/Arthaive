@@ -165,3 +165,13 @@ export interface NavItem {
   href: string
   active?: boolean
 }
+
+
+export interface WeeklyDigest {
+  weekFolder: string
+  dealCount: number
+  totalFunding: number
+  topDeal: Deal
+  topSectors: string[]
+  dateRange: { from: string; to: string }
+}
