@@ -61,3 +61,5 @@ export function isValidUrl(url: string): boolean {
 export function formatYear(dateStr: string): string {
   return new Date(dateStr).getFullYear().toString()
 }
+
+// utility module — last updated 2026-01-06
