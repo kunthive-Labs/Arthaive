@@ -182,3 +182,11 @@ export interface UserPreferences {
   watchedSectors: string[]
   watchedInvestors: string[]
 }
+
+
+export interface ChartDataPoint {
+  label: string
+  value: number
+  color?: string
+  meta?: Record<string, unknown>
+}
