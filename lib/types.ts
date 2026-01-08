@@ -190,3 +190,11 @@ export interface ChartDataPoint {
   color?: string
   meta?: Record<string, unknown>
 }
+
+
+export interface ToastMessage {
+  id: string
+  type: "success" | "error" | "info"
+  message: string
+  duration?: number
+}
