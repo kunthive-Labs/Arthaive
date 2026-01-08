@@ -69,3 +69,8 @@ export function formatYear(dateStr: string): string {
 // utility module — last updated 2026-01-08
 
 // utility module — last updated 2026-01-08
+
+export function getQuarter(dateStr: string): string {
+  const m = new Date(dateStr).getMonth()
+  return `Q${Math.floor(m / 3) + 1}`
+}
