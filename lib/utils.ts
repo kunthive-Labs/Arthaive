@@ -74,3 +74,5 @@ export function getQuarter(dateStr: string): string {
   const m = new Date(dateStr).getMonth()
   return `Q${Math.floor(m / 3) + 1}`
 }
+
+// utility module — last updated 2026-01-08
