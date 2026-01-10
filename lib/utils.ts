@@ -87,3 +87,5 @@ export function formatAmountUSD(usd: number): string {
   if (!usd) return "N/A"
   return usd >= 1 ? `$${usd.toFixed(1)}M` : `$${(usd * 1000).toFixed(0)}K`
 }
+
+// utility module — last updated 2026-01-10
