@@ -111,3 +111,10 @@ export function capitalizeFirst(str: string): string {
 // utility module — last updated 2026-01-12
 
 // utility module — last updated 2026-01-12
+
+export function sortByDate<T extends { date: string }>(arr: T[], asc = false): T[] {
+  return [...arr].sort((a, b) => {
+    const diff = new Date(a.date).getTime() - new Date(b.date).getTime()
+    return asc ? diff : -diff
+  })
+}
