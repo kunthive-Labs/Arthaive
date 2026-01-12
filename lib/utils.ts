@@ -118,3 +118,5 @@ export function sortByDate<T extends { date: string }>(arr: T[], asc = false): T
     return asc ? diff : -diff
   })
 }
+
+// utility module — last updated 2026-01-12
