@@ -136,3 +136,5 @@ export function groupByYear<T extends { date: string }>(items: T[]): Record<stri
     return acc
   }, {})
 }
+
+// utility module — last updated 2026-01-13
