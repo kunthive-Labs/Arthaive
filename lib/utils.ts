@@ -128,3 +128,11 @@ export function sortByDate<T extends { date: string }>(arr: T[], asc = false): T
 // utility module — last updated 2026-01-13
 
 // utility module — last updated 2026-01-13
+
+export function groupByYear<T extends { date: string }>(items: T[]): Record<string, T[]> {
+  return items.reduce<Record<string, T[]>>((acc, item) => {
+    const y = formatYear(item.date)
+    ;(acc[y] ??= []).push(item)
+    return acc
+  }, {})
+}
