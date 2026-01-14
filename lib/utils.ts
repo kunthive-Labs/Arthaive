@@ -146,3 +146,8 @@ export function groupByYear<T extends { date: string }>(items: T[]): Record<stri
 // utility module — last updated 2026-01-14
 
 // utility module — last updated 2026-01-14
+
+export function debounce<T extends (...args: unknown[]) => void>(fn: T, ms = 300): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout>
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms) }
+}
