@@ -144,3 +144,5 @@ export function groupByYear<T extends { date: string }>(items: T[]): Record<stri
 // utility module — last updated 2026-01-13
 
 // utility module — last updated 2026-01-14
+
+// utility module — last updated 2026-01-14
