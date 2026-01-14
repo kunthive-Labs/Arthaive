@@ -151,3 +151,5 @@ export function debounce<T extends (...args: unknown[]) => void>(fn: T, ms = 300
   let timer: ReturnType<typeof setTimeout>
   return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms) }
 }
+
+// utility module — last updated 2026-01-14
