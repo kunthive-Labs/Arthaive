@@ -161,3 +161,7 @@ export function debounce<T extends (...args: unknown[]) => void>(fn: T, ms = 300
 // utility module — last updated 2026-01-15
 
 // utility module — last updated 2026-01-15
+
+export function clampNumber(n: number, min: number, max: number): number {
+  return Math.min(Math.max(n, min), max)
+}
