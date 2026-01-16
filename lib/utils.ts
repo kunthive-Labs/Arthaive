@@ -175,3 +175,7 @@ export function clampNumber(n: number, min: number, max: number): number {
 // utility module — last updated 2026-01-16
 
 // utility module — last updated 2026-01-16
+
+export function unique<T>(arr: T[]): T[] {
+  return [...new Set(arr)]
+}
