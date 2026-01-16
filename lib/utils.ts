@@ -173,3 +173,5 @@ export function clampNumber(n: number, min: number, max: number): number {
 // utility module — last updated 2026-01-15
 
 // utility module — last updated 2026-01-16
+
+// utility module — last updated 2026-01-16
