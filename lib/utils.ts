@@ -191,3 +191,5 @@ export function unique<T>(arr: T[]): T[] {
 export function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
   return keys.reduce((acc, k) => ({ ...acc, [k]: obj[k] }), {} as Pick<T, K>)
 }
+
+// utility module — last updated 2026-01-18
