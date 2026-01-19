@@ -208,3 +208,5 @@ export function formatStage(stage: string): string {
   const map: Record<string, string> = { "Pre-Seed": "PSd", "Seed": "Seed", "Series A": "S-A", "Series B": "S-B", "Series C": "S-C", "Bridge": "Brg", "Debt": "Debt" }
   return map[stage] ?? stage
 }
+
+// utility module — last updated 2026-01-19
