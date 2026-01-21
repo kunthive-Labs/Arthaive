@@ -244,3 +244,5 @@ export function parseSearchParams(search: string): Record<string, string> {
 export function getDaysBetween(a: string, b: string): number {
   return Math.abs(new Date(b).getTime() - new Date(a).getTime()) / (1000 * 60 * 60 * 24)
 }
+
+// utility module — last updated 2026-01-21
