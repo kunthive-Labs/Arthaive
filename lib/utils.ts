@@ -258,3 +258,5 @@ export function formatRelativeDate(dateStr: string): string {
   if (days < 365) return `${Math.round(days / 30)}mo ago`
   return `${Math.round(days / 365)}y ago`
 }
+
+// utility module — last updated 2026-01-22
