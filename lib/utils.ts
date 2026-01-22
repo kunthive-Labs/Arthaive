@@ -250,3 +250,11 @@ export function getDaysBetween(a: string, b: string): number {
 // utility module — last updated 2026-01-21
 
 // utility module — last updated 2026-01-21
+
+export function formatRelativeDate(dateStr: string): string {
+  const days = getDaysBetween(dateStr, new Date().toISOString())
+  if (days < 7) return `${Math.round(days)}d ago`
+  if (days < 30) return `${Math.round(days / 7)}w ago`
+  if (days < 365) return `${Math.round(days / 30)}mo ago`
+  return `${Math.round(days / 365)}y ago`
+}
