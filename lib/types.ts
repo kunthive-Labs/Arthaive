@@ -198,3 +198,12 @@ export interface ToastMessage {
   message: string
   duration?: number
 }
+
+
+export type ExportFormat = "csv" | "json" | "xlsx"
+
+export interface ExportOptions {
+  format: ExportFormat
+  fields?: string[]
+  filename?: string
+}
