@@ -416,3 +416,8 @@ export function formatRelativeDate(dateStr: string): string {
 // utility module — last updated 2026-01-31
 
 // utility module — last updated 2026-01-31
+
+export function parseAmount(str: string): number {
+  const n = parseFloat(str.replace(/[\u20b9$,\s]/g, ""))
+  return isNaN(n) ? 0 : n
+}
