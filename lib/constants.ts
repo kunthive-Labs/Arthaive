@@ -134,3 +134,6 @@ export const EXPORT_FORMATS = [
   { label: "JSON", value: "json" as const },
   { label: "Excel", value: "xlsx" as const },
 ] as const
+
+
+export const COMPARE_MAX = 3
