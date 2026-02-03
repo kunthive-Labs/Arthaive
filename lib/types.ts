@@ -215,3 +215,12 @@ export interface CompareResult {
   delta: number
   pctChange: number
 }
+
+
+export interface TrendPoint {
+  date: string
+  value: number
+  label?: string
+}
+
+export type TrendSeries = TrendPoint[]
