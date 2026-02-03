@@ -421,3 +421,7 @@ export function parseAmount(str: string): number {
   const n = parseFloat(str.replace(/[\u20b9$,\s]/g, ""))
   return isNaN(n) ? 0 : n
 }
+
+export function compareAmounts(a: number, b: number): -1 | 0 | 1 {
+  return a < b ? -1 : a > b ? 1 : 0
+}
