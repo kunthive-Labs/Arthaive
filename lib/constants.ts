@@ -137,3 +137,15 @@ export const EXPORT_FORMATS = [
 
 
 export const COMPARE_MAX = 3
+
+
+export const CITY_COORDINATES: Record<string, [number, number]> = {
+  "Bengaluru": [12.97, 77.59],
+  "Mumbai": [19.07, 72.87],
+  "Delhi": [28.61, 77.20],
+  "Hyderabad": [17.38, 78.48],
+  "Chennai": [13.08, 80.27],
+  "Pune": [18.52, 73.85],
+  "Kolkata": [22.57, 88.36],
+  "Ahmedabad": [23.02, 72.57],
+}
