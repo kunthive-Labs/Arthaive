@@ -163,3 +163,12 @@ export const SECTOR_COLORS: Record<string, string> = {
   "D2C": "#db2777",
   "Gaming": "#9333ea",
 }
+
+
+export const TREND_WINDOWS = [
+  { label: "1M", days: 30 },
+  { label: "3M", days: 90 },
+  { label: "6M", days: 180 },
+  { label: "1Y", days: 365 },
+  { label: "All", days: 0 },
+] as const
