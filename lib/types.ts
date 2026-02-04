@@ -224,3 +224,12 @@ export interface TrendPoint {
 }
 
 export type TrendSeries = TrendPoint[]
+
+
+export interface SectorStats {
+  sector: string
+  dealCount: number
+  totalFunding: number
+  avgDealSize: number
+  topStage: string
+}
