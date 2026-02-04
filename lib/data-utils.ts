@@ -6,3 +6,7 @@ export function normalizeDeals(raw: unknown[]): Array<Record<string, unknown>> {
 export function extractUniqueSectors(deals: Array<{ sectors?: string[] }>): string[] {
   return [...new Set(deals.flatMap(d => d.sectors ?? []))].sort()
 }
+
+export function extractUniqueInvestors(deals: Array<{ investors?: string[] }>): string[] {
+  return [...new Set(deals.flatMap(d => d.investors ?? []).filter(Boolean))].sort()
+}
