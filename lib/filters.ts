@@ -27,3 +27,7 @@ export function countActiveFilters(filters: Record<string, unknown>): number {
 export function mergeFilters<T extends Record<string, unknown>>(base: T, patch: Partial<T>): T {
   return { ...base, ...patch, page: 1 }
 }
+
+export function filtersEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
