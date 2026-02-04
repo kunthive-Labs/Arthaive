@@ -17,3 +17,10 @@ export function calcAxisBounds(values: number[], padding = 0.1): { min: number; 
   const range = max - min || 1
   return { min: Math.max(0, min - range * padding), max: max + range * padding }
 }
+
+export function formatAxisLabel(value: number): string {
+  if (value >= 1e7) return (value / 1e7).toFixed(0) + "Cr"
+  if (value >= 1e5) return (value / 1e5).toFixed(0) + "L"
+  if (value >= 1e3) return (value / 1e3).toFixed(0) + "K"
+  return String(value)
+}
