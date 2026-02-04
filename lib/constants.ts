@@ -149,3 +149,17 @@ export const CITY_COORDINATES: Record<string, [number, number]> = {
   "Kolkata": [22.57, 88.36],
   "Ahmedabad": [23.02, 72.57],
 }
+
+
+export const SECTOR_COLORS: Record<string, string> = {
+  "Fintech": "#15803d",
+  "Edtech": "#1d4ed8",
+  "Healthtech": "#7c3aed",
+  "SaaS": "#b45309",
+  "E-Commerce": "#dc2626",
+  "Logistics": "#0891b2",
+  "Agritech": "#65a30d",
+  "Cleantech": "#0d9488",
+  "D2C": "#db2777",
+  "Gaming": "#9333ea",
+}
