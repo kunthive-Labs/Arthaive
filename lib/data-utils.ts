@@ -10,3 +10,7 @@ export function extractUniqueSectors(deals: Array<{ sectors?: string[] }>): stri
 export function extractUniqueInvestors(deals: Array<{ investors?: string[] }>): string[] {
   return [...new Set(deals.flatMap(d => d.investors ?? []).filter(Boolean))].sort()
 }
+
+export function extractUniqueLocations(deals: Array<{ location?: string }>): string[] {
+  return [...new Set(deals.map(d => d.location).filter(Boolean) as string[])].sort()
+}
