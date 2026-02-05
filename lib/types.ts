@@ -233,3 +233,11 @@ export interface SectorStats {
   avgDealSize: number
   topStage: string
 }
+
+
+export interface CityStats {
+  city: string
+  dealCount: number
+  totalFunding: number
+  topSector: string
+}
