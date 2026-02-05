@@ -31,3 +31,7 @@ export function mergeFilters<T extends Record<string, unknown>>(base: T, patch: 
 export function filtersEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }
+
+export function serializeFilters(filters: Record<string, unknown>): string {
+  return btoa(JSON.stringify(filters))
+}
