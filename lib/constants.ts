@@ -172,3 +172,11 @@ export const TREND_WINDOWS = [
   { label: "1Y", days: 365 },
   { label: "All", days: 0 },
 ] as const
+
+
+export const SHARE_PLATFORMS = [
+  { label: "Twitter/X", value: "twitter" as const },
+  { label: "LinkedIn", value: "linkedin" as const },
+  { label: "WhatsApp", value: "whatsapp" as const },
+  { label: "Copy Link", value: "copy" as const },
+] as const
