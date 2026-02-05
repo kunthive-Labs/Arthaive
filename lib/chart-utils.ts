@@ -24,3 +24,10 @@ export function formatAxisLabel(value: number): string {
   if (value >= 1e3) return (value / 1e3).toFixed(0) + "K"
   return String(value)
 }
+
+export function buildBarData(items: Array<{ label: string; value: number }>, color = "#15803d"): object {
+  return {
+    labels: items.map(i => i.label),
+    datasets: [{ data: items.map(i => i.value), backgroundColor: color, borderRadius: 4 }],
+  }
+}
