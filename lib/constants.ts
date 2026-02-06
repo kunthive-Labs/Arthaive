@@ -180,3 +180,8 @@ export const SHARE_PLATFORMS = [
   { label: "WhatsApp", value: "whatsapp" as const },
   { label: "Copy Link", value: "copy" as const },
 ] as const
+
+
+export const WEEKLY_DIGEST_DAY = 1
+export const SEARCH_DEBOUNCE_MS = 300
+export const MAX_BOOKMARKS = 50
