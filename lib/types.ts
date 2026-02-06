@@ -241,3 +241,11 @@ export interface CityStats {
   totalFunding: number
   topSector: string
 }
+
+
+export interface WeeklyStats {
+  week: string
+  dealCount: number
+  totalFunding: number
+  sectors: string[]
+}
