@@ -29,3 +29,12 @@ export function buildSearchIndex(deals: Array<{ id?: string; company?: string; s
   }
   return idx
 }
+
+export function searchDeals<T extends { id?: string }>(deals: T[], index: Map<string, string[]>, query: string): T[] {
+  const q = query.toLowerCase().trim()
+  if (!q) return deals
+  return deals.filter(d => {
+    const terms = index.get(d.id ?? "")
+    return terms?.some(t => t.includes(q))
+  })
+}
