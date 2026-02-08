@@ -446,3 +446,8 @@ export function median(nums: number[]): number {
 export function mean(nums: number[]): number {
   return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0
 }
+
+export function stddev(nums: number[]): number {
+  const m = mean(nums)
+  return Math.sqrt(mean(nums.map(n => (n - m) ** 2)))
+}
