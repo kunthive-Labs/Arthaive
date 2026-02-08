@@ -39,3 +39,9 @@ export function serializeFilters(filters: Record<string, unknown>): string {
 export function deserializeFilters<T>(encoded: string): T | null {
   try { return JSON.parse(atob(encoded)) as T } catch { return null }
 }
+
+export function removeFilterValue(filters: Record<string, string | string[]>, key: string, value: string): Record<string, string | string[]> {
+  const current = filters[key]
+  if (Array.isArray(current)) return { ...filters, [key]: current.filter(v => v !== value) }
+  return { ...filters, [key]: "" }
+}
