@@ -257,3 +257,10 @@ export interface SearchSuggestion {
   value: string
   count?: number
 }
+
+
+export interface BookmarkItem {
+  id: string
+  type: "deal" | "investor"
+  savedAt: string
+}
