@@ -35,3 +35,7 @@ export function filtersEqual(a: Record<string, unknown>, b: Record<string, unkno
 export function serializeFilters(filters: Record<string, unknown>): string {
   return btoa(JSON.stringify(filters))
 }
+
+export function deserializeFilters<T>(encoded: string): T | null {
+  try { return JSON.parse(atob(encoded)) as T } catch { return null }
+}
