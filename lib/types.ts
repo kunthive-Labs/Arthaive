@@ -249,3 +249,11 @@ export interface WeeklyStats {
   totalFunding: number
   sectors: string[]
 }
+
+
+export interface SearchSuggestion {
+  type: "company" | "sector" | "investor" | "location"
+  label: string
+  value: string
+  count?: number
+}
