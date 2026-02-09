@@ -264,3 +264,11 @@ export interface BookmarkItem {
   type: "deal" | "investor"
   savedAt: string
 }
+
+
+export interface SharePayload {
+  url: string
+  title: string
+  text?: string
+  platform?: "twitter" | "linkedin" | "whatsapp" | "copy"
+}
