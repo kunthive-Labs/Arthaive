@@ -38,3 +38,15 @@ export function searchDeals<T extends { id?: string }>(deals: T[], index: Map<st
     return terms?.some(t => t.includes(q))
   })
 }
+
+export function normalizeDealForExport(deal: Record<string, unknown>): Record<string, string> {
+  return {
+    company: String(deal.company ?? ""),
+    amount: String(deal.amount ?? ""),
+    stage: String(deal.stage ?? ""),
+    sectors: Array.isArray(deal.sectors) ? deal.sectors.join("; ") : "",
+    investors: Array.isArray(deal.investors) ? deal.investors.join("; ") : "",
+    location: String(deal.location ?? ""),
+    date: String(deal.date ?? ""),
+  }
+}
