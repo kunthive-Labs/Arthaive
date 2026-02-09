@@ -189,3 +189,6 @@ export const MAX_BOOKMARKS = 50
 
 export const API_VERSION = "v1"
 export const API_BASE = `/api/${API_VERSION}`
+
+
+export const DEFAULT_CHART_TYPE: "bar" | "line" | "pie" = "bar"
