@@ -455,3 +455,7 @@ export function stddev(nums: number[]): number {
 export function toTitleCase(str: string): string {
   return str.replace(/\b\w/g, c => c.toUpperCase())
 }
+
+export function camelToKebab(str: string): string {
+  return str.replace(/([A-Z])/g, m => "-" + m.toLowerCase())
+}
