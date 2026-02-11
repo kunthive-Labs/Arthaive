@@ -291,3 +291,11 @@ export interface AnalyticsFilter {
   cities?: string[]
   metric: "count" | "amount" | "avg"
 }
+
+
+export interface HeatmapCell {
+  x: string
+  y: string
+  value: number
+  label?: string
+}
