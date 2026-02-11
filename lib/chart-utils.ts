@@ -62,3 +62,10 @@ export function normalizeToPercent(values: number[]): number[] {
   const total = values.reduce((a, b) => a + b, 0)
   return total ? values.map(v => (v / total) * 100) : values.map(() => 0)
 }
+
+export function buildHeatmapData(cells: Array<{ x: string; y: string; value: number }>): { xLabels: string[]; yLabels: string[]; matrix: number[][] } {
+  const xLabels = [...new Set(cells.map(c => c.x))]
+  const yLabels = [...new Set(cells.map(c => c.y))]
+  const matrix = yLabels.map(y => xLabels.map(x => cells.find(c => c.x === x && c.y === y)?.value ?? 0))
+  return { xLabels, yLabels, matrix }
+}
