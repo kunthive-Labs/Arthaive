@@ -73,3 +73,14 @@ export function paginateArray<T>(arr: T[], page: number, size: number): { items:
   const items = arr.slice((page - 1) * size, page * size)
   return { items, total, totalPages }
 }
+
+export function buildMonthlyTrend(deals: Array<{ date?: string; amount?: number }>): Array<{ month: string; count: number; total: number }> {
+  const byMonth: Record<string, { count: number; total: number }> = {}
+  for (const deal of deals) {
+    if (!deal.date) continue
+    const month = deal.date.slice(0, 7)
+    if (!byMonth[month]) byMonth[month] = { count: 0, total: 0 }
+    byMonth[month].count++; byMonth[month].total += deal.amount ?? 0
+  }
+  return Object.entries(byMonth).sort(([a], [b]) => a.localeCompare(b)).map(([month, v]) => ({ month, ...v }))
+}
