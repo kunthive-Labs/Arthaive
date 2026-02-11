@@ -56,3 +56,13 @@ export function mergeDealSources(primary: unknown[], secondary: unknown[]): unkn
   const newItems = (secondary as Array<{ id?: string }>).filter(d => !ids.has(d.id))
   return [...primary, ...newItems]
 }
+
+export function aggregateDealsByStage(deals: Array<{ stage?: string; amount?: number }>): Record<string, { count: number; total: number }> {
+  const stats: Record<string, { count: number; total: number }> = {}
+  for (const d of deals) {
+    const stage = d.stage ?? "Unknown"
+    if (!stats[stage]) stats[stage] = { count: 0, total: 0 }
+    stats[stage].count++; stats[stage].total += d.amount ?? 0
+  }
+  return stats
+}
