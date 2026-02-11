@@ -50,3 +50,9 @@ export function normalizeDealForExport(deal: Record<string, unknown>): Record<st
     date: String(deal.date ?? ""),
   }
 }
+
+export function mergeDealSources(primary: unknown[], secondary: unknown[]): unknown[] {
+  const ids = new Set((primary as Array<{ id?: string }>).map(d => d.id))
+  const newItems = (secondary as Array<{ id?: string }>).filter(d => !ids.has(d.id))
+  return [...primary, ...newItems]
+}
