@@ -69,3 +69,8 @@ export function buildHeatmapData(cells: Array<{ x: string; y: string; value: num
   const matrix = yLabels.map(y => xLabels.map(x => cells.find(c => c.x === x && c.y === y)?.value ?? 0))
   return { xLabels, yLabels, matrix }
 }
+
+export function getChartColorByIndex(idx: number): string {
+  const palette = ["#15803d","#1d4ed8","#7c3aed","#b45309","#dc2626","#0891b2","#db2777","#65a30d","#9333ea","#0d9488"]
+  return palette[idx % palette.length]
+}
