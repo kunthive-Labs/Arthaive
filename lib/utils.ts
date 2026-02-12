@@ -478,3 +478,7 @@ export function formatCompact(n: number): string {
   if (n >= 1e3) return (n / 1e3).toFixed(1) + "K"
   return String(n)
 }
+
+export function calcYoY(prev: number, curr: number): number {
+  return prev === 0 ? 0 : ((curr - prev) / prev) * 100
+}
