@@ -299,3 +299,9 @@ export interface HeatmapCell {
   value: number
   label?: string
 }
+
+
+export type FundingStage =
+  | "Pre-Seed" | "Seed" | "Series A" | "Series B"
+  | "Series C" | "Series D" | "Series E"
+  | "Pre-IPO" | "Bridge" | "Debt" | "Grant"
