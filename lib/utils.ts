@@ -471,3 +471,10 @@ export function stripHtml(html: string): string {
 export function formatNumber(n: number): string {
   return new Intl.NumberFormat("en-IN").format(Math.round(n))
 }
+
+export function formatCompact(n: number): string {
+  if (n >= 1e7) return (n / 1e7).toFixed(1) + "Cr"
+  if (n >= 1e5) return (n / 1e5).toFixed(1) + "L"
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "K"
+  return String(n)
+}
