@@ -66,3 +66,15 @@ export function aggregateDealsByStage(deals: Array<{ stage?: string; amount?: nu
   }
   return stats
 }
+
+export function aggregateDealsByQuarter(deals: Array<{ date?: string; amount?: number }>): Record<string, { count: number; total: number }> {
+  const stats: Record<string, { count: number; total: number }> = {}
+  for (const d of deals) {
+    if (!d.date) continue
+    const dt = new Date(d.date)
+    const q = `${dt.getFullYear()}-Q${Math.floor(dt.getMonth() / 3) + 1}`
+    if (!stats[q]) stats[q] = { count: 0, total: 0 }
+    stats[q].count++; stats[q].total += d.amount ?? 0
+  }
+  return stats
+}
