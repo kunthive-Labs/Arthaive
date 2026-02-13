@@ -224,3 +224,9 @@ export const DEFAULT_FILTERS = {
   page: 1,
   pageSize: 20,
 }
+
+
+export const MONTH_LABELS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+] as const
