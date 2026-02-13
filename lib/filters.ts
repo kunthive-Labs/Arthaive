@@ -88,3 +88,8 @@ export function buildMonthlyTrend(deals: Array<{ date?: string; amount?: number 
 export function topN<T>(items: T[], n: number, scoreFn: (item: T) => number): T[] {
   return [...items].sort((a, b) => scoreFn(b) - scoreFn(a)).slice(0, n)
 }
+
+export function deduplicateByKey<T>(arr: T[], key: keyof T): T[] {
+  const seen = new Set()
+  return arr.filter(item => { const k = item[key]; if (seen.has(k)) return false; seen.add(k); return true })
+}
