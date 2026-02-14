@@ -314,3 +314,11 @@ export interface DealMeta {
   confidence: "high" | "medium" | "low"
   verifiedAt?: string
 }
+
+
+export interface PaginationState {
+  page: number
+  pageSize: number
+  total: number
+  totalPages: number
+}
