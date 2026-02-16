@@ -93,3 +93,14 @@ export function deduplicateByKey<T>(arr: T[], key: keyof T): T[] {
   const seen = new Set()
   return arr.filter(item => { const k = item[key]; if (seen.has(k)) return false; seen.add(k); return true })
 }
+
+export function buildSectorStats(deals: Array<{ sectors?: string[]; amount?: number }>): Record<string, { count: number; total: number }> {
+  const stats: Record<string, { count: number; total: number }> = {}
+  for (const deal of deals) {
+    for (const sector of deal.sectors ?? []) {
+      if (!stats[sector]) stats[sector] = { count: 0, total: 0 }
+      stats[sector].count++; stats[sector].total += deal.amount ?? 0
+    }
+  }
+  return stats
+}
