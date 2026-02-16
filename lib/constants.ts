@@ -230,3 +230,13 @@ export const MONTH_LABELS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ] as const
+
+
+export const DEAL_TABLE_COLUMNS = [
+  { key: "company", label: "Company", sortable: true },
+  { key: "amount", label: "Amount", sortable: true },
+  { key: "stage", label: "Stage", sortable: true },
+  { key: "sector", label: "Sector", sortable: false },
+  { key: "location", label: "City", sortable: true },
+  { key: "date", label: "Date", sortable: true },
+] as const
