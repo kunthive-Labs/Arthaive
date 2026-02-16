@@ -81,3 +81,14 @@ export function buildStackedBarData(series: Array<{ label: string; data: number[
     datasets: series.map(s => ({ label: s.label, data: s.data, backgroundColor: s.color, stack: "stack0" })),
   }
 }
+
+export function calcTrendLine(points: number[]): { slope: number; intercept: number } {
+  const n = points.length
+  const xs = points.map((_, i) => i)
+  const meanX = xs.reduce((a, b) => a + b, 0) / n
+  const meanY = points.reduce((a, b) => a + b, 0) / n
+  const num = xs.reduce((s, x, i) => s + (x - meanX) * (points[i] - meanY), 0)
+  const den = xs.reduce((s, x) => s + (x - meanX) ** 2, 0)
+  const slope = den ? num / den : 0
+  return { slope, intercept: meanY - slope * meanX }
+}
