@@ -114,3 +114,7 @@ export function buildCityStats(deals: Array<{ location?: string; amount?: number
   }
   return stats
 }
+
+export function pickRandom<T>(arr: T[], n = 1): T[] {
+  return [...arr].sort(() => Math.random() - 0.5).slice(0, n)
+}
