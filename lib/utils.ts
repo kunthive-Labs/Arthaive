@@ -500,3 +500,7 @@ export function chunkArray<T>(arr: T[], size: number): T[][] {
 export function flatUnique<T>(arrays: T[][]): T[] {
   return [...new Set(arrays.flat())]
 }
+
+export function sumBy<T>(arr: T[], fn: (item: T) => number): number {
+  return arr.reduce((acc, item) => acc + fn(item), 0)
+}
