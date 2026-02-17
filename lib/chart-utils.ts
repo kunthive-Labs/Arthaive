@@ -99,3 +99,12 @@ export function buildDonutData(items: Array<{ label: string; value: number }>, c
     datasets: [{ data: items.map(i => i.value), backgroundColor: colors, cutout: "65%" }],
   }
 }
+
+export function mergeChartSeries(base: number[], overlay: number[]): Array<{ base: number; overlay: number; diff: number }> {
+  const len = Math.max(base.length, overlay.length)
+  return Array.from({ length: len }, (_, i) => ({
+    base: base[i] ?? 0,
+    overlay: overlay[i] ?? 0,
+    diff: (overlay[i] ?? 0) - (base[i] ?? 0),
+  }))
+}
