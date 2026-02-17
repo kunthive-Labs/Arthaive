@@ -89,3 +89,15 @@ export function buildInvestorProfile(name: string, deals: Array<{ investors?: st
     stages: [...new Set(myDeals.map(d => d.stage).filter(Boolean) as string[])],
   }
 }
+
+export function calcDealScore(deal: { amount?: number; stage?: string; date?: string }): number {
+  let score = 0
+  if (deal.amount) score += Math.min(deal.amount / 1e6, 50)
+  const stageScore: Record<string, number> = { "Series C": 30, "Series B": 25, "Series A": 20, "Seed": 15, "Pre-Seed": 10 }
+  score += stageScore[deal.stage ?? ""] ?? 5
+  if (deal.date) {
+    const age = (Date.now() - new Date(deal.date).getTime()) / 86400000
+    score += Math.max(0, 20 - age / 10)
+  }
+  return Math.round(score)
+}
