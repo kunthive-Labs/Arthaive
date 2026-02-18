@@ -339,3 +339,12 @@ export interface FilterPreset {
   filters: DealFilters
   createdAt: string
 }
+
+
+export interface DashboardWidget {
+  id: string
+  type: "stat" | "chart" | "table" | "heatmap"
+  title: string
+  metric: string
+  span?: 1 | 2 | 3 | 4
+}
