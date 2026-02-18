@@ -504,3 +504,7 @@ export function flatUnique<T>(arrays: T[][]): T[] {
 export function sumBy<T>(arr: T[], fn: (item: T) => number): number {
   return arr.reduce((acc, item) => acc + fn(item), 0)
 }
+
+export function maxBy<T>(arr: T[], fn: (item: T) => number): T | undefined {
+  return arr.reduce<T | undefined>((max, item) => !max || fn(item) > fn(max) ? item : max, undefined)
+}
