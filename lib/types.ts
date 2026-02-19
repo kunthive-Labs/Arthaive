@@ -356,3 +356,10 @@ export interface ReportConfig {
   sections: Array<{ type: string; config: Record<string, unknown> }>
   format: ExportFormat
 }
+
+
+export interface DealComparison {
+  ids: string[]
+  metrics: Record<string, CompareResult>
+  winner?: string
+}
