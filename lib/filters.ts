@@ -118,3 +118,7 @@ export function buildCityStats(deals: Array<{ location?: string; amount?: number
 export function pickRandom<T>(arr: T[], n = 1): T[] {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, n)
 }
+
+export function invertRecord<T extends string>(rec: Record<T, string>): Record<string, T> {
+  return Object.fromEntries(Object.entries(rec).map(([k, v]) => [v, k])) as Record<string, T>
+}
