@@ -101,3 +101,12 @@ export function calcDealScore(deal: { amount?: number; stage?: string; date?: st
   }
   return Math.round(score)
 }
+
+export function deduplicateDeals<T extends { company?: string; date?: string; amount?: number }>(deals: T[]): T[] {
+  const seen = new Set<string>()
+  return deals.filter(d => {
+    const key = `${d.company?.toLowerCase()}-${d.date}-${d.amount}`
+    if (seen.has(key)) return false
+    seen.add(key); return true
+  })
+}
