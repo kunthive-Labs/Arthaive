@@ -108,3 +108,15 @@ export function mergeChartSeries(base: number[], overlay: number[]): Array<{ bas
     diff: (overlay[i] ?? 0) - (base[i] ?? 0),
   }))
 }
+
+export function buildAreaData(points: Array<{ x: string; y: number }>, color = "#15803d"): object {
+  return {
+    datasets: [{
+      data: points,
+      backgroundColor: color + "33",
+      borderColor: color,
+      fill: true,
+      tension: 0.4,
+    }],
+  }
+}
