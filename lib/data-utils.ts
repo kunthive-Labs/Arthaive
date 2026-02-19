@@ -110,3 +110,7 @@ export function deduplicateDeals<T extends { company?: string; date?: string; am
     seen.add(key); return true
   })
 }
+
+export function flattenDealInvestors(deals: Array<{ investors?: string[] }>): string[] {
+  return [...new Set(deals.flatMap(d => d.investors ?? []).filter(Boolean))]
+}
