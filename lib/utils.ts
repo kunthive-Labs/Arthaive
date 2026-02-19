@@ -512,3 +512,9 @@ export function maxBy<T>(arr: T[], fn: (item: T) => number): T | undefined {
 export function minBy<T>(arr: T[], fn: (item: T) => number): T | undefined {
   return arr.reduce<T | undefined>((min, item) => !min || fn(item) < fn(min) ? item : min, undefined)
 }
+
+export function groupBy<T>(arr: T[], fn: (item: T) => string): Record<string, T[]> {
+  return arr.reduce<Record<string, T[]>>((acc, item) => {
+    const key = fn(item);(acc[key] ??= []).push(item); return acc
+  }, {})
+}
