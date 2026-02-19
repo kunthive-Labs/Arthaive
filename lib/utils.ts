@@ -508,3 +508,7 @@ export function sumBy<T>(arr: T[], fn: (item: T) => number): number {
 export function maxBy<T>(arr: T[], fn: (item: T) => number): T | undefined {
   return arr.reduce<T | undefined>((max, item) => !max || fn(item) > fn(max) ? item : max, undefined)
 }
+
+export function minBy<T>(arr: T[], fn: (item: T) => number): T | undefined {
+  return arr.reduce<T | undefined>((min, item) => !min || fn(item) < fn(min) ? item : min, undefined)
+}
