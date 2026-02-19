@@ -348,3 +348,11 @@ export interface DashboardWidget {
   metric: string
   span?: 1 | 2 | 3 | 4
 }
+
+
+export interface ReportConfig {
+  title: string
+  dateRange: { from: string; to: string }
+  sections: Array<{ type: string; config: Record<string, unknown> }>
+  format: ExportFormat
+}
