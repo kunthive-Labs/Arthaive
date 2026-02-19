@@ -122,3 +122,8 @@ export function pickRandom<T>(arr: T[], n = 1): T[] {
 export function invertRecord<T extends string>(rec: Record<T, string>): Record<string, T> {
   return Object.fromEntries(Object.entries(rec).map(([k, v]) => [v, k])) as Record<string, T>
 }
+
+export function calcPortfolioStats(amounts: number[]): { total: number; avg: number; count: number } {
+  const total = amounts.reduce((a, b) => a + b, 0)
+  return { count: amounts.length, total, avg: amounts.length ? total / amounts.length : 0 }
+}
