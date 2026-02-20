@@ -125,3 +125,8 @@ export function calcYAxisMax(values: number[], roundTo = 1000): number {
   const max = Math.max(...values, 0)
   return Math.ceil(max / roundTo) * roundTo
 }
+
+export function buildFunnelData(stages: string[], values: number[]): Array<{ stage: string; value: number; pct: number }> {
+  const max = values[0] || 1
+  return stages.map((stage, i) => ({ stage, value: values[i], pct: (values[i] / max) * 100 }))
+}
