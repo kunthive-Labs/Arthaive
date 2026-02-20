@@ -114,3 +114,15 @@ export function deduplicateDeals<T extends { company?: string; date?: string; am
 export function flattenDealInvestors(deals: Array<{ investors?: string[] }>): string[] {
   return [...new Set(deals.flatMap(d => d.investors ?? []).filter(Boolean))]
 }
+
+export function computeFundingMatrix(deals: Array<{ sectors?: string[]; stage?: string; amount?: number }>): Record<string, Record<string, number>> {
+  const matrix: Record<string, Record<string, number>> = {}
+  for (const deal of deals) {
+    const stage = deal.stage ?? "Unknown"
+    for (const sector of deal.sectors ?? []) {
+      if (!matrix[sector]) matrix[sector] = {}
+      matrix[sector][stage] = (matrix[sector][stage] ?? 0) + (deal.amount ?? 0)
+    }
+  }
+  return matrix
+}
