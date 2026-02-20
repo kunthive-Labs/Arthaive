@@ -127,3 +127,9 @@ export function calcPortfolioStats(amounts: number[]): { total: number; avg: num
   const total = amounts.reduce((a, b) => a + b, 0)
   return { count: amounts.length, total, avg: amounts.length ? total / amounts.length : 0 }
 }
+
+export function highlightMatch(text: string, query: string): string {
+  if (!query.trim()) return text
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
+  return text.replace(regex, "<mark>$1</mark>")
+}
