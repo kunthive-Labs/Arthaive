@@ -524,3 +524,7 @@ export function omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Om
   for (const k of keys) delete copy[k]
   return copy
 }
+
+export function mapValues<T, U>(obj: Record<string, T>, fn: (v: T, k: string) => U): Record<string, U> {
+  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, fn(v, k)]))
+}
