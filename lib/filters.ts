@@ -133,3 +133,14 @@ export function highlightMatch(text: string, query: string): string {
   const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi")
   return text.replace(regex, "<mark>$1</mark>")
 }
+
+export function filterDeals<T extends { stage?: string; sectors?: string[]; location?: string; amount?: number }>(deals: T[], f: { stage?: string[]; sectors?: string[]; location?: string; minAmount?: number; maxAmount?: number }): T[] {
+  return deals.filter(d => {
+    if (f.stage?.length && d.stage && !f.stage.includes(d.stage)) return false
+    if (f.sectors?.length && !d.sectors?.some(s => f.sectors!.includes(s))) return false
+    if (f.location && d.location !== f.location) return false
+    if (f.minAmount != null && (d.amount ?? 0) < f.minAmount) return false
+    if (f.maxAmount != null && (d.amount ?? 0) > f.maxAmount) return false
+    return true
+  })
+}
