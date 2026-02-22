@@ -130,3 +130,18 @@ export function buildFunnelData(stages: string[], values: number[]): Array<{ sta
   const max = values[0] || 1
   return stages.map((stage, i) => ({ stage, value: values[i], pct: (values[i] / max) * 100 }))
 }
+
+export function buildTimeAxis(from: string, to: string, unit: "month" | "quarter" | "year" = "month"): string[] {
+  const result: string[] = []
+  const cur = new Date(from)
+  const end = new Date(to)
+  while (cur <= end) {
+    if (unit === "month") result.push(cur.toISOString().slice(0, 7))
+    else if (unit === "year") result.push(String(cur.getFullYear()))
+    const next = new Date(cur)
+    if (unit === "month") next.setMonth(next.getMonth() + 1)
+    else next.setFullYear(next.getFullYear() + 1)
+    cur.setTime(next.getTime())
+  }
+  return [...new Set(result)]
+}
