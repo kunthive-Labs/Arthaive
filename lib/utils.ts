@@ -539,3 +539,7 @@ export function deepMerge<T extends Record<string, unknown>>(base: T, override: 
   }
   return result
 }
+
+export function normalizeString(str: string): string {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()
+}
