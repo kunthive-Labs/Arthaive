@@ -144,3 +144,9 @@ export function filterDeals<T extends { stage?: string; sectors?: string[]; loca
     return true
   })
 }
+
+export function normalizeAmount(raw: number | string | undefined): number {
+  if (typeof raw === "number") return raw
+  if (!raw) return 0
+  return parseFloat(String(raw).replace(/[^0-9.]/g, "")) || 0
+}
