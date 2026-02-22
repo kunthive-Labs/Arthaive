@@ -126,3 +126,7 @@ export function computeFundingMatrix(deals: Array<{ sectors?: string[]; stage?: 
   }
   return matrix
 }
+
+export function normalizeInvestorName(name: string): string {
+  return name.trim().replace(/\s+/g, " ").replace(/(\s+fund|\s+ventures|\s+capital|\s+partners)$/i, "")
+}
