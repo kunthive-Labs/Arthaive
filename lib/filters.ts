@@ -150,3 +150,13 @@ export function normalizeAmount(raw: number | string | undefined): number {
   if (!raw) return 0
   return parseFloat(String(raw).replace(/[^0-9.]/g, "")) || 0
 }
+
+export function buildInvestorIndex(deals: Array<{ investors?: string[] }>): Record<string, number> {
+  const idx: Record<string, number> = {}
+  for (const deal of deals) {
+    for (const inv of deal.investors ?? []) {
+      idx[inv] = (idx[inv] ?? 0) + 1
+    }
+  }
+  return idx
+}
