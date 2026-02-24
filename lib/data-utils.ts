@@ -139,3 +139,11 @@ export function matchDuplicateDeals<T extends { company?: string; amount?: numbe
   const score = (sameName ? 0.5 : 0) + (sameAmount ? 0.3 : 0) + (sameDate ? 0.2 : 0)
   return score >= threshold
 }
+
+export function serializeDeal(deal: Record<string, unknown>): string {
+  return JSON.stringify(deal)
+}
+
+export function deserializeDeal(json: string): Record<string, unknown> {
+  return JSON.parse(json)
+}
