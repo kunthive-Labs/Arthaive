@@ -552,3 +552,12 @@ export function fuzzyMatch(query: string, target: string): boolean {
   }
   return qi === q.length
 }
+
+export function scoreRelevance(deal: { company?: string; sectors?: string[]; description?: string }, query: string): number {
+  const q = query.toLowerCase()
+  let score = 0
+  if (deal.company?.toLowerCase().includes(q)) score += 3
+  if (deal.sectors?.some(s => s.toLowerCase().includes(q))) score += 2
+  if (deal.description?.toLowerCase().includes(q)) score += 1
+  return score
+}
