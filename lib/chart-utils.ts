@@ -155,3 +155,15 @@ export function buildBubbleData(items: Array<{ x: number; y: number; r: number; 
     })),
   }
 }
+
+export function buildRadarData(labels: string[], datasets: Array<{ label: string; data: number[]; color: string }>): object {
+  return {
+    labels,
+    datasets: datasets.map(d => ({
+      label: d.label,
+      data: d.data,
+      backgroundColor: d.color + "33",
+      borderColor: d.color,
+    })),
+  }
+}
