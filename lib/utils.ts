@@ -543,3 +543,12 @@ export function deepMerge<T extends Record<string, unknown>>(base: T, override: 
 export function normalizeString(str: string): string {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()
 }
+
+export function fuzzyMatch(query: string, target: string): boolean {
+  const q = normalizeString(query), t = normalizeString(target)
+  let qi = 0
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) qi++
+  }
+  return qi === q.length
+}
