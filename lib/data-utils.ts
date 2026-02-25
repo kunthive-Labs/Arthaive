@@ -147,3 +147,5 @@ export function serializeDeal(deal: Record<string, unknown>): string {
 export function deserializeDeal(json: string): Record<string, unknown> {
   return JSON.parse(json)
 }
+
+// data-utils — updated 2026-02-25
