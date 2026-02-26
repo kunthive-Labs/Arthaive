@@ -176,3 +176,9 @@ export function buildTimeline(deals: Array<{ date?: string; amount?: number; com
   }
   return Object.entries(byYear).sort(([a], [b]) => a.localeCompare(b)).map(([year, v]) => ({ year, ...v }))
 }
+
+export function toCSVString(rows: Array<Record<string, unknown>>, cols: string[]): string {
+  const header = cols.join(",")
+  const lines = rows.map(r => cols.map(c => `"${String(r[c] ?? "").replace(/"/g, '""')}"`).join(","))
+  return [header, ...lines].join("\n")
+}
