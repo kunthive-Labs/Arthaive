@@ -151,3 +151,9 @@ export function deserializeDeal(json: string): Record<string, unknown> {
 // data-utils — updated 2026-02-25
 
 // data-utils — updated 2026-02-26
+
+export function chunkDeals<T>(deals: T[], batchSize = 100): T[][] {
+  const batches: T[][] = []
+  for (let i = 0; i < deals.length; i += batchSize) batches.push(deals.slice(i, i + batchSize))
+  return batches
+}
