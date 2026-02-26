@@ -159,3 +159,5 @@ export function chunkDeals<T>(deals: T[], batchSize = 100): T[][] {
 }
 
 // data-utils — updated 2026-02-26
+
+// data-utils — updated 2026-02-26
