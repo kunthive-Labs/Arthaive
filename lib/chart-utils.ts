@@ -178,3 +178,10 @@ export function buildAnnotations(points: Array<{ index: number; label: string; c
     label: { content: p.label, display: true, position: "start" },
   }))
 }
+
+export function buildTreemapData(items: Array<{ label: string; value: number; group?: string }>): Array<{ id: string; parent: string; value: number; label: string }> {
+  const groups = [...new Set(items.map(i => i.group ?? "root"))]
+  const groupNodes = groups.map(g => ({ id: g, parent: "root", value: 0, label: g }))
+  const leafNodes = items.map((item, i) => ({ id: `leaf-${i}`, parent: item.group ?? "root", value: item.value, label: item.label }))
+  return [{ id: "root", parent: "", value: 0, label: "All" }, ...groupNodes, ...leafNodes]
+}
