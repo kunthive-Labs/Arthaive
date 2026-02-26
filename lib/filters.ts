@@ -165,3 +165,14 @@ export function calcMarketShare(stats: Record<string, { total: number }>): Recor
   const grand = Object.values(stats).reduce((s, v) => s + v.total, 0)
   return Object.fromEntries(Object.entries(stats).map(([k, v]) => [k, grand ? (v.total / grand) * 100 : 0]))
 }
+
+export function buildTimeline(deals: Array<{ date?: string; amount?: number; company?: string }>): Array<{ year: string; count: number; total: number }> {
+  const byYear: Record<string, { count: number; total: number }> = {}
+  for (const deal of deals) {
+    if (!deal.date) continue
+    const year = deal.date.slice(0, 4)
+    if (!byYear[year]) byYear[year] = { count: 0, total: 0 }
+    byYear[year].count++; byYear[year].total += deal.amount ?? 0
+  }
+  return Object.entries(byYear).sort(([a], [b]) => a.localeCompare(b)).map(([year, v]) => ({ year, ...v }))
+}
