@@ -182,3 +182,12 @@ export function toCSVString(rows: Array<Record<string, unknown>>, cols: string[]
   const lines = rows.map(r => cols.map(c => `"${String(r[c] ?? "").replace(/"/g, '""')}"`).join(","))
   return [header, ...lines].join("\n")
 }
+
+export function parseCSVString(csv: string): Array<Record<string, string>> {
+  const [headerLine, ...rows] = csv.trim().split("\n")
+  const keys = headerLine.split(",")
+  return rows.map(row => {
+    const vals = row.split(",")
+    return Object.fromEntries(keys.map((k, i) => [k.trim(), (vals[i] ?? "").trim()]))
+  })
+}
