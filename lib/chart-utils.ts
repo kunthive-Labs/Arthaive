@@ -193,3 +193,7 @@ export function formatTooltipValue(value: number, metric: "amount" | "count" | "
   if (value >= 1e5) return "\u20b9" + (value / 1e5).toFixed(1) + "L"
   return "\u20b9" + value.toLocaleString("en-IN")
 }
+
+export function buildLegend(labels: string[], colors: string[]): Array<{ label: string; color: string }> {
+  return labels.map((label, i) => ({ label, color: colors[i] ?? getChartColorByIndex(i) }))
+}
