@@ -44,3 +44,8 @@ export function buildDealUrl(dealId: string): string {
 export function buildInvestorUrl(name: string): string {
   return `/investors/${encodeURIComponent(name.toLowerCase().replace(/\s+/g, "-"))}`
 }
+
+
+export function buildSectorUrl(sector: string): string {
+  return `/sectors/${encodeURIComponent(sector.toLowerCase().replace(/\s+/g, "-"))}`
+}
