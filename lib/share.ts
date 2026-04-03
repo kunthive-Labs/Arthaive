@@ -49,3 +49,8 @@ export function buildInvestorUrl(name: string): string {
 export function buildSectorUrl(sector: string): string {
   return `/sectors/${encodeURIComponent(sector.toLowerCase().replace(/\s+/g, "-"))}`
 }
+
+
+export function getShareTitle(company: string, stage: string): string {
+  return `${company} · ${stage} | India Startup Funding`
+}
