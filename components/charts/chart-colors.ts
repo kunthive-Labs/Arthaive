@@ -25,3 +25,9 @@ export function colorForIndex(i: number): string {
 
 export const CHART_GRID_COLOR = "hsl(var(--muted))"
 export const CHART_AXIS_COLOR = "hsl(var(--muted-foreground))"
+
+
+export const CHART_COLORS_CATEGORICAL = [
+  "#6366f1","#06b6d4","#10b981","#f59e0b","#ef4444",
+  "#8b5cf6","#f97316","#14b8a6","#84cc16","#ec4899",
+]
