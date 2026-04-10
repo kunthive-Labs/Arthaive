@@ -31,3 +31,11 @@ export const CHART_COLORS_CATEGORICAL = [
   "#6366f1","#06b6d4","#10b981","#f59e0b","#ef4444",
   "#8b5cf6","#f97316","#14b8a6","#84cc16","#ec4899",
 ]
+
+
+export const TOOLTIP_STYLE = {
+  backgroundColor: "hsl(var(--background))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "6px",
+  fontSize: 12,
+}
