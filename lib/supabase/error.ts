@@ -20,3 +20,11 @@ export function getAuthErrorMessage(err: unknown): string {
   }
   return "An unexpected error occurred."
 }
+
+
+export const AUTH_ERROR_CODES = {
+  INVALID_CREDENTIALS: "invalid_credentials",
+  USER_NOT_FOUND: "user_not_found",
+  SESSION_EXPIRED: "session_expired",
+  RATE_LIMITED: "over_email_send_rate_limit",
+} as const
