@@ -112,3 +112,13 @@ export async function getBookmarkCount(userId: string): Promise<number> {
     .eq("user_id", userId)
   return count ?? 0
 }
+
+
+export async function getWatchlistCount(userId: string): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from("watchlist")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+  return count ?? 0
+}
