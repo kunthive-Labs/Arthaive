@@ -122,3 +122,9 @@ export async function getWatchlistCount(userId: string): Promise<number> {
     .eq("user_id", userId)
   return count ?? 0
 }
+
+
+export async function deactivateAllAlerts(userId: string) {
+  const supabase = await createClient()
+  return supabase.from("alerts").update({ active: false }).eq("user_id", userId)
+}
