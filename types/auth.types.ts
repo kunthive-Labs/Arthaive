@@ -16,3 +16,8 @@ export interface UserProfile {
   created_at: string
   updated_at: string
 }
+
+
+export function isAuthenticated(user: User | null): user is User {
+  return user !== null
+}
