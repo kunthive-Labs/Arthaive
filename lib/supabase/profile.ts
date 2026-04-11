@@ -102,3 +102,13 @@ export async function deleteAlert(alertId: string) {
   const supabase = await createClient()
   return supabase.from("alerts").delete().eq("id", alertId)
 }
+
+
+export async function getBookmarkCount(userId: string): Promise<number> {
+  const supabase = await createClient()
+  const { count } = await supabase
+    .from("bookmarks")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+  return count ?? 0
+}
