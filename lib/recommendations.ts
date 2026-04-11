@@ -54,3 +54,18 @@ export function getRelatedSectors(
     .slice(0, 5)
     .map(([s]) => s)
 }
+
+
+export function getTopInvestorsByDeals(
+  deals: import("@/data/funding-data").FundingDeal[],
+  n = 10
+): string[] {
+  const counts = new Map<string, number>()
+  for (const d of deals) {
+    if (d.leadInvestor) counts.set(d.leadInvestor, (counts.get(d.leadInvestor) ?? 0) + 1)
+  }
+  return Array.from(counts.entries())
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, n)
+    .map(([name]) => name)
+}
