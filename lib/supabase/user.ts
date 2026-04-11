@@ -46,3 +46,9 @@ export async function getPublicProfile(userId: string) {
     .single()
   return data
 }
+
+
+export async function deleteAccount(userId: string) {
+  const supabase = await createClient()
+  await supabase.from("profiles").delete().eq("id", userId)
+}
