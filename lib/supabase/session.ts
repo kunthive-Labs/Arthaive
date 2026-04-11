@@ -17,3 +17,10 @@ export async function getSessionUserId(): Promise<string | null> {
   const user = await getUser()
   return user?.id ?? null
 }
+
+
+export async function isSessionValid(): Promise<boolean> {
+  const session = await getSession()
+  if (!session) return false
+  return new Date(session.expires_at! * 1000) > new Date()
+}
