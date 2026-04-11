@@ -21,3 +21,10 @@ export interface UserProfile {
 export function isAuthenticated(user: User | null): user is User {
   return user !== null
 }
+
+
+export type UserRole = "viewer" | "contributor" | "admin"
+
+export interface UserWithRole extends UserProfile {
+  role: UserRole
+}
