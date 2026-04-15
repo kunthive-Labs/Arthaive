@@ -97,3 +97,18 @@ export function getInvestorDeals(
     (d) => d.leadInvestor === investorName || d.investors?.includes(investorName)
   )
 }
+
+
+const STAGE_ORDER = [
+  "Angel","Pre-Seed","Seed","Pre-Series A","Series A",
+  "Pre-Series B","Series B","Series C","Series D","Series E+",
+]
+
+export function stageIndex(stage: string): number {
+  return STAGE_ORDER.indexOf(stage)
+}
+
+export function nextStage(stage: string): string | null {
+  const i = stageIndex(stage)
+  return i >= 0 && i < STAGE_ORDER.length - 1 ? STAGE_ORDER[i + 1] : null
+}
