@@ -112,3 +112,18 @@ export function nextStage(stage: string): string | null {
   const i = stageIndex(stage)
   return i >= 0 && i < STAGE_ORDER.length - 1 ? STAGE_ORDER[i + 1] : null
 }
+
+
+export function getWeeklyStats(
+  deals: import("@/data/funding-data").FundingDeal[]
+): { week: string; count: number; total: number }[] {
+  const map = new Map<string, { count: number; total: number }>()
+  for (const d of deals) {
+    const week = d.weekFolder
+    const cur = map.get(week) ?? { count: 0, total: 0 }
+    map.set(week, { count: cur.count + 1, total: cur.total + d.amount })
+  }
+  return Array.from(map.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([week, v]) => ({ week, ...v }))
+}
