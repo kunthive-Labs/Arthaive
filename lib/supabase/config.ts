@@ -12,3 +12,11 @@ export const AUTH_REDIRECT_AFTER_LOGOUT = "/"
 
 export const STORAGE_AVATAR_BUCKET = "avatars"
 export const STORAGE_MAX_FILE_SIZE = 5 * 1024 * 1024
+
+
+export function validateConfig(): { valid: boolean; missing: string[] } {
+  const missing: string[] = []
+  if (!SUPABASE_URL) missing.push("NEXT_PUBLIC_SUPABASE_URL")
+  if (!SUPABASE_ANON_KEY) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+  return { valid: missing.length === 0, missing }
+}
