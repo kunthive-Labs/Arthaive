@@ -36,3 +36,10 @@ export interface DashboardStats {
   savedSearchCount: number
   activeAlertCount: number
 }
+
+
+export interface NotificationPreferences {
+  emailAlerts: boolean
+  weeklyDigest: boolean
+  newDealToast: boolean
+}
