@@ -28,3 +28,11 @@ export type UserRole = "viewer" | "contributor" | "admin"
 export interface UserWithRole extends UserProfile {
   role: UserRole
 }
+
+
+export interface DashboardStats {
+  bookmarkCount: number
+  watchlistCount: number
+  savedSearchCount: number
+  activeAlertCount: number
+}
