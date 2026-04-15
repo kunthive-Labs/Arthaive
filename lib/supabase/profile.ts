@@ -143,3 +143,14 @@ export async function countAlertMatches(
     return true
   }).length
 }
+
+
+export async function getActiveAlerts(userId: string) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("alerts")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("active", true)
+  return data ?? []
+}
