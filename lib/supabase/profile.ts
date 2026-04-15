@@ -128,3 +128,18 @@ export async function deactivateAllAlerts(userId: string) {
   const supabase = await createClient()
   return supabase.from("alerts").update({ active: false }).eq("user_id", userId)
 }
+
+
+export async function countAlertMatches(
+  sector: string | null,
+  stage: string | null,
+  minAmount: number | null,
+  deals: import("@/data/funding-data").FundingDeal[]
+): Promise<number> {
+  return deals.filter((d) => {
+    if (sector && !d.sectors?.includes(sector)) return false
+    if (stage && d.stage !== stage) return false
+    if (minAmount && d.amount < minAmount) return false
+    return true
+  }).length
+}
