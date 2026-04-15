@@ -67,3 +67,15 @@ export function decodeFilters(encoded: string): Record<string, unknown> {
     return {}
   }
 }
+
+
+export function diffFilters(
+  base: Record<string, unknown>,
+  current: Record<string, unknown>
+): Record<string, unknown> {
+  const diff: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(current)) {
+    if (JSON.stringify(v) !== JSON.stringify(base[k])) diff[k] = v
+  }
+  return diff
+}
