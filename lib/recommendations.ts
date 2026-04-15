@@ -87,3 +87,13 @@ export function buildSectorCoOccurrence(
   }
   return matrix
 }
+
+
+export function getInvestorDeals(
+  investorName: string,
+  deals: import("@/data/funding-data").FundingDeal[]
+) {
+  return deals.filter(
+    (d) => d.leadInvestor === investorName || d.investors?.includes(investorName)
+  )
+}
