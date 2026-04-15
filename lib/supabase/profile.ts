@@ -154,3 +154,9 @@ export async function getActiveAlerts(userId: string) {
     .eq("active", true)
   return data ?? []
 }
+
+
+export async function clearBookmarks(userId: string) {
+  const supabase = await createClient()
+  return supabase.from("bookmarks").delete().eq("user_id", userId)
+}
