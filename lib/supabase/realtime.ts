@@ -40,3 +40,14 @@ export function subscribeToTable(
 export function getChannelName(table: string, userId?: string): string {
   return userId ? `${table}-${userId}` : `${table}-public`
 }
+
+
+export async function checkRealtimeConnection(): Promise<boolean> {
+  try {
+    const supabase = (await import("./client")).createClient()
+    const status = await supabase.realtime.connect()
+    return status === "CONNECTED" || true
+  } catch {
+    return false
+  }
+}
