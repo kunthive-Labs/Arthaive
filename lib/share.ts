@@ -86,3 +86,9 @@ export function formatAmount(amount: number): string {
   if (amount >= 1000) return `₹${(amount / 1000).toFixed(2)}K Cr`
   return `₹${amount.toLocaleString("en-IN")} Cr`
 }
+
+
+export function isoDayOfWeek(dateStr: string): number {
+  const d = new Date(dateStr)
+  return d.getDay() === 0 ? 7 : d.getDay()
+}
