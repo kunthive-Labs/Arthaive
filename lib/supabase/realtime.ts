@@ -35,3 +35,8 @@ export function subscribeToTable(
 
   return () => supabase.removeChannel(channel)
 }
+
+
+export function getChannelName(table: string, userId?: string): string {
+  return userId ? `${table}-${userId}` : `${table}-public`
+}
