@@ -66,3 +66,11 @@ export function interpolateColor(value: number, min = 0, max = 100): string {
   const h = Math.round(220 - ratio * 160)
   return `hsl(${h} 80% 50%)`
 }
+
+
+export function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
