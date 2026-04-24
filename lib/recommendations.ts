@@ -154,3 +154,21 @@ export function dealMomentumScore(
   const total = deals.filter((d) => d.sectors?.includes(sector)).length
   return total > 0 ? Math.round((recent / total) * 100) : 0
 }
+
+
+export function sectorGrowthRate(
+  sector: string,
+  deals: import("@/data/funding-data").FundingDeal[]
+): number {
+  const byYear = new Map<string, number>()
+  for (const d of deals) {
+    if (!d.sectors?.includes(sector)) continue
+    const year = d.date.slice(0, 4)
+    byYear.set(year, (byYear.get(year) ?? 0) + d.amount)
+  }
+  const years = Array.from(byYear.keys()).sort()
+  if (years.length < 2) return 0
+  const last = byYear.get(years.at(-1)!)!
+  const prev = byYear.get(years.at(-2)!)!
+  return prev > 0 ? Math.round(((last - prev) / prev) * 100) : 0
+}
