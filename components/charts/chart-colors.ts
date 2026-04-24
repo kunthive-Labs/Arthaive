@@ -48,3 +48,14 @@ export const CHART_ANIMATION_EASING = "ease-out"
 export function stageColor(stage: string): string {
   return (STAGE_COLORS[stage] as string | undefined) ?? CHART_COLORS[0]
 }
+
+
+export interface GradientDef {
+  id: string
+  color: string
+  opacity?: number
+}
+
+export function chartGradientDefs(color: string, id = "primary"): GradientDef {
+  return { id, color, opacity: 0.3 }
+}
