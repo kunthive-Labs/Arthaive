@@ -127,3 +127,18 @@ export function getWeeklyStats(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([week, v]) => ({ week, ...v }))
 }
+
+
+export function getCoInvestors(
+  investorName: string,
+  deals: import("@/data/funding-data").FundingDeal[]
+): Map<string, number> {
+  const coInvestors = new Map<string, number>()
+  for (const deal of deals) {
+    if (!deal.investors?.includes(investorName) && deal.leadInvestor !== investorName) continue
+    for (const inv of deal.investors ?? []) {
+      if (inv !== investorName) coInvestors.set(inv, (coInvestors.get(inv) ?? 0) + 1)
+    }
+  }
+  return coInvestors
+}
