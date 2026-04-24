@@ -172,3 +172,18 @@ export function sectorGrowthRate(
   const prev = byYear.get(years.at(-2)!)!
   return prev > 0 ? Math.round(((last - prev) / prev) * 100) : 0
 }
+
+
+export function detectFundingCycles(
+  deals: import("@/data/funding-data").FundingDeal[]
+): { month: string; dealCount: number }[] {
+  const monthMap = new Map<string, number>()
+  for (const d of deals) {
+    const key = d.date.slice(0, 7)
+    monthMap.set(key, (monthMap.get(key) ?? 0) + 1)
+  }
+  return Array.from(monthMap.entries())
+    .sort(([a], [b]) => b.localeCompare(a))
+    .slice(0, 24)
+    .map(([month, dealCount]) => ({ month, dealCount }))
+}
