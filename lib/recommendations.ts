@@ -142,3 +142,15 @@ export function getCoInvestors(
   }
   return coInvestors
 }
+
+
+export function dealMomentumScore(
+  sector: string,
+  deals: import("@/data/funding-data").FundingDeal[],
+  windowDays = 30
+): number {
+  const cutoff = new Date(Date.now() - windowDays * 86400000).toISOString().slice(0, 10)
+  const recent = deals.filter((d) => d.date >= cutoff && d.sectors?.includes(sector)).length
+  const total = deals.filter((d) => d.sectors?.includes(sector)).length
+  return total > 0 ? Math.round((recent / total) * 100) : 0
+}
