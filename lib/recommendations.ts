@@ -187,3 +187,14 @@ export function detectFundingCycles(
     .slice(0, 24)
     .map(([month, dealCount]) => ({ month, dealCount }))
 }
+
+
+export type RoundCategory = "early" | "growth" | "late" | "debt" | "other"
+
+export function classifyRound(stage: string): RoundCategory {
+  if (["Angel","Pre-Seed","Seed","Pre-Series A"].includes(stage)) return "early"
+  if (["Series A","Pre-Series B","Series B"].includes(stage)) return "growth"
+  if (["Series C","Series D","Series E+","Growth"].includes(stage)) return "late"
+  if (stage === "Debt") return "debt"
+  return "other"
+}
