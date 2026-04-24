@@ -198,3 +198,17 @@ export function classifyRound(stage: string): RoundCategory {
   if (stage === "Debt") return "debt"
   return "other"
 }
+
+
+export function sectorPerformanceScore(
+  sector: string,
+  deals: import("@/data/funding-data").FundingDeal[]
+): number {
+  const sectorDeals = deals.filter((d) => d.sectors?.includes(sector))
+  if (!sectorDeals.length) return 0
+  const avgAmount = sectorDeals.reduce((s, d) => s + d.amount, 0) / sectorDeals.length
+  const recency = sectorDeals.filter(
+    (d) => d.date >= new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10)
+  ).length
+  return Math.round((avgAmount / 100) * 0.5 + recency * 2)
+}
