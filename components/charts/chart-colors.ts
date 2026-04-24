@@ -59,3 +59,10 @@ export interface GradientDef {
 export function chartGradientDefs(color: string, id = "primary"): GradientDef {
   return { id, color, opacity: 0.3 }
 }
+
+
+export function interpolateColor(value: number, min = 0, max = 100): string {
+  const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)))
+  const h = Math.round(220 - ratio * 160)
+  return `hsl(${h} 80% 50%)`
+}
