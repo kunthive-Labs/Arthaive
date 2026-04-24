@@ -100,3 +100,8 @@ export function quarterLabel(dateStr: string): string {
   const q = Math.ceil(month / 3)
   return `Q${q} FY${year}`
 }
+
+
+export function getOgImageUrl(type: "deal" | "sector" | "investor", slug: string): string {
+  return `/api/og?type=${type}&slug=${encodeURIComponent(slug)}`
+}
