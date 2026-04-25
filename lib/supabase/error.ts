@@ -36,3 +36,9 @@ export class AuthSessionExpiredError extends Error {
     this.name = "AuthSessionExpiredError"
   }
 }
+
+
+export function shouldRetry(err: unknown): boolean {
+  if (!isAuthError(err)) return false
+  return !["invalid_credentials","user_not_found"].includes((err as import("@supabase/supabase-js").AuthError).code ?? "")
+}
