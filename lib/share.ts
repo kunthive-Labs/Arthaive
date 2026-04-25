@@ -116,3 +116,8 @@ export function safeDealUrl(dealId: string | undefined): string {
   if (!dealId) return "/explore"
   return buildDealUrl(dealId)
 }
+
+
+export function isValidAmount(amount: unknown): amount is number {
+  return typeof amount === "number" && isFinite(amount) && amount >= 0
+}
