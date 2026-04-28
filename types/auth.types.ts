@@ -73,3 +73,11 @@ export type AuthEvent =
   | "TOKEN_REFRESHED"
   | "USER_UPDATED"
   | "PASSWORD_RECOVERY"
+
+
+export interface RealtimeDealEvent {
+  eventType: "INSERT" | "UPDATE" | "DELETE"
+  new: Record<string, unknown>
+  old: Record<string, unknown>
+  timestamp: string
+}
