@@ -92,3 +92,9 @@ export function compactNumber(value: number): string {
   if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`
   return String(value)
 }
+
+
+export const CHART_HEIGHT_SM = 200
+export const CHART_HEIGHT_MD = 288
+export const CHART_HEIGHT_LG = 400
+export const CHART_MARGIN = { top: 8, right: 16, left: 0, bottom: 0 }
