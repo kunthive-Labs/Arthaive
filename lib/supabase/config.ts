@@ -25,3 +25,7 @@ export function validateConfig(): { valid: boolean; missing: string[] } {
 export const QUERY_CACHE_TIME = 5 * 60 * 1000
 export const REALTIME_TIMEOUT = 30 * 1000
 export const MAX_RETRY_ATTEMPTS = 3
+
+
+export const LIVE_FEED_MAX_ITEMS = 50
+export const LIVE_FEED_TOAST_DURATION = 4000
