@@ -142,3 +142,8 @@ export function financialYear(dateStr: string): string {
   return month < 4 ? `FY${String(year - 1).slice(2)}-${String(year).slice(2)}`
     : `FY${String(year).slice(2)}-${String(year + 1).slice(2)}`
 }
+
+
+export function dealAgeInDays(dateStr: string): number {
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000)
+}
