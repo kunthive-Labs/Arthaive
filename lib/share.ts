@@ -133,3 +133,12 @@ export function formatTimeAgo(isoDate: string): string {
   if (hours < 24) return `${hours}h ago`
   return `${Math.floor(hours / 24)}d ago`
 }
+
+
+export function financialYear(dateStr: string): string {
+  const d = new Date(dateStr)
+  const year = d.getFullYear()
+  const month = d.getMonth() + 1
+  return month < 4 ? `FY${String(year - 1).slice(2)}-${String(year).slice(2)}`
+    : `FY${String(year).slice(2)}-${String(year + 1).slice(2)}`
+}
