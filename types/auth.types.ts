@@ -81,3 +81,11 @@ export interface RealtimeDealEvent {
   old: Record<string, unknown>
   timestamp: string
 }
+
+
+export interface LiveFeedFilters {
+  sector?: string
+  stage?: string
+  minAmount?: number
+  paused: boolean
+}
