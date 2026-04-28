@@ -147,3 +147,16 @@ export function financialYear(dateStr: string): string {
 export function dealAgeInDays(dateStr: string): number {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000)
 }
+
+
+const USD_RATE = 83.5
+
+export function inrToUsd(crores: number): number {
+  return Math.round((crores * 10_000_000) / USD_RATE)
+}
+
+export function formatUsd(amount: number): string {
+  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`
+  return `$${amount}`
+}
