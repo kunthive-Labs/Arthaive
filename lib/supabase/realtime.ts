@@ -51,3 +51,11 @@ export async function checkRealtimeConnection(): Promise<boolean> {
     return false
   }
 }
+
+
+export function formatDealEvent(payload: Record<string, unknown>): string {
+  const company = payload.company as string ?? "Unknown"
+  const amount = payload.amount as number ?? 0
+  const stage = payload.stage as string ?? ""
+  return `${company} raised ₹${amount.toLocaleString("en-IN")} Cr (${stage})`
+}
