@@ -212,3 +212,13 @@ export function sectorPerformanceScore(
   ).length
   return Math.round((avgAmount / 100) * 0.5 + recency * 2)
 }
+
+
+export function calculateCAGR(
+  startValue: number,
+  endValue: number,
+  years: number
+): number {
+  if (!startValue || !years) return 0
+  return Math.round(((Math.pow(endValue / startValue, 1 / years) - 1) * 100) * 10) / 10
+}
