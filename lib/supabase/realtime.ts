@@ -59,3 +59,8 @@ export function formatDealEvent(payload: Record<string, unknown>): string {
   const stage = payload.stage as string ?? ""
   return `${company} raised ₹${amount.toLocaleString("en-IN")} Cr (${stage})`
 }
+
+
+export function exponentialBackoff(attempt: number, baseMs = 500): number {
+  return Math.min(baseMs * Math.pow(2, attempt), 30000)
+}
