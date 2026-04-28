@@ -11,3 +11,8 @@ export { ChartWrapper } from "./chart-wrapper"
 export { ChartSkeleton } from "./chart-skeleton"
 export { ChartEmpty } from "./chart-empty"
 export { CHART_COLORS, colorForIndex } from "./chart-colors"
+
+export { SectorRadar } from "./sector-radar"
+export { SizeHistogram } from "./size-histogram"
+export { InvestorPortfolioPie } from "./investor-portfolio-pie"
+export { DealTimeline } from "./deal-timeline"
