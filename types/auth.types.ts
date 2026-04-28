@@ -104,3 +104,12 @@ export interface FeedEventCounters {
   thisWeek: number
   thisMonth: number
 }
+
+
+export type SortField = "date" | "amount" | "company" | "stage" | "location"
+export type SortDirection = "asc" | "desc"
+
+export interface SortState {
+  field: SortField
+  direction: SortDirection
+}
