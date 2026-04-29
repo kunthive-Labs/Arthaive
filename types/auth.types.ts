@@ -113,3 +113,18 @@ export interface SortState {
   field: SortField
   direction: SortDirection
 }
+
+
+export interface SchemaOrgOrganization {
+  "@type": "Organization"
+  name: string
+  url?: string
+  description?: string
+}
+
+export interface SchemaOrgFinancialTransaction {
+  "@type": "MoneyTransfer"
+  amount: string
+  currency: "INR"
+  sender: SchemaOrgOrganization
+}
