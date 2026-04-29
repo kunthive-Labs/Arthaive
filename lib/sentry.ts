@@ -56,3 +56,18 @@ export function trackApiCall(endpoint: string, status: number, duration: number)
     console.debug(`[Sentry] api: ${endpoint} ${status} ${duration}ms`)
   }
 }
+
+
+export class PerfMeasure {
+  private start: number
+  constructor(private name: string) {
+    this.start = performance.now()
+  }
+  end() {
+    const duration = performance.now() - this.start
+    if (process.env.NODE_ENV === "development") {
+      console.debug(`[Perf] ${this.name}: ${duration.toFixed(1)}ms`)
+    }
+    return duration
+  }
+}
