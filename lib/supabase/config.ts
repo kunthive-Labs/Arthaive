@@ -57,3 +57,8 @@ export const PERF_BUDGET = {
 
 export const SEARCH_DEBOUNCE_MS = 200
 export const FILTER_DEBOUNCE_MS = 150
+
+
+export const DEFAULT_PAGE_SIZE = 20
+export const MAX_PAGE_SIZE = 100
+export const EXPORT_LIMIT = 5000
