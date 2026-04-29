@@ -53,3 +53,7 @@ export const PERF_BUDGET = {
   FID: 100,
   TTFB: 800,
 }
+
+
+export const SEARCH_DEBOUNCE_MS = 200
+export const FILTER_DEBOUNCE_MS = 150
