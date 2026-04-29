@@ -132,3 +132,12 @@ export interface SchemaOrgFinancialTransaction {
 
 export const AVATAR_SIZES = [32, 64, 128] as const
 export type AvatarSize = (typeof AVATAR_SIZES)[number]
+
+
+export interface AppNotification {
+  id: string
+  type: "success" | "error" | "info" | "deal"
+  title: string
+  description?: string
+  duration?: number
+}
