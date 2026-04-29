@@ -43,3 +43,16 @@ export function startTransaction(name: string, op: string) {
   }
   return { finish: () => {} }
 }
+
+
+export function trackPageView(path: string, duration: number) {
+  if (process.env.NODE_ENV === "development") {
+    console.debug(`[Sentry] pageView: ${path} in ${duration}ms`)
+  }
+}
+
+export function trackApiCall(endpoint: string, status: number, duration: number) {
+  if (process.env.NODE_ENV === "development") {
+    console.debug(`[Sentry] api: ${endpoint} ${status} ${duration}ms`)
+  }
+}
