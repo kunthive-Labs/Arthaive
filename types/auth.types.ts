@@ -165,3 +165,12 @@ export const DEFAULT_FILTER_PRESETS: FilterPreset[] = [
   { id: "seed", name: "Seed Stage", filters: { stages: ["Seed","Pre-Seed"] }, isDefault: false },
   { id: "large", name: "Large Rounds (>100 Cr)", filters: { minAmount: 100 }, isDefault: false },
 ]
+
+
+export interface PipelineStats {
+  totalDeals: number
+  newDeals: number
+  duplicatesFound: number
+  errorsFound: number
+  lastRun: string
+}
