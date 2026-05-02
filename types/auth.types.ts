@@ -183,3 +183,10 @@ export interface DataQualityScore {
   amountConfidence: number
   overall: number
 }
+
+
+export interface BatchResult<T> {
+  succeeded: T[]
+  failed: { item: T; error: string }[]
+  total: number
+}
