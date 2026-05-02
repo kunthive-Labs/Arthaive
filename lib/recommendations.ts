@@ -314,3 +314,16 @@ const SECTOR_ALIASES: Record<string, string> = {
 export function normalizeSector(sector: string): string {
   return SECTOR_ALIASES[sector.toLowerCase()] ?? sector
 }
+
+
+const CITY_STATE: Record<string, string> = {
+  "Bengaluru": "Karnataka","Bangalore": "Karnataka",
+  "Mumbai": "Maharashtra","Pune": "Maharashtra",
+  "Delhi": "Delhi NCR","New Delhi": "Delhi NCR","Noida": "Delhi NCR","Gurugram": "Delhi NCR",
+  "Hyderabad": "Telangana","Chennai": "Tamil Nadu",
+  "Kolkata": "West Bengal","Ahmedabad": "Gujarat",
+}
+
+export function cityToState(city: string): string {
+  return CITY_STATE[city] ?? "Other"
+}
