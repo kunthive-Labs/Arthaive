@@ -270,3 +270,16 @@ export function findDuplicateDeals(
   }
   return Object.values(groups).filter((g) => g.length > 1)
 }
+
+
+export function detectAmountOutliers(
+  deals: import("@/data/funding-data").FundingDeal[],
+  zThreshold = 3
+): string[] {
+  const amounts = deals.map((d) => d.amount)
+  const mean = amounts.reduce((s, v) => s + v, 0) / amounts.length
+  const std = Math.sqrt(amounts.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / amounts.length)
+  return deals
+    .filter((d) => Math.abs(d.amount - mean) > zThreshold * std)
+    .map((d) => d.id)
+}
