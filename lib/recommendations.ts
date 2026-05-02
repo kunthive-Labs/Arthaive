@@ -246,3 +246,14 @@ export function investorStageBreakdown(
   }
   return result
 }
+
+
+export function normalizeCompanyName(name: string): string {
+  return name
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/pvt\.?\s*ltd\.?/gi, "")
+    .replace(/private\s+limited/gi, "")
+    .replace(/(inc|llc|ltd)\.?/gi, "")
+    .trim()
+}
