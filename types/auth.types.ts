@@ -190,3 +190,12 @@ export interface BatchResult<T> {
   failed: { item: T; error: string }[]
   total: number
 }
+
+
+export interface PipelineRun {
+  id: string
+  startedAt: string
+  completedAt: string | null
+  status: "running" | "success" | "failed"
+  stats: PipelineStats
+}
