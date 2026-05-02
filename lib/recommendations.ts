@@ -300,3 +300,17 @@ export function dataCompletenessScore(
   ]
   return Math.round((checks.filter(Boolean).length / checks.length) * 100)
 }
+
+
+const SECTOR_ALIASES: Record<string, string> = {
+  "fintech": "Fintech",
+  "fin-tech": "Fintech",
+  "healthtech": "Healthtech",
+  "health-tech": "Healthtech",
+  "edtech": "Edtech",
+  "ed-tech": "Edtech",
+}
+
+export function normalizeSector(sector: string): string {
+  return SECTOR_ALIASES[sector.toLowerCase()] ?? sector
+}
