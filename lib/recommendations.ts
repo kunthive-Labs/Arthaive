@@ -327,3 +327,15 @@ const CITY_STATE: Record<string, string> = {
 export function cityToState(city: string): string {
   return CITY_STATE[city] ?? "Other"
 }
+
+
+export function estimateAnnualDeployment(
+  investor: string,
+  deals: import("@/data/funding-data").FundingDeal[]
+): number {
+  const investorDeals = getInvestorDeals(investor, deals)
+  if (!investorDeals.length) return 0
+  const total = investorDeals.reduce((s, d) => s + d.amount, 0)
+  const years = 2
+  return Math.round(total / years)
+}
