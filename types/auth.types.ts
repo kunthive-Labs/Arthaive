@@ -199,3 +199,12 @@ export interface PipelineRun {
   status: "running" | "success" | "failed"
   stats: PipelineStats
 }
+
+
+export interface StartupHealthIndicators {
+  roundCount: number
+  totalRaised: number
+  lastRoundDate: string
+  daysSinceLastRound: number
+  leadInvestorTier: "top" | "mid" | "emerging" | "unknown"
+}
