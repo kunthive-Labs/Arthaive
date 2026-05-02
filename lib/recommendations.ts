@@ -257,3 +257,16 @@ export function normalizeCompanyName(name: string): string {
     .replace(/(inc|llc|ltd)\.?/gi, "")
     .trim()
 }
+
+
+export function findDuplicateDeals(
+  deals: import("@/data/funding-data").FundingDeal[]
+): string[][] {
+  const groups: Record<string, string[]> = {}
+  for (const d of deals) {
+    const key = `${normalizeCompanyName(d.company)}__${d.date.slice(0, 7)}`
+    if (!groups[key]) groups[key] = []
+    groups[key].push(d.id)
+  }
+  return Object.values(groups).filter((g) => g.length > 1)
+}
