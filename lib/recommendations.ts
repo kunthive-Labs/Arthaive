@@ -283,3 +283,20 @@ export function detectAmountOutliers(
     .filter((d) => Math.abs(d.amount - mean) > zThreshold * std)
     .map((d) => d.id)
 }
+
+
+export function dataCompletenessScore(
+  deal: import("@/data/funding-data").FundingDeal
+): number {
+  const checks = [
+    !!deal.company,
+    deal.amount > 0,
+    !!deal.stage,
+    (deal.sectors?.length ?? 0) > 0,
+    !!deal.date,
+    !!deal.location,
+    (deal.investors?.length ?? 0) > 0,
+    !!deal.sourceUrl,
+  ]
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100)
+}
