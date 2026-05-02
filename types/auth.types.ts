@@ -208,3 +208,18 @@ export interface StartupHealthIndicators {
   daysSinceLastRound: number
   leadInvestorTier: "top" | "mid" | "emerging" | "unknown"
 }
+
+
+export type PipelineErrorCode =
+  | "PARSE_ERROR"
+  | "VALIDATION_ERROR"
+  | "DUPLICATE"
+  | "NETWORK_ERROR"
+  | "AMOUNT_OUTLIER"
+
+export interface PipelineError {
+  code: PipelineErrorCode
+  message: string
+  dealId?: string
+  raw?: unknown
+}
