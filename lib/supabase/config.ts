@@ -62,3 +62,8 @@ export const FILTER_DEBOUNCE_MS = 150
 export const DEFAULT_PAGE_SIZE = 20
 export const MAX_PAGE_SIZE = 100
 export const EXPORT_LIMIT = 5000
+
+
+export const RATE_LIMIT_WINDOW_MS = 60 * 1000
+export const RATE_LIMIT_MAX_REQUESTS = 100
+export const EXPORT_RATE_LIMIT = 10
