@@ -223,3 +223,16 @@ export interface PipelineError {
   dealId?: string
   raw?: unknown
 }
+
+
+export interface GeoCoordinate {
+  lat: number
+  lon: number
+  city: string
+  state: string
+}
+
+export type FundingGeoData = GeoCoordinate & {
+  totalFunding: number
+  dealCount: number
+}
