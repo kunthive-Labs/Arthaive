@@ -246,3 +246,12 @@ export interface RobotsRule {
   allow?: string[]
   disallow?: string[]
 }
+
+
+export interface PageMeta {
+  title: string
+  description: string
+  canonical: string
+  ogImage?: string
+  noIndex?: boolean
+}
