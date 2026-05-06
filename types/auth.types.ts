@@ -283,3 +283,13 @@ export interface CacheRoute {
   strategy: CacheStrategy
   maxAge?: number
 }
+
+
+export interface ApiMeta {
+  total: number
+  page: number
+  pageSize: number
+  hasMore: boolean
+  generatedAt: string
+  cacheHit?: boolean
+}
