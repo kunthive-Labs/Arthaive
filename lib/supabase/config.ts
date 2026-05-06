@@ -116,3 +116,11 @@ export function requestKey(method: string, url: string, params?: Record<string, 
 
 export const GZIP_THRESHOLD = 1024
 export const MAX_RESPONSE_SIZE = 10 * 1024 * 1024
+
+
+export const REQUIRED_ENV_VARS = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+] as const
+
+export type RequiredEnvVar = (typeof REQUIRED_ENV_VARS)[number]
