@@ -339,3 +339,11 @@ export function estimateAnnualDeployment(
   const years = 2
   return Math.round(total / years)
 }
+
+
+export function sliceForInitialLoad<T>(
+  items: T[],
+  count = 50
+): [T[], T[]] {
+  return [items.slice(0, count), items.slice(count)]
+}
