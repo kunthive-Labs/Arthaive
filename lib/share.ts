@@ -196,3 +196,8 @@ export function arrayToCsv(rows: Record<string, unknown>[]): string {
   return lines.join("
 ")
 }
+
+
+export function memoKey(...parts: (string | number | boolean | null | undefined)[]): string {
+  return parts.map((p) => String(p ?? "")).join("|")
+}
