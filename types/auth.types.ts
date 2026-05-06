@@ -263,3 +263,9 @@ export interface CursorPage<T> {
   hasMore: boolean
   total?: number
 }
+
+
+export type PrefetchHint =
+  | { type: "route"; path: string }
+  | { type: "data"; key: string }
+  | { type: "image"; src: string }
