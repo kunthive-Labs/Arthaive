@@ -71,3 +71,12 @@ export class PerfMeasure {
     return duration
   }
 }
+
+
+export const SENTRY_CONFIG = {
+  environment: process.env.NODE_ENV,
+  release: process.env.NEXT_PUBLIC_APP_VERSION,
+  tracesSampleRate: 0.1,
+  replaysSessionSampleRate: 0.05,
+  replaysOnErrorSampleRate: 1.0,
+} as const
