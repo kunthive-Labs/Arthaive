@@ -94,3 +94,10 @@ export const SITEMAP_PRIORITIES = {
 export const SEO_SITE_NAME = "India Startup Funding"
 export const SEO_DEFAULT_DESCRIPTION = "Track every Indian startup funding round in real time. Analytics, trends, and investor insights."
 export const SEO_KEYWORDS = ["India startup funding","Indian VC","startup investment","funding rounds","Indian unicorns"]
+
+
+export const BUNDLE_BUDGET_KB = {
+  initial: 200,
+  page: 100,
+  component: 50,
+}
