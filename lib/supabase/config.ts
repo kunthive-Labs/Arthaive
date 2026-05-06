@@ -101,3 +101,8 @@ export const BUNDLE_BUDGET_KB = {
   page: 100,
   component: 50,
 }
+
+
+export const LAZY_LOAD_THRESHOLD = "200px"
+export const VIRTUAL_LIST_ITEM_HEIGHT = 72
+export const VIRTUAL_LIST_OVERSCAN = 5
