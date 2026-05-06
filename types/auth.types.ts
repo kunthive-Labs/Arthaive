@@ -269,3 +269,17 @@ export type PrefetchHint =
   | { type: "route"; path: string }
   | { type: "data"; key: string }
   | { type: "image"; src: string }
+
+
+export type CacheStrategy =
+  | "cache-first"
+  | "network-first"
+  | "stale-while-revalidate"
+  | "network-only"
+  | "cache-only"
+
+export interface CacheRoute {
+  pattern: string
+  strategy: CacheStrategy
+  maxAge?: number
+}
