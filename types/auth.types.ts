@@ -300,3 +300,10 @@ export interface ErrorBoundaryState {
   error: Error | null
   errorInfo: { componentStack: string } | null
 }
+
+
+export const PWA_CACHE_ROUTES: CacheRoute[] = [
+  { pattern: "/", strategy: "stale-while-revalidate", maxAge: 3600 },
+  { pattern: "/analytics", strategy: "stale-while-revalidate", maxAge: 3600 },
+  { pattern: "/api/stats", strategy: "stale-while-revalidate", maxAge: 1800 },
+]
