@@ -359,3 +359,18 @@ export function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
     return result
   }) as T
 }
+
+
+export async function batchFetch<T>(
+  items: string[],
+  fetcher: (id: string) => Promise<T>,
+  concurrency = 3
+): Promise<T[]> {
+  const results: T[] = []
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = items.slice(i, i + concurrency)
+    const fetched = await Promise.all(batch.map(fetcher))
+    results.push(...fetched)
+  }
+  return results
+}
