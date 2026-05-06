@@ -106,3 +106,9 @@ export const BUNDLE_BUDGET_KB = {
 export const LAZY_LOAD_THRESHOLD = "200px"
 export const VIRTUAL_LIST_ITEM_HEIGHT = 72
 export const VIRTUAL_LIST_OVERSCAN = 5
+
+
+export function requestKey(method: string, url: string, params?: Record<string, unknown>): string {
+  const paramStr = params ? JSON.stringify(params) : ""
+  return `${method}:${url}:${paramStr}`
+}
