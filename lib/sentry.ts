@@ -97,3 +97,13 @@ export function classifyError(err: unknown): "auth" | "network" | "data" | "unkn
   }
   return "unknown"
 }
+
+
+export function logStructuredError(
+  err: unknown,
+  context: { userId?: string; path?: string; action?: string }
+) {
+  const classification = classifyError(err)
+  captureException(err, { ...context, classification })
+  if (context.userId) setUser(context.userId, "")
+}
