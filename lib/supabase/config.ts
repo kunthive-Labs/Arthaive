@@ -133,3 +133,10 @@ export const DATA_VERSION = "2026-05"
 
 export const MIN_TOUCH_TARGET = 44
 export const MOBILE_BREAKPOINT = 768
+
+
+export const KEYBOARD_SHORTCUTS = {
+  search: "/",
+  escape: "Escape",
+  commandPalette: "k",
+} as const
