@@ -118,3 +118,12 @@ export function getErrorRecoverySuggestion(err: unknown): string {
     default: return "Something went wrong. Please try again."
   }
 }
+
+
+export function assertProductionReady() {
+  const missing = (["NEXT_PUBLIC_SUPABASE_URL","NEXT_PUBLIC_SUPABASE_ANON_KEY"] as string[])
+    .filter((k) => !process.env[k])
+  if (missing.length) {
+    console.warn(`[Config] Missing env vars: ${missing.join(", ")}`)
+  }
+}
