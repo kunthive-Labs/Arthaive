@@ -119,3 +119,8 @@ export function getChartTheme(isDark: boolean) {
     primary: "hsl(var(--primary))",
   }
 }
+
+
+export const PRINT_SAFE_COLORS = [
+  "#000000","#333333","#555555","#777777","#999999","#bbbbbb",
+]
