@@ -98,3 +98,11 @@ export const CHART_HEIGHT_SM = 200
 export const CHART_HEIGHT_MD = 288
 export const CHART_HEIGHT_LG = 400
 export const CHART_MARGIN = { top: 8, right: 16, left: 0, bottom: 0 }
+
+
+export const Z_INDEX = {
+  tooltip: 50,
+  modal: 100,
+  toast: 150,
+  dropdown: 200,
+} as const
