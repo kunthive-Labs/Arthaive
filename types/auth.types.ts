@@ -307,3 +307,13 @@ export const PWA_CACHE_ROUTES: CacheRoute[] = [
   { pattern: "/analytics", strategy: "stale-while-revalidate", maxAge: 3600 },
   { pattern: "/api/stats", strategy: "stale-while-revalidate", maxAge: 1800 },
 ]
+
+
+export type AriaRole =
+  | "dialog"
+  | "alertdialog"
+  | "navigation"
+  | "main"
+  | "complementary"
+  | "search"
+  | "status"
