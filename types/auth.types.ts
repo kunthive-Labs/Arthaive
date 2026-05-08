@@ -345,3 +345,8 @@ export interface CommandItem {
   action: () => void
   keywords?: string[]
 }
+
+
+export type NonNullable2<T> = T extends null | undefined ? never : T
+export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }
+export type Prettify<T> = { [K in keyof T]: T[K] } & unknown
