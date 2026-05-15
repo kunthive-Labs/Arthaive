@@ -15,6 +15,7 @@ export type Database = {
           email: string
           full_name: string | null
           avatar_url: string | null
+          notification_prefs: Json | null
           created_at: string
           updated_at: string
         }
@@ -23,6 +24,7 @@ export type Database = {
           email: string
           full_name?: string | null
           avatar_url?: string | null
+          notification_prefs?: Json | null
           created_at?: string
           updated_at?: string
         }
@@ -31,6 +33,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           avatar_url?: string | null
+          notification_prefs?: Json | null
           updated_at?: string
         }
         Relationships: []
