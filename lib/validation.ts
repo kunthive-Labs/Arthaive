@@ -20,3 +20,11 @@ export const dateRangeSchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 }).refine(d => d.from <= d.to, "from must be before to")
+
+export const notifySchema = z.object({
+  email_deals: z.boolean().optional(),
+  email_weekly: z.boolean().optional(),
+  email_alerts: z.boolean().optional(),
+  push_enabled: z.boolean().optional(),
+})
+export type NotifyPrefs = z.infer<typeof notifySchema>
