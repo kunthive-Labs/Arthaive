@@ -27,4 +27,3 @@ export const notifySchema = z.object({
   email_alerts: z.boolean().optional(),
   push_enabled: z.boolean().optional(),
 })
-export type NotifyPrefs = z.infer<typeof notifySchema>
