@@ -7,7 +7,8 @@ import { useParams } from "next/navigation"
 
 export default function DealPage() {
   const params = useParams()
-  const id = Array.isArray(params?.id) ? params.id[0] : params?.id
+  const raw = Array.isArray(params?.id) ? params.id[0] : params?.id
+  const id = raw ? decodeURIComponent(raw) : ""
   const deal = fundingData.find((d) => d.id === id)
 
   if (!deal) {

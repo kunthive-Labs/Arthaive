@@ -18,7 +18,7 @@ interface DealCardProps {
 
 export function DealCard({ deal }: DealCardProps) {
   return (
-    <Link href={`/deal/${deal.id}`}>
+    <Link href={`/deal/${encodeURIComponent(deal.id)}`}>
       <div className="neo-border neo-hover p-6 bg-white cursor-pointer h-full flex flex-col">
         <div className="flex justify-between items-start gap-4 mb-4">
           <div className="flex-1">
