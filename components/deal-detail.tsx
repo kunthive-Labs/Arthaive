@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { BackButton } from "@/components/back-button"
 
 interface DealDetailProps {
   deal: {
@@ -21,6 +22,7 @@ interface DealDetailProps {
 export function DealDetail({ deal }: DealDetailProps) {
   return (
     <main className="max-w-4xl mx-auto px-4 md:px-6 py-12">
+      <BackButton fallback="/explore" />
       {/* Header */}
       <div className="neo-border p-8 mb-8 bg-white">
         <div className="flex items-start justify-between gap-6 mb-6">

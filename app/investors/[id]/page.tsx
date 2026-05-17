@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { fundingData } from "@/data/funding-data"
 import { SectionHeader } from "@/components/section-header"
 import { StatCard } from "@/components/stat-card"
+import { BackButton } from "@/components/back-button"
 
 interface Props { params: { id: string } }
 
@@ -20,6 +21,7 @@ export default function InvestorProfilePage({ params }: Props) {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-12">
+      <BackButton fallback="/investors" />
       <SectionHeader title={name} subtitle={`${deals.length} deals tracked`} />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
         <StatCard value={deals.length} label="Total Deals" accent />
