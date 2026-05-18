@@ -12,8 +12,8 @@ export function useDeals(initial: DealFilters = {}) {
     setLoading(true); setError(null)
     try {
       const qs = new URLSearchParams()
-      if (filters.sector?.length) qs.set("sector", filters.sector.join(","))
-      if (filters.stage?.length) qs.set("stage", filters.stage.join(","))
+      if (filters.sectors?.length) qs.set("sector", filters.sectors.join(","))
+      if (filters.stages?.length) qs.set("stage", filters.stages.join(","))
       if (filters.location) qs.set("location", filters.location)
       if (filters.search) qs.set("q", filters.search)
       if (filters.page) qs.set("page", String(filters.page))

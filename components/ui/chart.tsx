@@ -125,6 +125,8 @@ function ChartTooltipContent({
     indicator?: 'line' | 'dot' | 'dashed'
     nameKey?: string
     labelKey?: string
+    payload?: Array<{ value?: unknown; name?: string | number; dataKey?: string | number; color?: string; payload?: Record<string, unknown> }>
+    label?: string | number
   }) {
   const { config } = useChart()
 
@@ -144,7 +146,7 @@ function ChartTooltipContent({
     if (labelFormatter) {
       return (
         <div className={cn('font-medium', labelClassName)}>
-          {labelFormatter(value, payload)}
+          {labelFormatter(value, payload as any)}
         </div>
       )
     }
@@ -182,7 +184,7 @@ function ChartTooltipContent({
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || 'value'}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
-          const indicatorColor = color || item.payload.fill || item.color
+          const indicatorColor = color || (item.payload as Record<string, unknown>)?.fill as string | undefined || item.color
 
           return (
             <div
@@ -193,7 +195,7 @@ function ChartTooltipContent({
               )}
             >
               {formatter && item?.value !== undefined && item.name ? (
-                formatter(item.value, item.name, item, index, item.payload)
+                formatter(item.value as any, item.name as any, item as any, index, item.payload as any)
               ) : (
                 <>
                   {itemConfig?.icon ? (
@@ -232,9 +234,9 @@ function ChartTooltipContent({
                         {itemConfig?.label || item.name}
                       </span>
                     </div>
-                    {item.value && (
+                    {item.value !== undefined && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
-                        {item.value.toLocaleString()}
+                        {(item.value as number).toLocaleString()}
                       </span>
                     )}
                   </div>
@@ -256,10 +258,11 @@ function ChartLegendContent({
   payload,
   verticalAlign = 'bottom',
   nameKey,
-}: React.ComponentProps<'div'> &
-  Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
+}: React.ComponentProps<'div'> & {
     hideIcon?: boolean
     nameKey?: string
+    verticalAlign?: 'top' | 'bottom' | 'middle'
+    payload?: Array<{ value?: string; dataKey?: string | number; color?: string }>
   }) {
   const { config } = useChart()
 

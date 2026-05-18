@@ -193,8 +193,7 @@ export function arrayToCsv(rows: Record<string, unknown>[]): string {
       headers.map((h) => JSON.stringify(r[h] ?? "")).join(",")
     ),
   ]
-  return lines.join("
-")
+  return lines.join("\n")
 }
 
 

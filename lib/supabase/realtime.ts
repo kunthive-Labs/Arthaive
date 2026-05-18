@@ -45,8 +45,8 @@ export function getChannelName(table: string, userId?: string): string {
 export async function checkRealtimeConnection(): Promise<boolean> {
   try {
     const supabase = (await import("./client")).createClient()
-    const status = await supabase.realtime.connect()
-    return status === "CONNECTED" || true
+    await supabase.realtime.connect()
+    return true
   } catch {
     return false
   }

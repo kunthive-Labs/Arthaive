@@ -8,7 +8,7 @@ export function limitChartItems<T extends { value: number }>(items: T[], max = 1
   if (items.length <= max) return items
   const top = items.slice(0, max - 1)
   const rest = items.slice(max - 1).reduce((s, i) => s + i.value, 0)
-  return [...top, { label: otherLabel, value: rest } as T]
+  return [...top, { label: otherLabel, value: rest } as unknown as T]
 }
 
 export function calcAxisBounds(values: number[], padding = 0.1): { min: number; max: number } {

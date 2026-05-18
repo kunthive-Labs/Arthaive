@@ -7,7 +7,7 @@ export function useSearch() {
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
   const [loading, setLoading] = useState(false)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const search = useCallback((q: string) => {
     setQuery(q)

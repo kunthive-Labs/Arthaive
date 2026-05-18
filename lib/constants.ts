@@ -194,20 +194,9 @@ export const API_BASE = `/api/${API_VERSION}`
 export const DEFAULT_CHART_TYPE: "bar" | "line" | "pie" = "bar"
 
 
-export const INVESTOR_TYPES = [
-  "VC Fund", "Angel", "Family Office", "CVC",
-  "PE Fund", "Accelerator", "Government", "Micro-VC",
-] as const
-
 export const FUNDING_STAGES_ORDER = [
   "Pre-Seed", "Seed", "Series A", "Series B",
   "Series C", "Series D", "Pre-IPO", "Bridge", "Debt",
-] as const
-
-
-export const TOP_CITIES = [
-  "Bengaluru", "Mumbai", "Delhi NCR", "Hyderabad",
-  "Chennai", "Pune", "Kolkata", "Ahmedabad", "Gurugram",
 ] as const
 
 
