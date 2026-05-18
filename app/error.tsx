@@ -21,12 +21,20 @@ export default function Error({
         <p className="text-gray-600 mb-6">
           {error.message || "An unexpected error occurred."}
         </p>
-        <button
-          onClick={reset}
-          className="bg-black text-white px-6 py-3 font-bold border-4 border-black hover:bg-white hover:text-black transition-colors"
-        >
-          Try again
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={reset}
+            className="flex-1 bg-black text-white px-6 py-3 font-bold border-4 border-black hover:bg-white hover:text-black transition-colors"
+          >
+            Try again
+          </button>
+          <a
+            href="/"
+            className="flex-1 text-center bg-white text-black px-6 py-3 font-bold border-4 border-black hover:bg-gray-50 transition-colors"
+          >
+            Go Home
+          </a>
+        </div>
       </div>
     </div>
   )
