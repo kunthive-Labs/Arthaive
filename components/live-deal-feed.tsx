@@ -7,12 +7,12 @@ import { toast } from "sonner"
 interface LiveDeal {
   id: string
   company: string
-  amount: number
+  amount_inr: number
   stage: string
   sectors: string[]
   location: string
-  date: string
-  inserted_at: string
+  deal_date: string
+  created_at: string
 }
 
 export function LiveDealFeed() {
@@ -23,11 +23,11 @@ export function LiveDealFeed() {
     // Load recent deals
     supabase
       .from("deals")
-      .select("id, company, amount, stage, sectors, location, date, inserted_at")
-      .order("inserted_at", { ascending: false })
+      .select("id, company, amount_inr, stage, sectors, location, deal_date, created_at")
+      .order("created_at", { ascending: false })
       .limit(20)
       .then(({ data }) => {
-        if (data) setDeals(data as LiveDeal[])
+        if (data) setDeals(data as unknown as LiveDeal[])
       })
 
     // Subscribe to new inserts
@@ -40,7 +40,7 @@ export function LiveDealFeed() {
           const newDeal = payload.new as LiveDeal
           setDeals((prev) => [newDeal, ...prev].slice(0, 50))
           toast.success(`New deal: ${newDeal.company} — ${newDeal.stage}`, {
-            description: `₹${newDeal.amount} Cr · ${newDeal.location}`,
+            description: `₹${newDeal.amount_inr} Cr · ${newDeal.location}`,
           })
         }
       )
@@ -72,9 +72,9 @@ export function LiveDealFeed() {
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-semibold text-sm">₹{deal.amount?.toLocaleString("en-IN")} Cr</div>
+            <div className="font-semibold text-sm">₹{deal.amount_inr?.toLocaleString("en-IN")} Cr</div>
             <div className="text-xs text-muted-foreground">
-              {new Date(deal.date ?? deal.inserted_at).toLocaleDateString("en-IN")}
+              {new Date(deal.deal_date ?? deal.created_at).toLocaleDateString("en-IN")}
             </div>
           </div>
         </div>

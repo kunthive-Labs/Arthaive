@@ -9,6 +9,235 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      sources: {
+        Row: {
+          id: string
+          source_type: string
+          title: string | null
+          url: string
+          publication_date: string | null
+          publisher: string | null
+          reliability_tier: string
+          extraction_method: string
+          raw_text_snapshot: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          source_type?: string
+          title?: string | null
+          url: string
+          publication_date?: string | null
+          publisher?: string | null
+          reliability_tier?: string
+          extraction_method?: string
+          raw_text_snapshot?: string | null
+          created_at?: string
+        }
+        Update: {
+          source_type?: string
+          title?: string | null
+          url?: string
+          publication_date?: string | null
+          publisher?: string | null
+          reliability_tier?: string
+          extraction_method?: string
+          raw_text_snapshot?: string | null
+        }
+        Relationships: []
+      }
+      review_queue: {
+        Row: {
+          id: string
+          source_id: string | null
+          raw_extracted_data: Json
+          suggested_company: string | null
+          match_confidence: number | null
+          status: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          source_id?: string | null
+          raw_extracted_data?: Json
+          suggested_company?: string | null
+          match_confidence?: number | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          source_id?: string | null
+          raw_extracted_data?: Json
+          suggested_company?: string | null
+          match_confidence?: number | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_queue_source_id_fkey"
+            columns: ["source_id"]
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      pipeline_jobs: {
+        Row: {
+          id: string
+          run_at: string
+          source_feed: string | null
+          articles_fetched: number
+          articles_filtered: number
+          records_extracted: number
+          records_auto_approved: number
+          records_flagged: number
+          run_status: string
+          error_log: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          run_at?: string
+          source_feed?: string | null
+          articles_fetched?: number
+          articles_filtered?: number
+          records_extracted?: number
+          records_auto_approved?: number
+          records_flagged?: number
+          run_status?: string
+          error_log?: string | null
+          created_at?: string
+        }
+        Update: {
+          run_at?: string
+          source_feed?: string | null
+          articles_fetched?: number
+          articles_filtered?: number
+          records_extracted?: number
+          records_auto_approved?: number
+          records_flagged?: number
+          run_status?: string
+          error_log?: string | null
+        }
+        Relationships: []
+      }
+      startup_aliases: {
+        Row: {
+          id: string
+          company: string
+          alias_name: string
+          alias_type: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company: string
+          alias_name: string
+          alias_type?: string
+          created_at?: string
+        }
+        Update: {
+          company?: string
+          alias_name?: string
+          alias_type?: string
+        }
+        Relationships: []
+      }
+      investor_aliases: {
+        Row: {
+          id: string
+          investor_name: string
+          alias_name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          investor_name: string
+          alias_name: string
+          created_at?: string
+        }
+        Update: {
+          investor_name?: string
+          alias_name?: string
+        }
+        Relationships: []
+      }
+      deals: {
+        Row: {
+          id: string
+          company: string
+          company_url: string | null
+          amount_inr: number
+          amount_usd: number
+          stage: string
+          sectors: string[]
+          investors: string[]
+          lead_investor: string | null
+          deal_date: string
+          location: string
+          description: string | null
+          source_url: string | null
+          week_folder: string | null
+          record_status: string
+          date_confidence: string | null
+          stage_confidence: string | null
+          source_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          company: string
+          company_url?: string | null
+          amount_inr?: number
+          amount_usd?: number
+          stage: string
+          sectors?: string[]
+          investors?: string[]
+          lead_investor?: string | null
+          deal_date: string
+          location: string
+          description?: string | null
+          source_url?: string | null
+          week_folder?: string | null
+          record_status?: string
+          date_confidence?: string | null
+          stage_confidence?: string | null
+          source_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string
+          company_url?: string | null
+          amount_inr?: number
+          amount_usd?: number
+          stage?: string
+          sectors?: string[]
+          investors?: string[]
+          lead_investor?: string | null
+          deal_date?: string
+          location?: string
+          description?: string | null
+          source_url?: string | null
+          week_folder?: string | null
+          record_status?: string
+          date_confidence?: string | null
+          stage_confidence?: string | null
+          source_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string

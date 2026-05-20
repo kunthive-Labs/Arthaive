@@ -190,7 +190,7 @@ Run `npm run build` locally. Should compile clean. Deploy to Vercel. Check `/api
 
 ---
 
-## Phase 2 — Admin Interface
+## Phase 2 — Admin Interface ✅ (implemented)
 
 > **Goal:** A fully functional admin panel at `/admin` for reviewing queue items, managing entities, viewing pipeline logs, and importing data. Only authenticated admin users can access it.
 >
@@ -970,7 +970,7 @@ Deploy to Vercel. Submit sitemap to Google Search Console.
 |---|---|---|---|
 | 0 | ✅ Done | Frontend, static data, auth | — |
 | 1 | Supabase Live DB | Real DB, all pages read from Supabase | 4–6 days |
-| 2 | Admin Interface | Review queue, entity manager, pipeline logs | 8–12 days |
+| 2 | ✅ Admin Interface | Review queue, entity manager, pipeline logs | 8–12 days |
 | 3 | Discovery Pipeline | RSS poller, keyword filter, article queuing | 6–10 days |
 | 4 | Extraction Pipeline | Rule-based + AI extraction, auto-approval | 8–14 days |
 | 5 | Entity Resolution | Fuzzy matching, alias system, dedup | 6–10 days |
