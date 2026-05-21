@@ -35,3 +35,9 @@ next-env.d.ts
 # IDE
 .vscode
 .idea
+
+# Python pipeline
+pipeline/.venv/
+pipeline/.extractor_cache.sqlite
+**/__pycache__/
+*.pyc
