@@ -4,3 +4,4 @@ lxml>=5.2
 anthropic>=0.40
 supabase>=2.7
 python-dotenv>=1.0
+rapidfuzz>=3.9
