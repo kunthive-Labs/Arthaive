@@ -32,6 +32,23 @@ export function ExploreClient({ sectors, locations, stages, years }: ExploreClie
 
   const { deals, loading, total, totalPages, refetch } = useDeals({})
 
+  // Initialize filters from URL query params (e.g. linked from /analytics "View data →")
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const sectorParams = params.getAll("sector")
+    const stageParams = params.getAll("stage")
+    const yearParams = params.getAll("year")
+    const locationParam = params.get("location")
+    const searchParam = params.get("search")
+
+    if (sectorParams.length) setSelectedSectors(sectorParams)
+    if (stageParams.length) setSelectedStages(stageParams)
+    if (yearParams.length) setSelectedYears(yearParams)
+    if (locationParam) setSelectedLocation(locationParam)
+    if (searchParam) setSearchQuery(searchParam)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const runSearch = useCallback(() => {
     refetch({
       search: searchQuery,
