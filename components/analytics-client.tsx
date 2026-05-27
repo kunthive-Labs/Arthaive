@@ -12,6 +12,8 @@ import { SankeyDiagram } from "@/components/charts/sankey-diagram"
 import { IndiaMap } from "@/components/charts/india-map"
 import { YoYComparison } from "@/components/charts/yoy-comparison"
 import { DealVelocity } from "@/components/charts/deal-velocity"
+import { CoverageNotice } from "@/components/coverage-notice"
+import Link from "next/link"
 import type { FundingDeal } from "@/data/funding-data"
 import type { Deal } from "@/lib/types"
 
@@ -20,11 +22,23 @@ const TOP_SECTORS = [
   "D2C", "Agritech", "Deeptech", "Gaming",
 ]
 
-interface AnalyticsClientProps {
-  deals: Deal[]
+function ViewData({ href }: { href: string }) {
+  return (
+    <Link
+      href={href}
+      className="inline-block mt-2 text-xs font-semibold text-green-700 hover:underline"
+    >
+      View data →
+    </Link>
+  )
 }
 
-export function AnalyticsClient({ deals }: AnalyticsClientProps) {
+interface AnalyticsClientProps {
+  deals: Deal[]
+  coverage?: { earliest: string; latest: string; total: number }
+}
+
+export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
   // Deal from lib/types is structurally compatible with FundingDeal from the data file.
   // Both have: amount, date, sectors, stage, location, investors, company, id.
   // The cast is safe — Deal has a superset of FundingDeal fields.
@@ -40,6 +54,15 @@ export function AnalyticsClient({ deals }: AnalyticsClientProps) {
           <p className="text-xs text-gray-400 mt-1">{deals.length.toLocaleString()} verified records</p>
         </div>
 
+        {coverage && (
+          <CoverageNotice
+            earliest={coverage.earliest}
+            latest={coverage.latest}
+            total={coverage.total}
+            className="mb-8"
+          />
+        )}
+
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="flex-wrap h-auto gap-1">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -54,14 +77,17 @@ export function AnalyticsClient({ deals }: AnalyticsClientProps) {
             <div>
               <h2 className="text-lg font-semibold mb-4">Monthly Funding Volume</h2>
               <FundingTrendLine deals={fd} />
+              <ViewData href="/explore?sort=date" />
             </div>
             <div>
               <h2 className="text-lg font-semibold mb-4">Top 15 Sectors by Total Funding</h2>
               <SectorBarChart deals={fd} topN={15} />
+              <ViewData href="/explore" />
             </div>
             <div>
               <h2 className="text-lg font-semibold mb-4">Deal Count by Stage</h2>
               <StageFunnel deals={fd} />
+              <ViewData href="/explore" />
             </div>
             <AnalyticsDashboard />
           </TabsContent>
@@ -94,6 +120,7 @@ export function AnalyticsClient({ deals }: AnalyticsClientProps) {
             <div>
               <h2 className="text-lg font-semibold mb-4">Funding by City</h2>
               <IndiaMap deals={fd} />
+              <ViewData href="/explore" />
             </div>
           </TabsContent>
 
