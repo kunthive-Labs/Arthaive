@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/admin/pipeline", label: "Pipeline Logs" },
   { href: "/admin/import", label: "Import" },
   { href: "/admin/export", label: "Export" },
+  { href: "/admin/ai-usage", label: "AI Usage" },
 ]
 
 export default async function AdminLayout({

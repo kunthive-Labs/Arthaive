@@ -28,6 +28,12 @@ export function Header() {
             <Link href="/reports" className="font-bold text-sm hover:text-green-700 transition">
               REPORTS
             </Link>
+            <Link href="/search" className="font-bold text-sm hover:text-green-700 transition">
+              ASK&nbsp;AI
+            </Link>
+            <Link href="/api-docs" className="font-bold text-sm hover:text-green-700 transition">
+              API
+            </Link>
           </nav>
         </div>
 

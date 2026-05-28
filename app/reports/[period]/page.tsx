@@ -7,6 +7,8 @@ import { SectorBarChart } from "@/components/charts/sector-bar-chart"
 import { StageFunnel } from "@/components/charts/stage-funnel"
 import { getReport } from "@/lib/db/reports"
 import { getCoverageRange } from "@/lib/db/analytics"
+import { generateTrendSummary } from "@/lib/ai/trend-summary"
+import { AISection } from "@/components/ai-label"
 import { formatCurrency } from "@/lib/format"
 import type { FundingDeal } from "@/data/funding-data"
 
@@ -39,6 +41,9 @@ export default async function ReportPage({ params }: { params: { period: string 
   ])
 
   if (!report) notFound()
+
+  // Trend summary is best-effort — generation failures (no key, API error) just hide the section.
+  const aiSummary = report.totalDeals > 0 ? await generateTrendSummary(report) : null
 
   const fd = report.deals as unknown as FundingDeal[]
 
@@ -75,15 +80,18 @@ export default async function ReportPage({ params }: { params: { period: string 
               <StatCard label="Startups funded" value={report.newStartups.toLocaleString()} />
             </div>
 
-            {/* AI trend summary slot — populated in Phase 7 */}
-            <div className="border-2 border-dashed border-gray-300 bg-gray-50 p-4 mb-8">
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                AI Summary
+            {aiSummary && (
+              <div className="mb-8">
+                <AISection>
+                  {aiSummary.summary.split("\n").filter(Boolean).map((para, i) => (
+                    <p key={i} className={i > 0 ? "mt-3" : ""}>{para}</p>
+                  ))}
+                  {aiSummary.cached && (
+                    <p className="mt-3 text-xs text-gray-500">Cached summary.</p>
+                  )}
+                </AISection>
               </div>
-              <p className="text-sm text-gray-400 mt-1">
-                AI-written trend summary will appear here (Phase 7).
-              </p>
-            </div>
+            )}
 
             {report.topDeals.length > 0 && (
               <section className="mb-10">
