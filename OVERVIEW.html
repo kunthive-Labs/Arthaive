@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arthaive — The Field Guide</title>
+<meta name="description" content="A complete, visual explainer of Arthaive: India's open, source-backed startup-funding intelligence platform. Product, architecture, data model, pipeline, entity resolution, admin, frontend and roadmap in one page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4eede;
+    --paper-2:#efe7d3;
+    --panel:#f9f4e9;
+    --ink:#1b1712;
+    --ink-soft:#5a4f3e;
+    --ink-faint:#8a7c64;
+    --vermilion:#c63a1a;
+    --vermilion-deep:#a02d12;
+    --saffron:#d98a1c;
+    --forest:#235640;
+    --forest-soft:#3a7458;
+    --line:rgba(27,23,18,.16);
+    --line-soft:rgba(27,23,18,.08);
+    --shadow:18px 18px 0 rgba(27,23,18,.08);
+    --maxw:1180px;
+    --serif:"Newsreader",Georgia,serif;
+    --display:"Fraunces","Newsreader",Georgia,serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:96px}
+  body{
+    background-color:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:18px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* grain + ledger atmosphere */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(217,138,28,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, rgba(35,86,64,.08), transparent 55%);
+  }
+  .wrap{position:relative;z-index:1}
+
+  /* reading progress */
+  #progress{position:fixed;top:0;left:0;height:4px;width:0;background:var(--vermilion);z-index:200;transition:width .1s linear}
+
+  a{color:var(--vermilion-deep);text-underline-offset:3px;text-decoration-thickness:1px}
+
+  /* ---------- top nav ---------- */
+  nav.top{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;gap:1.4rem;
+    padding:.7rem clamp(1rem,4vw,3rem);
+    background:rgba(244,238,222,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.top .brand{font-family:var(--display);font-weight:900;font-size:1.35rem;letter-spacing:-.02em;margin-right:auto}
+  nav.top .brand b{color:var(--vermilion)}
+  nav.top .links{display:flex;gap:.2rem;flex-wrap:wrap}
+  nav.top .links a{
+    font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--ink-soft);text-decoration:none;padding:.35rem .55rem;border-radius:2px;transition:.18s;
+  }
+  nav.top .links a:hover{color:var(--vermilion);background:rgba(198,58,26,.08)}
+  nav.top .links a.active{color:var(--paper);background:var(--ink)}
+  @media(max-width:1080px){nav.top .links{display:none}}
+
+  /* ---------- layout ---------- */
+  section{position:relative;padding:clamp(3.5rem,7vw,6rem) clamp(1.2rem,5vw,3rem)}
+  .inner{max-width:var(--maxw);margin:0 auto}
+  .sec-num{font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--vermilion);display:block;margin-bottom:1rem}
+  h2.sec-title{font-family:var(--display);font-weight:600;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1.02;letter-spacing:-.025em;margin-bottom:.4rem;max-width:18ch}
+  .sec-lede{font-size:clamp(1.05rem,1.6vw,1.3rem);color:var(--ink-soft);max-width:62ch;margin-bottom:2.6rem;font-style:italic}
+  .divider{height:1px;background:var(--line);max-width:var(--maxw);margin:0 auto}
+  .alt{background:var(--paper-2)}
+
+  /* ---------- hero ---------- */
+  header.hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:7rem clamp(1.2rem,5vw,3rem) 4rem;position:relative;overflow:hidden;
+  }
+  .hero-grid{position:absolute;inset:0;z-index:0;opacity:.5;
+    background-image:linear-gradient(var(--line-soft) 1px,transparent 1px);background-size:100% 2.1rem}
+  .hero-inner{max-width:var(--maxw);margin:0 auto;width:100%;position:relative;z-index:1}
+  .kicker{font-family:var(--mono);font-size:.78rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:1.6rem;display:flex;align-items:center;gap:.8rem}
+  .kicker::before{content:"";width:42px;height:2px;background:var(--vermilion)}
+  h1{font-family:var(--display);font-weight:900;font-size:clamp(3.4rem,12vw,9rem);line-height:.86;letter-spacing:-.04em;margin-bottom:.1em}
+  h1 .a{color:var(--vermilion)}
+  h1 em{font-style:italic;font-weight:400;color:var(--forest)}
+  .hero-sub{font-size:clamp(1.2rem,2.4vw,1.9rem);max-width:30ch;margin:1.4rem 0 2.4rem;line-height:1.3}
+  .hero-sub b{font-weight:600;border-bottom:2px solid var(--saffron)}
+  .hero-stats{display:flex;flex-wrap:wrap;gap:clamp(1.5rem,4vw,3.4rem);border-top:1px solid var(--line);padding-top:1.8rem}
+  .stat .n{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1;letter-spacing:-.02em}
+  .stat .n .a{color:var(--vermilion)}
+  .stat .l{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-top:.4rem;max-width:14ch}
+  .scroll-cue{position:absolute;bottom:1.6rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);z-index:1}
+  .scroll-cue span{display:block;text-align:center;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* ---------- generic pieces ---------- */
+  .lead-p{font-size:1.22rem;max-width:64ch;margin-bottom:1.4rem}
+  .lead-p .dropcap:first-letter{}
+  .dropcap::first-letter{font-family:var(--display);font-weight:900;font-size:3.6em;float:left;line-height:.72;padding:.05em .12em 0 0;color:var(--vermilion)}
+  p{max-width:68ch;margin-bottom:1rem}
+  strong{font-weight:600}
+  .mono{font-family:var(--mono)}
+  code{font-family:var(--mono);font-size:.85em;background:rgba(27,23,18,.06);padding:.1em .4em;border-radius:3px;color:var(--vermilion-deep)}
+
+  .grid{display:grid;gap:1.1rem}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:900px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border:1px solid var(--line);padding:1.5rem;border-radius:3px;position:relative;transition:transform .25s,box-shadow .25s}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+  .card h3{font-family:var(--display);font-weight:600;font-size:1.25rem;letter-spacing:-.01em;margin-bottom:.5rem}
+  .card p{font-size:.97rem;color:var(--ink-soft);margin:0}
+  .card .tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--vermilion);display:block;margin-bottom:.7rem}
+
+  /* principles */
+  .principle{display:flex;gap:1rem;align-items:flex-start}
+  .principle .pn{font-family:var(--display);font-weight:900;font-size:1.5rem;color:var(--paper);background:var(--ink);width:2.6rem;height:2.6rem;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;font-size:.95rem}
+  .principle:nth-child(odd) .pn{background:var(--vermilion)}
+  .principle:nth-child(even) .pn{background:var(--forest)}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.95rem;background:var(--panel);border:1px solid var(--line)}
+  caption{text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:.6rem 0}
+  th,td{text-align:left;padding:.65rem .85rem;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-2);border-bottom:1px solid var(--line)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(217,138,28,.07)}
+  td code{white-space:nowrap}
+
+  /* architecture stack */
+  .stack{display:flex;flex-direction:column;gap:0;max-width:760px;margin:1rem auto}
+  .layer{border:1.5px solid var(--ink);background:var(--panel);padding:1.3rem 1.5rem;position:relative}
+  .layer + .layer{margin-top:2.4rem}
+  .layer::after{content:"▼";position:absolute;bottom:-2rem;left:50%;transform:translateX(-50%);color:var(--vermilion);font-size:.9rem}
+  .layer:last-child::after{display:none}
+  .layer .ln{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--vermilion);display:block;margin-bottom:.3rem}
+  .layer h3{font-family:var(--display);font-weight:600;font-size:1.35rem;margin-bottom:.35rem}
+  .layer p{font-size:.95rem;color:var(--ink-soft);margin:0}
+  .layer.l1{border-color:var(--vermilion)}
+  .layer.l2{border-color:var(--ink)}
+  .layer.l3{border-color:var(--forest)}
+  .layer.l4{border-color:var(--saffron)}
+  .flow-note{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);position:absolute;right:1.2rem;bottom:-1.55rem}
+
+  /* pipeline steps */
+  .steps{counter-reset:step;border-left:2px solid var(--line);margin:1rem 0 1rem 1rem;padding-left:0}
+  .step{position:relative;padding:0 0 1.6rem 2.6rem}
+  .step::before{counter-increment:step;content:counter(step);position:absolute;left:-1.05rem;top:0;width:2rem;height:2rem;background:var(--paper);border:2px solid var(--vermilion);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:.8rem;color:var(--vermilion-deep)}
+  .step h4{font-family:var(--display);font-weight:600;font-size:1.15rem;margin-bottom:.2rem}
+  .step .file{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-bottom:.3rem}
+  .step p{font-size:.95rem;color:var(--ink-soft);margin:0;max-width:60ch}
+
+  /* threshold gauge */
+  .gauge{display:flex;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden;margin:1.4rem 0;font-family:var(--mono)}
+  .gauge .band{padding:1.1rem 1rem;flex:1;color:var(--paper)}
+  .gauge .band .r{font-size:.72rem;letter-spacing:.08em;opacity:.85}
+  .gauge .band .v{font-family:var(--display);font-weight:600;font-size:1.05rem;margin:.25rem 0;font-family:var(--serif)}
+  .gauge .b1{background:var(--forest)}
+  .gauge .b2{background:var(--saffron);color:var(--ink)}
+  .gauge .b3{background:var(--vermilion)}
+  @media(max-width:600px){.gauge{flex-direction:column}}
+
+  /* callout */
+  .callout{border-left:4px solid var(--saffron);background:var(--panel);padding:1.2rem 1.4rem;margin:1.6rem 0;border-radius:0 4px 4px 0}
+  .callout.warn{border-color:var(--vermilion)}
+  .callout.good{border-color:var(--forest)}
+  .callout .ct{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.4rem}
+  .callout p{margin:0;font-size:.98rem}
+
+  /* roadmap bars */
+  .phase{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:1rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line-soft)}
+  .phase .pl{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap}
+  .phase .pl b{font-family:var(--display);font-weight:600;font-size:1.05rem}
+  .phase .pl .ph{font-family:var(--mono);font-size:.66rem;color:var(--vermilion);letter-spacing:.1em}
+  .bar{height:14px;background:var(--paper-2);border:1px solid var(--line);border-radius:2px;overflow:hidden;position:relative}
+  .bar i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--forest),var(--forest) 6px,var(--forest-soft) 6px,var(--forest-soft) 12px)}
+  .status{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;text-align:right}
+  .status.done{color:var(--forest)}
+  .status.part{color:var(--saffron)}
+  .status.todo{color:var(--ink-faint)}
+  @media(max-width:600px){.phase{grid-template-columns:1fr}.status{text-align:left}}
+
+  /* steps list (getting started) */
+  ol.gs{counter-reset:gs;list-style:none;margin:1rem 0;max-width:70ch}
+  ol.gs li{position:relative;padding:0 0 1.1rem 2.4rem;counter-increment:gs}
+  ol.gs li::before{content:counter(gs);position:absolute;left:0;top:-.1rem;font-family:var(--display);font-weight:900;font-size:1.3rem;color:var(--vermilion)}
+  ol.gs li b{font-family:var(--display);font-weight:600}
+  pre{background:var(--ink);color:#f0e9d8;font-family:var(--mono);font-size:.82rem;padding:1rem 1.2rem;border-radius:4px;overflow-x:auto;margin:.7rem 0;line-height:1.55}
+  pre .c{color:#c9a86a}
+  pre .a{color:#f2a07a}
+
+  /* glossary */
+  .gloss{columns:2;column-gap:2.5rem;max-width:var(--maxw)}
+  @media(max-width:680px){.gloss{columns:1}}
+  .gloss dt{font-family:var(--display);font-weight:600;font-size:1.02rem;margin-top:.9rem;break-after:avoid}
+  .gloss dd{font-size:.92rem;color:var(--ink-soft);margin:0 0 .3rem;break-before:avoid}
+  .gloss dt code{font-size:.78rem}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  footer{background:var(--ink);color:var(--paper);padding:4rem clamp(1.2rem,5vw,3rem) 3rem;position:relative;z-index:1}
+  footer .inner{max-width:var(--maxw);margin:0 auto}
+  footer h2{font-family:var(--display);font-weight:900;font-size:clamp(2rem,6vw,3.6rem);letter-spacing:-.03em;line-height:1;margin-bottom:1rem}
+  footer h2 .a{color:var(--saffron)}
+  footer p{color:#cbbfa6;max-width:60ch}
+  footer .meta{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#8a7c5e;margin-top:2.4rem;border-top:1px solid rgba(255,255,255,.12);padding-top:1.4rem;display:flex;gap:1.4rem;flex-wrap:wrap}
+  ::selection{background:var(--vermilion);color:var(--paper)}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<nav class="top">
+  <span class="brand">Artha<b>ive</b></span>
+  <div class="links">
+    <a href="#product">Product</a>
+    <a href="#principles">Principles</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#data">Data Model</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#resolution">Resolution</a>
+    <a href="#admin">Admin</a>
+    <a href="#frontend">Frontend</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#start">Run It</a>
+    <a href="#glossary">Glossary</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="kicker">The Field Guide &nbsp;·&nbsp; India Startup Funding Intelligence</div>
+    <h1><span class="a">Artha</span>ive</h1>
+    <p class="hero-sub">A free, <b>source-backed</b> database of Indian startup funding — every record traceable to the article it came from.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="n"><span class="a">1,696</span></div><div class="l">Funding deals in the dataset</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">System layers</div></div>
+      <div class="stat"><div class="n">9</div><div class="l">Build phases</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">Design principles</div></div>
+      <div class="stat"><div class="n">18</div><div class="l">Database migrations</div></div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>Scroll ▾<br>Read the guide</span></div>
+</header>
+
+<!-- ============ PRODUCT ============ -->
+<section id="product">
+  <div class="inner">
+    <span class="sec-num">§ 01 — What this is</span>
+    <h2 class="sec-title">An India-first answer to a paywalled question.</h2>
+    <p class="sec-lede">If you want to ask “show me every Series A in fintech from Q1 2026,” you either pay thousands for Tracxn/Crunchbase or scrape the news by hand for hours. Arthaive is the free, structured, third option.</p>
+
+    <p class="lead-p dropcap">Arthaive extracts <strong>structured funding data</strong> from the articles that journalists already write, normalizes it, and makes it searchable — without charging for access and without losing the trail back to the source. It is built for founders benchmarking valuations, investors scouting pipeline, journalists looking up histories, and analysts pulling aggregate trends.</p>
+
+    <div class="grid g3" style="margin-top:2.2rem">
+      <div class="card reveal"><span class="tag">Not a news site</span><p>We don't write articles. We extract structured data <em>from</em> the articles other people write.</p></div>
+      <div class="card reveal"><span class="tag">Not a Crunchbase clone</span><p>We focus on India and stay free. We don't chase global coverage.</p></div>
+      <div class="card reveal"><span class="tag">Not unverified data</span><p>Every record links back to its source article. Wrong number? Click through and check.</p></div>
+    </div>
+
+    <table class="reveal" style="margin-top:2.4rem">
+      <caption>Who it is for</caption>
+      <thead><tr><th>Audience</th><th>What they get</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Founders</strong></td><td>Benchmark valuations, find investors active in your sector</td></tr>
+        <tr><td><strong>Investors</strong></td><td>Track competitors, scout pipeline, validate market trends</td></tr>
+        <tr><td><strong>Journalists</strong></td><td>Look up a startup's funding history in seconds</td></tr>
+        <tr><td><strong>Analysts &amp; researchers</strong></td><td>Pull aggregate stats by sector, stage, city, year</td></tr>
+        <tr><td><strong>Students</strong></td><td>Learn how the ecosystem moves — without paying for a database</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout good reveal">
+      <div class="ct">What "100% done" looks like</div>
+      <p>Crawls Entrackr, Inc42, YourStory &amp; MoneyControl daily · every funded Indian startup has a canonical record with full round history · search, filters, analytics &amp; reports run from live queries · a rate-limited Public API v1 is open to researchers · and the platform stays free.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ PRINCIPLES ============ -->
+<section id="principles" class="alt">
+  <div class="inner">
+    <span class="sec-num">§ 02 — The eight load-bearing rules</span>
+    <h2 class="sec-title">Every feature is measured against these.</h2>
+    <p class="sec-lede">From <code>PROJECT_REFERENCE.md §5</code>. If a decision drifts from one of these, it gets pushed back. They are not aspirations — they are gates.</p>
+
+    <div class="grid g2" style="gap:1.6rem 3rem">
+      <div class="principle reveal"><div class="pn">P1</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Source-backed data</h3><p style="color:var(--ink-soft);font-size:.97rem">Every funding event in the public dataset has at least one source URL. No sourceless records.</p></div></div>
+      <div class="principle reveal"><div class="pn">P2</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Canonical identity</h3><p style="color:var(--ink-soft);font-size:.97rem">One startup = one row, one investor = one row. Aliases ("Sequoia India" → "Peak XV") map to canonical names so dedup works.</p></div></div>
+      <div class="principle reveal"><div class="pn">P3</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Normalized structure</h3><p style="color:var(--ink-soft);font-size:.97rem">Startups, rounds, investors, sources are separate tables joined by foreign keys — not one fat spreadsheet.</p></div></div>
+      <div class="principle reveal"><div class="pn">P4</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Incremental updates</h3><p style="color:var(--ink-soft);font-size:.97rem">The pipeline runs daily and adds new records. It never rebuilds the dataset from scratch.</p></div></div>
+      <div class="principle reveal"><div class="pn">P5</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Human verification</h3><p style="color:var(--ink-soft);font-size:.97rem">Extracted records pass through a review queue. High-confidence ones auto-approve; the rest wait for an admin.</p></div></div>
+      <div class="principle reveal"><div class="pn">P6</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Explainable analytics</h3><p style="color:var(--ink-soft);font-size:.97rem">Every chart traces to its rows. If you can't show the deals behind a number, the chart doesn't ship.</p></div></div>
+      <div class="principle reveal"><div class="pn">P7</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Cost efficiency</h3><p style="color:var(--ink-soft);font-size:.97rem">AI calls are reserved for what regex can't handle and high-value summaries. We don't Claude-every-line.</p></div></div>
+      <div class="principle reveal"><div class="pn">P8</div><div><h3 style="font-family:var(--display);font-weight:600;font-size:1.15rem">Honest data labeling</h3><p style="color:var(--ink-soft);font-size:.97rem">We disclose coverage gaps. Charts show date ranges. The UI says what's verified vs. estimated.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section id="architecture">
+  <div class="inner">
+    <span class="sec-num">§ 03 — Architecture</span>
+    <h2 class="sec-title">Four layers, one direction of flow.</h2>
+    <p class="sec-lede">Data is born in the news, refined by Python &amp; Claude, stored in Postgres, and served by Next.js. Each layer talks only to its neighbour.</p>
+
+    <div class="stack">
+      <div class="layer l1 reveal"><span class="ln">Layer 1 · Frontend — Next.js 14 (App Router) · Vercel</span><h3>The public site</h3><p>Routes under <code>app/</code>: <code>/explore</code>, <code>/analytics</code>, <code>/deal/[id]</code>, <code>/investors</code>, <code>/sectors</code>, <code>/live</code>, <code>/admin</code>, <code>/submit</code>. Server components for SEO, client components for filters &amp; charts.</p><span class="flow-note">server reads + auth ▼</span></div>
+      <div class="layer l2 reveal"><span class="ln">Layer 2 · Database — Supabase Postgres</span><h3>The source of truth</h3><p>18 migrations. 10+ tables — <code>deals</code>, <code>sources</code>, <code>review_queue</code>, aliases, investors, sectors, <code>pipeline_jobs</code>, user profiles. RLS enforces who reads/writes what.</p><span class="flow-note">▲ service-role writes</span></div>
+      <div class="layer l3 reveal"><span class="ln">Layer 3 · Pipeline — Python (scheduled CLI)</span><h3>The refinery</h3><p><code>pipeline/</code> — Discovery → Fetch → Extract → Resolve → Dedup → Route. Writes to <code>deals</code> (auto-approved) or <code>review_queue</code>. Each run is additive.</p><span class="flow-note">AI extraction calls ▼</span></div>
+      <div class="layer l4 reveal"><span class="ln">Layer 4 · AI — Anthropic Claude</span><h3>The judgement</h3><p>Claude Haiku turns article bodies into strict-JSON funding events. Phase 7 adds trend summaries, natural-language search &amp; sector classification.</p></div>
+    </div>
+
+    <table class="reveal" style="margin-top:3rem">
+      <caption>Where things are deployed</caption>
+      <thead><tr><th>Component</th><th>Host</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td>Vercel — auto-deploy on push to <code>main</code></td></tr>
+        <tr><td>Database</td><td>Supabase managed Postgres</td></tr>
+        <tr><td>Pipeline</td><td>Scheduled CLI (cron / GitHub Actions / worker)</td></tr>
+        <tr><td>AI</td><td>Anthropic API (cloud)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout reveal">
+      <div class="ct">The dual-source pattern</div>
+      <p>The key file is <code>lib/db/deals.ts</code>. <code>getDeals(filters)</code> tries Supabase first and falls back to the static <code>data/funding-data.ts</code> (1,696 deals) when the DB is empty or unconfigured. This is how the migration happens gradually — the frontend works whether or not the live DB is populated.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ DATA MODEL ============ -->
+<section id="data" class="alt">
+  <div class="inner">
+    <span class="sec-num">§ 04 — Data model</span>
+    <h2 class="sec-title">A normalized graph, not a spreadsheet.</h2>
+    <p class="sec-lede"><code>sources</code> and <code>investors</code> feed <code>deals</code>; <code>review_queue</code> gates what enters; alias tables resolve identity; <code>pipeline_jobs</code> records every run.</p>
+
+    <div class="grid g3">
+      <div class="card reveal"><span class="tag">Core · the verified dataset</span><h3>deals</h3><p>Single source of truth for confirmed funding events. <code>company</code>, <code>amount_inr/usd</code>, <code>stage</code>, <code>sectors[]</code>, <code>investors[]</code>, <code>deal_date</code>, <code>source_url</code>. Public reads filter on <code>record_status='verified'</code>.</p></div>
+      <div class="card reveal"><span class="tag">Core · provenance</span><h3>sources</h3><p>One row per URL ever processed. <code>url</code> is UNIQUE — the URL-dedup key. Stores <code>reliability_tier</code> and a 5,000-char raw snapshot, so the evidence survives even if the article goes dead.</p></div>
+      <div class="card reveal"><span class="tag">Core · the gate</span><h3>review_queue</h3><p>Pipeline output awaiting humans. Keeps the full <code>raw_extracted_data</code> (jsonb), a <code>suggested_company</code>, a <code>match_confidence</code>, and a status: pending → approved / rejected / merged.</p></div>
+      <div class="card reveal"><span class="tag">Entity · identity</span><h3>startup_aliases<br>investor_aliases</h3><p>The truth table for "these strings mean the same entity." <code>(company, alias_name, alias_type)</code> — former_name, alternate_spelling, short_name, brand_name. Trigram GIN index for fuzzy lookups.</p></div>
+      <div class="card reveal"><span class="tag">Operational · audit</span><h3>pipeline_jobs</h3><p>One row per run. Counts fetched / filtered / extracted / auto-approved / flagged, plus <code>run_status</code> and error log. Powers the admin "Pipeline" health page.</p></div>
+      <div class="card reveal"><span class="tag">User-facing</span><h3>profiles · alerts<br>bookmarks · saved_searches</h3><p>Per-user features: display name &amp; bio, saved deals, saved queries, watchlists, and email-digest alerts on new matching deals.</p></div>
+    </div>
+
+    <div class="callout reveal" style="margin-top:2.4rem">
+      <div class="ct">Deliberate trade-offs, not oversights</div>
+      <p><code>deals.company</code> is text, not a FK to a <code>startups</code> table — the alias table already gives canonical identity (P2). <code>deals.investors</code> is a text array, not a join table. <code>record_status</code> lives on <code>deals</code> so public reads stay one simple filter. All reversible if they start hurting.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ PIPELINE ============ -->
+<section id="pipeline">
+  <div class="inner">
+    <span class="sec-num">§ 05 — The data collection pipeline</span>
+    <h2 class="sec-title">How a news article becomes a row.</h2>
+    <p class="sec-lede">The most important chapter. A Python CLI you run on a cron — nine steps from a source sitemap to a verified deal, every run additive thanks to URL-level dedup.</p>
+
+    <div class="steps">
+      <div class="step reveal"><h4>Discovery</h4><div class="file">pipeline/discovery.py</div><p>Walks the source's daily-partitioned sitemap, pulls URLs newer than <code>--since</code>, applies a coarse keyword pre-filter (slugs like <em>raises</em>, <em>secures</em>, <em>series</em>).</p></div>
+      <div class="step reveal"><h4>URL-level dedup</h4><div class="file">dedup.py · is_url_seen</div><p>Skips any URL already in <code>sources</code>. This is what makes repeated runs safe and additive (P4).</p></div>
+      <div class="step reveal"><h4>Fetch</h4><div class="file">fetcher.py + wayback.py</div><p>Downloads with httpx, extracts the body via CSS selectors. Dead link? Falls back to the Wayback Machine. Body truncated to 5,000 chars to bound token cost.</p></div>
+      <div class="step reveal"><h4>AI extraction</h4><div class="file">extractor.py · Claude Haiku</div><p>Returns strict JSON — company, amount, currency, stage, sectors, investors, date, and a self-rated <code>confidence</code>. Non-funding articles return <code>is_funding_event=false</code> and are dropped. Responses cached in SQLite by <code>sha256(url+body)</code> — re-runs are free.</p></div>
+      <div class="step reveal"><h4>Currency normalization</h4><div class="file">currency.py</div><p>Converts amount + currency into both <code>amount_inr</code> and <code>amount_usd</code> at a fixed rate (83.5). Good enough for round-level charts; the only file to change when historical rates arrive.</p></div>
+      <div class="step reveal"><h4>Entity resolution</h4><div class="file">entity_resolver.py</div><p>Maps every company &amp; investor name to its canonical form — exact alias hit, then rapidfuzz. (See §06.)</p></div>
+      <div class="step reveal"><h4>Deal-level dedup</h4><div class="file">dedup.py · find_duplicate_deal</div><p>Same company + <code>deal_date</code> within ±30 days + <code>amount_inr</code> within ±10% → treated as a duplicate (likely a second publisher) and routed to review with a hint.</p></div>
+      <div class="step reveal"><h4>Routing</h4><div class="file">run.py · _route_record</div><p>Auto-approve only if <strong>all</strong> hold: confidence ≥ 0.80, canonical company exists, date non-null, amount &gt; 0, no duplicate. Pass → <code>deals</code> (verified, instantly public). Else → <code>review_queue</code>.</p></div>
+      <div class="step reveal"><h4>Job log</h4><div class="file">queue.py · log_job_run</div><p>One row to <code>pipeline_jobs</code> with all counts and run status — the data behind the admin health dashboard.</p></div>
+    </div>
+
+    <table class="reveal" style="margin-top:1.6rem">
+      <caption>Failure modes &amp; how they're handled</caption>
+      <thead><tr><th>What can go wrong</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>Article URL is dead</td><td>Wayback Machine fallback tries an archive snapshot</td></tr>
+        <tr><td>Claude returns invalid JSON</td><td>Retry once; if still bad, drop &amp; cache the failure</td></tr>
+        <tr><td>API rate-limit / Supabase write fails</td><td>Per-URL try/except — log error, continue, finish with status <code>partial</code></td></tr>
+        <tr><td>Same article re-discovered tomorrow</td><td>URL-dedup skips it</td></tr>
+        <tr><td>Two publishers cover one round</td><td>Deal-dedup (step 7) collapses it to review</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ ENTITY RESOLUTION ============ -->
+<section id="resolution" class="alt">
+  <div class="inner">
+    <span class="sec-num">§ 06 — Entity resolution</span>
+    <h2 class="sec-title">"Sequoia India" and "Peak XV" are the same investor.</h2>
+    <p class="sec-lede">Sequoia rebranded to Peak XV in 2023. Store them as separate rows and search misses three-quarters of their deals, the leaderboard splits, and histories lie. Resolution is the fix for principle P2.</p>
+
+    <p class="lead-p">Two halves: the <strong>alias tables</strong> (<code>startup_aliases</code>, <code>investor_aliases</code>) are the source of truth for "these strings mean the same entity," seeded day-one with ~30 known cases. The <strong>resolver</strong> (<code>entity_resolver.py</code>) runs three checks in order — exact alias hit → exact canonical hit → fuzzy match via rapidfuzz <code>token_sort_ratio</code> against every canonical name, alias, and previously-verified deal.</p>
+
+    <div class="gauge reveal">
+      <div class="band b1"><div class="r">SCORE ≥ 92</div><div class="v">Auto-canonicalize</div><div class="r">Replace the name before insert. False positives are rare.</div></div>
+      <div class="band b2"><div class="r">SCORE 75–91</div><div class="v">Suggest &amp; review</div><div class="r">Attach as suggested_company, route to the queue. A human confirms.</div></div>
+      <div class="band b3"><div class="r">SCORE &lt; 92, under 75</div><div class="v">Treat as new</div><div class="r">No good match → probably a new entity. Use the name as-is.</div></div>
+    </div>
+
+    <div class="callout good reveal">
+      <div class="ct">The closed loop — every variant is a one-time cost</div>
+      <p>Aliases grow from three sources: the day-one seed, the admin entity manager, and <strong>auto-alias on approval</strong> (Phase 5.4) — when a reviewer confirms "Sequoia India" → "Peak XV Partners" once, the next pipeline run resolves it without their help. Every name learned is remembered.</p>
+    </div>
+
+    <p style="font-size:.95rem;color:var(--ink-soft)">Conscious limits: the alias system collapses parent/subsidiary, treats global Sequoia &amp; India Peak&nbsp;XV as one, and can't yet distinguish a person who is both angel and founder. When simple stops being enough, it layers on rather than rebuilds — and at ~50k+ entities the fuzzy match moves into Postgres via the existing trigram index.</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ ADMIN ============ -->
+<section id="admin">
+  <div class="inner">
+    <span class="sec-num">§ 07 — The admin workflow</span>
+    <h2 class="sec-title">Where humans keep the data clean.</h2>
+    <p class="sec-lede">The pipeline auto-approves the confident extractions; everything ambiguous piles up in <code>review_queue</code>. The admin console at <code>/admin</code> is where principle P5 lives. Access is gated by the <code>ADMIN_EMAILS</code> env var.</p>
+
+    <div class="grid g4" style="margin-bottom:2.4rem">
+      <div class="card reveal"><span class="tag">/admin</span><p>Dashboard — counts, recent activity, links</p></div>
+      <div class="card reveal"><span class="tag">/admin/review</span><p>The queue — extractions awaiting a decision</p></div>
+      <div class="card reveal"><span class="tag">/admin/entities</span><p>Canonical names &amp; aliases manager</p></div>
+      <div class="card reveal"><span class="tag">/admin/sources</span><p>Publisher registry &amp; reliability tiers</p></div>
+      <div class="card reveal"><span class="tag">/admin/pipeline</span><p>Run logs, counts, errors, status</p></div>
+      <div class="card reveal"><span class="tag">/admin/import</span><p>Bulk CSV import of historical deals</p></div>
+      <div class="card reveal"><span class="tag">/admin/export</span><p>Pull the verified dataset as CSV / JSON</p></div>
+      <div class="card reveal"><span class="tag">audit</span><p>Every action stamps <code>reviewed_by</code> &amp; <code>reviewed_at</code></p></div>
+    </div>
+
+    <table class="reveal">
+      <caption>The core loop — four actions on a review item</caption>
+      <thead><tr><th>Action</th><th>What happens to the database</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Approve</strong></td><td>Insert a verified row into <code>deals</code>; mark queue item <code>approved</code>. (Phase 5.4: also auto-write the alias if the raw name differed.)</td></tr>
+        <tr><td><strong>Reject</strong></td><td>Mark <code>rejected</code> with a note. Stays for audit, never enters <code>deals</code>.</td></tr>
+        <tr><td><strong>Merge</strong></td><td>Mark <code>merged</code> — a duplicate of an existing deal; optionally append the new source URL.</td></tr>
+        <tr><td><strong>Needs more info</strong></td><td>Mark <code>needs_more_info</code> — unclear article or undisclosed amount; come back later.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout reveal">
+      <div class="ct">A typical admin day</div>
+      <p>Check <code>/admin/pipeline</code> (was last night green?) → work <code>/admin/review</code> (source article is one click away) → approve / reject / merge → alias any new name variants. A diligent admin clears ~50 items in 30 minutes once entity resolution starts pre-suggesting correctly.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ FRONTEND ============ -->
+<section id="frontend" class="alt">
+  <div class="inner">
+    <span class="sec-num">§ 08 — The public frontend</span>
+    <h2 class="sec-title">Every page, and where its data comes from.</h2>
+    <p class="sec-lede">A Next.js 14 app where every route is a folder. Frontend code never touches Supabase directly — always through <code>lib/db/*</code>, which applies the dual-source fallback.</p>
+
+    <table class="reveal">
+      <thead><tr><th>Route</th><th>Purpose</th><th>Data path</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>Home — hero stats, recent deals, active sectors</td><td><code>getDeals({limit:10})</code></td></tr>
+        <tr><td><code>/explore</code></td><td>Search &amp; filter; filters live in the URL (shareable)</td><td><code>getDeals(filters)</code></td></tr>
+        <tr><td><code>/deal/[id]</code></td><td>One funding event in full, with source link &amp; similar deals</td><td><code>getDealById(id)</code></td></tr>
+        <tr><td><code>/investors</code> · <code>/investors/[slug]</code></td><td>Investor list &amp; portfolio</td><td>aggregates over <code>deals.investors[]</code></td></tr>
+        <tr><td><code>/sectors</code> · <code>/sectors/[slug]</code></td><td>Sector list &amp; deals</td><td>aggregates over <code>deals.sectors[]</code></td></tr>
+        <tr><td><code>/analytics</code></td><td>Charts — monthly, sector, stage, city map, top investors, YoY</td><td><code>lib/db/analytics.ts</code></td></tr>
+        <tr><td><code>/live</code></td><td>Realtime feed — new verified deals appear without refresh</td><td>Supabase realtime channel</td></tr>
+        <tr><td><code>/submit</code></td><td>Community submission form</td><td>→ <code>submissions</code> table</td></tr>
+        <tr><td><code>/login</code> · <code>/profile</code> · <code>/dashboard</code></td><td>Auth, profile, bookmarks &amp; saved searches</td><td>Supabase auth</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout reveal" style="margin-top:2rem">
+      <div class="ct">The data-source switch</div>
+      <p>Controlled by <code>lib/supabase.ts:isSupabaseConfigured</code>. <strong>Supabase</strong> when env vars are set and the query returns ≥1 verified row; the static <strong>1,696-deal file</strong> otherwise. State is handled by server components + URL query params — no Redux/Zustand. Tailwind + shadcn/ui, dark mode default, Sentry for client errors.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap">
+  <div class="inner">
+    <span class="sec-num">§ 09 — Roadmap &amp; status</span>
+    <h2 class="sec-title">Nine phases, from foundation to launch.</h2>
+    <p class="sec-lede">The bars below reflect the documented snapshot in <code>09-roadmap.md</code> (dated 2026-05-23). The build has since moved on — read the reconciliation note underneath.</p>
+
+    <div class="reveal">
+      <div class="phase"><div class="pl"><span class="ph">PH 0</span><b>Frontend foundation</b></div><div class="bar"><i style="width:100%"></i></div><div class="status done">done</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 1</span><b>Supabase live database</b></div><div class="bar"><i style="width:100%"></i></div><div class="status done">done</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 2</span><b>Admin interface</b></div><div class="bar"><i style="width:100%"></i></div><div class="status done">done</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 3</span><b>Discovery pipeline</b></div><div class="bar"><i style="width:100%"></i></div><div class="status done">done</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 4</span><b>Extraction pipeline</b></div><div class="bar"><i style="width:82%"></i></div><div class="status part">done · minus rule-layer</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 5</span><b>Entity resolution</b></div><div class="bar"><i style="width:82%"></i></div><div class="status part">v1 · auto-alias pending</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 6</span><b>Analytics &amp; reports</b></div><div class="bar"><i style="width:35%"></i></div><div class="status part">partial</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 7</span><b>AI layer</b></div><div class="bar"><i style="width:4%"></i></div><div class="status todo">not started*</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 8</span><b>Public API v1</b></div><div class="bar"><i style="width:4%"></i></div><div class="status todo">not started*</div></div>
+      <div class="phase"><div class="pl"><span class="ph">PH 9</span><b>Production polish &amp; launch</b></div><div class="bar"><i style="width:4%"></i></div><div class="status todo">not started*</div></div>
+    </div>
+
+    <div class="callout warn reveal" style="margin-top:2rem">
+      <div class="ct">* Reconciliation — docs vs. as-built (verified 2026-06-02)</div>
+      <p>The roadmap doc was written at ~50% complete. Since then the repo has gained commits for <strong>Phase 7 (AI layer)</strong>, <strong>Phase 8 (public REST API v1)</strong> and <strong>Phase 9 (polish, SEO, error boundaries)</strong> — all three exist as real, tested code (<code>lib/ai/</code>, <code>app/api/v1/</code>, perf indexes, README). In other words, <strong>all 9 phases are now code-complete.</strong> The remaining work is <em>operational</em>, not development: set Supabase &amp; Anthropic env vars in production, apply migrations + seed data, and add a scheduler (cron / GitHub Action) to actually trigger the pipeline.</p>
+    </div>
+
+    <table class="reveal" style="margin-top:1.6rem">
+      <caption>Risks worth tracking</caption>
+      <thead><tr><th>Risk</th><th>Mitigation in place</th></tr></thead>
+      <tbody>
+        <tr><td>AI auto-approves garbage</td><td>Confidence ≥ 0.80 <em>plus</em> canonical company + date + amount + no-duplicate guards</td></tr>
+        <tr><td>Source HTML changes, fetcher breaks</td><td>Ordered CSS selectors + Wayback fallback; monitor fetch ratios</td></tr>
+        <tr><td>Resolver over-merges distinct entities</td><td>Conservative 92 threshold; 75–91 routed to humans; aliases override</td></tr>
+        <tr><td>Pipeline outage goes unnoticed</td><td><code>pipeline_jobs</code> + admin page; wire an alert on consecutive failures</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ GETTING STARTED ============ -->
+<section id="start" class="alt">
+  <div class="inner">
+    <span class="sec-num">§ 10 — Run it locally</span>
+    <h2 class="sec-title">The whole stack on your laptop in ~15 minutes.</h2>
+    <p class="sec-lede">Prereqs: Node 20+, Python 3.10+, a free Supabase project, and an Anthropic API key (pipeline only — the frontend runs without it on the static fallback).</p>
+
+    <ol class="gs reveal">
+      <li><b>Clone &amp; install.</b> Frontend deps with <code>npm install</code>; pipeline deps in a venv with <code>pip install -r pipeline/requirements.txt</code>.</li>
+      <li><b>Environment.</b> Copy <code>.env.example</code> → <code>.env.local</code> and fill in the Supabase URL + anon + service-role keys, <code>ADMIN_EMAILS</code>, and <code>ANTHROPIC_API_KEY</code>.</li>
+      <li><b>Database.</b> Run migrations <code>001 … 018</code> in the Supabase SQL editor (or <code>supabase db push</code>), then seed with <code>seed_aliases.sql</code>.</li>
+      <li><b>Frontend.</b> <code>npm run dev</code> → open <code>localhost:3000</code>. Empty DB? It falls back to the 1,696-deal static file, so the site is fully browsable.</li>
+      <li><b>Pipeline.</b> Dry-run first, then a real run (below). Check <code>sources</code>, <code>review_queue</code> &amp; <code>pipeline_jobs</code> in Supabase.</li>
+      <li><b>Admin.</b> Sign up with an email in <code>ADMIN_EMAILS</code>, then visit <code>/admin</code>.</li>
+    </ol>
+
+<pre><span class="c"># dry run — no DB writes, no AI calls</span>
+python -m pipeline.run --source entrackr --since 2026-05-01 <span class="a">--dry-run --limit 5</span>
+
+<span class="c"># the real thing</span>
+python -m pipeline.run --source entrackr --since 2026-05-20 <span class="a">--limit 10</span></pre>
+
+    <table class="reveal" style="margin-top:1.4rem">
+      <caption>Troubleshooting</caption>
+      <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend shows zero deals</td><td>Supabase configured but empty — run the pipeline, or unset the URL to use the static fallback</td></tr>
+        <tr><td>"Missing Supabase env vars"</td><td>Confirm both URL and service-role key are in <code>.env.local</code> at repo root</td></tr>
+        <tr><td>Admin page 404s</td><td>Your email isn't in <code>ADMIN_EMAILS</code>, or you're signed out</td></tr>
+        <tr><td>Pipeline re-extracts the same article</td><td>Delete <code>pipeline/.extractor_cache.sqlite</code> to force fresh extractions</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ GLOSSARY ============ -->
+<section id="glossary">
+  <div class="inner">
+    <span class="sec-num">§ 11 — Glossary</span>
+    <h2 class="sec-title">The vocabulary.</h2>
+    <p class="sec-lede">The domain terms used across the codebase and these docs — the shorthand that makes the rest legible.</p>
+
+    <dl class="gloss reveal">
+      <dt>Canonical name</dt><dd>The single authoritative name for an entity. "Peak XV Partners" is canonical; "Sequoia India" is an alias of it.</dd>
+      <dt>Alias</dt><dd>A name variant that maps to a canonical name. Stored in <code>startup_aliases</code> / <code>investor_aliases</code>.</dd>
+      <dt>Record status</dt><dd>Gates public visibility: <code>verified</code> (public), <code>needs_review</code>, <code>rejected</code>, <code>merged</code>. The site filters on verified.</dd>
+      <dt>Source</dt><dd>A row in <code>sources</code> — one per unique URL. Every deal links to at least one (P1).</dd>
+      <dt>Reliability tier</dt><dd><code>tier_1</code> direct reporting (Entrackr, Inc42) · <code>tier_2</code> reliable but rehashed · <code>tier_3</code> discovery hints only.</dd>
+      <dt>Confidence</dt><dd>Claude's self-rated 0–1 score per extraction. Drives auto-approval. Distinct from the resolver's 0–100 match score.</dd>
+      <dt>Auto-approval threshold</dt><dd>Confidence ≥ 0.80 plus guards: canonical company, non-null date, amount &gt; 0, no duplicate.</dd>
+      <dt>Match confidence</dt><dd>rapidfuzz <code>token_sort_ratio</code>, 0–100. ≥92 auto · 75–91 suggest · &lt;75 new entity.</dd>
+      <dt>URL-level dedup</dt><dd>Skipping an article whose URL is already in <code>sources</code> — how the pipeline stays safely re-runnable.</dd>
+      <dt>Deal-level dedup</dt><dd>Detecting a re-reported round: same company, ±10% amount, ±30 days.</dd>
+      <dt>Wayback fallback</dt><dd>When a live URL is dead, try archive.org's snapshot.</dd>
+      <dt>Extraction cache</dt><dd><code>.extractor_cache.sqlite</code> — every Claude response keyed by <code>sha256(url+body)</code>. Re-runs hit the cache, not the API.</dd>
+      <dt>Coverage notice</dt><dd>The disclaimer telling users what date range &amp; dataset the charts cover (P8).</dd>
+      <dt>Undisclosed amount</dt><dd>Round announced without a figure — stored <code>amount_inr=0</code>, shown as "Undisclosed," never auto-approved.</dd>
+      <dt>RLS</dt><dd>Row-Level Security — Postgres filtering that enforces "public read on verified, admin write only."</dd>
+    </dl>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="inner">
+    <h2>Source-backed by <span class="a">design.</span></h2>
+    <p>Every funding event in Arthaive traces to the article it came from. That single rule — P1 — shapes the schema, the pipeline, the review queue, and the analytics. This guide is the explanation; <code>PROJECT_REFERENCE.md</code> is the spec, and it wins any conflict.</p>
+    <div class="meta">
+      <span>Arthaive · India Startup Funding Intelligence</span>
+      <span>Generated from documentation/01–10 + README</span>
+      <span>Verified repo state · 2026-06-02</span>
+      <span>1,696 deals · 9 phases · 4 layers</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // reading progress
+  const prog=document.getElementById('progress');
+  const onScroll=()=>{
+    const h=document.documentElement;
+    const max=h.scrollHeight-h.clientHeight;
+    prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  };
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  // reveal on scroll
+  const io=new IntersectionObserver((es)=>{
+    es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // active nav link via section observer
+  const links=[...document.querySelectorAll('nav.top .links a')];
+  const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+  const navIo=new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=map.get(e.target.id); if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section[id]').forEach(s=>navIo.observe(s));
+</script>
+</body>
+</html>
