@@ -41,3 +41,7 @@ pipeline/.venv/
 pipeline/.extractor_cache.sqlite
 **/__pycache__/
 *.pyc
+
+# Claude Code (machine-local)
+.claude/settings.local.json
+.claude/worktrees/
