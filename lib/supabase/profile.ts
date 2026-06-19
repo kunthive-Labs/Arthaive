@@ -5,6 +5,7 @@ type Watchlist = Database["public"]["Tables"]["watchlist"]["Row"]
 type Bookmark = Database["public"]["Tables"]["bookmarks"]["Row"]
 type SavedSearch = Database["public"]["Tables"]["saved_searches"]["Row"]
 type Alert = Database["public"]["Tables"]["alerts"]["Row"]
+type DealNote = Database["public"]["Tables"]["deal_notes"]["Row"]
 
 export async function getWatchlist(userId: string): Promise<Watchlist[]> {
   const supabase = await createClient()
@@ -159,4 +160,73 @@ export async function getActiveAlerts(userId: string) {
 export async function clearBookmarks(userId: string) {
   const supabase = await createClient()
   return supabase.from("bookmarks").delete().eq("user_id", userId)
+}
+
+
+// --- Deal notes (private per-user notes + tags on a single deal) ---
+
+export async function getNote(userId: string, dealId: string): Promise<DealNote | null> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("deal_notes")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("deal_id", dealId)
+    .maybeSingle()
+  return data ?? null
+}
+
+export async function getNotes(userId: string): Promise<DealNote[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("deal_notes")
+    .select("*")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
+  return data ?? []
+}
+
+// Upsert: create the note on first save, update it thereafter. An empty note
+// (no content and no tags) is treated as a delete so we don't keep blank rows.
+export async function saveNote(
+  userId: string,
+  dealId: string,
+  content: string,
+  tags: string[]
+) {
+  const supabase = await createClient()
+  const trimmed = content.trim()
+  const cleanTags = Array.from(
+    new Set(tags.map((t) => t.trim()).filter(Boolean))
+  )
+
+  if (!trimmed && cleanTags.length === 0) {
+    return supabase
+      .from("deal_notes")
+      .delete()
+      .eq("user_id", userId)
+      .eq("deal_id", dealId)
+  }
+
+  return supabase
+    .from("deal_notes")
+    .upsert(
+      {
+        user_id: userId,
+        deal_id: dealId,
+        content: trimmed,
+        tags: cleanTags,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,deal_id" }
+    )
+}
+
+export async function deleteNote(userId: string, dealId: string) {
+  const supabase = await createClient()
+  return supabase
+    .from("deal_notes")
+    .delete()
+    .eq("user_id", userId)
+    .eq("deal_id", dealId)
 }
