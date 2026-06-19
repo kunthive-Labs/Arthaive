@@ -46,6 +46,8 @@ export default async function ReportPage({ params }: { params: { period: string 
   const aiSummary = report.totalDeals > 0 ? await generateTrendSummary(report) : null
 
   const fd = report.deals as unknown as FundingDeal[]
+  // Explore filters support year granularity, so chart links narrow to the report's year.
+  const exploreLink = `/explore?year=${report.period.start.slice(0, 4)}`
 
   return (
     <div className="min-h-screen bg-white">
@@ -121,11 +123,11 @@ export default async function ReportPage({ params }: { params: { period: string 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
               <div>
                 <h2 className="text-lg font-semibold mb-4">By sector</h2>
-                <SectorBarChart deals={fd} topN={8} />
+                <SectorBarChart deals={fd} topN={8} sourceLink={exploreLink} />
               </div>
               <div>
                 <h2 className="text-lg font-semibold mb-4">By stage</h2>
-                <StageFunnel deals={fd} />
+                <StageFunnel deals={fd} sourceLink={exploreLink} />
               </div>
             </div>
 

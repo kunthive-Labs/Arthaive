@@ -1,4 +1,4 @@
-# SUDEVI Deployment Guide
+# Arthaive Deployment Guide
 
 ## Deploying to Vercel
 

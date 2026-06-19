@@ -2,10 +2,11 @@
 
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-export function FundingHeatmap({ deals, topSectors = 12 }: { deals: Deal[]; topSectors?: number }) {
+export function FundingHeatmap({ deals, topSectors = 12, sourceLink }: { deals: Deal[]; topSectors?: number; sourceLink?: string }) {
   const { sectors, grid, maxVal } = useMemo(() => {
     const sectorTotals = new Map<string, number>()
     const cell = new Map<string, number>()
@@ -38,6 +39,7 @@ export function FundingHeatmap({ deals, topSectors = 12 }: { deals: Deal[]; topS
   }
 
   return (
+    <>
     <div className="overflow-x-auto">
       <table className="text-xs w-full border-collapse">
         <thead>
@@ -71,5 +73,7 @@ export function FundingHeatmap({ deals, topSectors = 12 }: { deals: Deal[]; topS
         </tbody>
       </table>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

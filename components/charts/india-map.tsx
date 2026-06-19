@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
 const CITY_COORDS: Record<string, [number, number]> = {
   "Bengaluru": [77.5946, 12.9716],
@@ -35,7 +36,7 @@ function latLonToSvg(lon: number, lat: number): [number, number] {
   return [x, y]
 }
 
-export function IndiaMap({ deals }: { deals: Deal[] }) {
+export function IndiaMap({ deals, sourceLink }: { deals: Deal[]; sourceLink?: string }) {
   const cities = useMemo(() => {
     const map = new Map<string, { total: number; count: number }>()
     for (const deal of deals) {
@@ -89,6 +90,7 @@ export function IndiaMap({ deals }: { deals: Deal[] }) {
             </div>
           ))}
       </div>
+      <ViewDataLink href={sourceLink} />
     </div>
   )
 }

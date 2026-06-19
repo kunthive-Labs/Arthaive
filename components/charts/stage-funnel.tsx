@@ -5,6 +5,7 @@ import {
 } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
 const STAGE_ORDER = [
   "Angel", "Pre-Seed", "Seed", "Pre-Series A", "Series A",
@@ -19,7 +20,7 @@ const COLORS = [
   "#14b8a6", "#64748b", "#94a3b8",
 ]
 
-export function StageFunnel({ deals }: { deals: Deal[] }) {
+export function StageFunnel({ deals, sourceLink }: { deals: Deal[]; sourceLink?: string }) {
   const data = useMemo(() => {
     const map = new Map<string, { count: number; amount: number }>()
     for (const deal of deals) {
@@ -37,6 +38,7 @@ export function StageFunnel({ deals }: { deals: Deal[] }) {
   }, [deals])
 
   return (
+    <>
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
@@ -55,5 +57,7 @@ export function StageFunnel({ deals }: { deals: Deal[] }) {
         </BarChart>
       </ResponsiveContainer>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

@@ -5,8 +5,9 @@ import {
 } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
-export function YoYComparison({ deals }: { deals: Deal[] }) {
+export function YoYComparison({ deals, sourceLink }: { deals: Deal[]; sourceLink?: string }) {
   const { data, years } = useMemo(() => {
     const map = new Map<string, Map<string, number>>()
     const yearSet = new Set<string>()
@@ -37,6 +38,7 @@ export function YoYComparison({ deals }: { deals: Deal[] }) {
   const COLORS = ["hsl(var(--primary))", "#06b6d4", "#f59e0b", "#10b981"]
 
   return (
+    <>
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
@@ -51,5 +53,7 @@ export function YoYComparison({ deals }: { deals: Deal[] }) {
         </BarChart>
       </ResponsiveContainer>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

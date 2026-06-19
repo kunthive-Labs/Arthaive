@@ -2,7 +2,7 @@
 
 > **How to use this document:** Each phase is self-contained. When you say "implement Phase N", every task in that phase gets built. Phases must be completed in order — each one depends on the previous.
 >
-> **Current state:** Phase 0 is complete. Work starts at Phase 1.
+> **Current state:** All phases (0–9) are implemented. This document is kept as the build record; exit criteria for each phase are noted in the phase headers.
 
 ---
 
@@ -313,7 +313,7 @@ Uses the existing `lib/export.ts` functions, but wired to Supabase data.
 
 ---
 
-## Phase 3 — Discovery Pipeline
+## Phase 3 — Discovery Pipeline ✅ (implemented)
 
 > **Goal:** An automated Python pipeline that polls RSS feeds twice daily, filters articles for funding keywords, fetches and stores article text, and queues them for review. Runs as a scheduled job.
 >
@@ -418,7 +418,7 @@ Create `.github/workflows/pipeline.yml` — runs `python pipeline/run.py` on a s
 
 ---
 
-## Phase 4 — Extraction Pipeline
+## Phase 4 — Extraction Pipeline ✅ (implemented)
 
 > **Goal:** For each article in the review queue (with `raw_extracted_data = {}`), extract structured funding fields using rule-based parsing first, Claude AI as fallback. Compute confidence score. Auto-approve high-confidence records.
 >
@@ -526,7 +526,7 @@ Update `pipeline/run.py` to have two modes:
 
 ---
 
-## Phase 5 — Entity Resolution
+## Phase 5 — Entity Resolution ✅ (implemented)
 
 > **Goal:** Every company name mention in extracted records maps to a canonical entity. No two deals refer to the same company by different names. Investor names are normalized similarly.
 >
@@ -607,7 +607,7 @@ insert into investor_aliases (investor_name, alias_name) values
 
 ---
 
-## Phase 6 — Analytics & Weekly Reports
+## Phase 6 — Analytics & Weekly Reports ✅ (implemented)
 
 > **Goal:** All analytics charts read from Supabase. A new `/reports` page auto-generates weekly and monthly funding digests from verified DB records. Every chart has a "View data" link.
 >
@@ -670,7 +670,7 @@ A report for a given week/month shows:
 
 ---
 
-## Phase 7 — AI Layer
+## Phase 7 — AI Layer ✅ (implemented)
 
 > **Goal:** Add Claude API as an intelligence layer on top of verified data. Three features: AI trend summaries on reports, natural language search, and sector classification for ambiguous records. All AI output is clearly labeled.
 >
@@ -771,7 +771,7 @@ All AI-generated content must be wrapped in:
 
 ---
 
-## Phase 8 — Public API v1
+## Phase 8 — Public API v1 ✅ (implemented)
 
 > **Goal:** A versioned, documented, rate-limited public REST API that developers and researchers can use to query the funding database.
 >
@@ -883,7 +883,7 @@ Run with `npm test`.
 
 ---
 
-## Phase 9 — Production Polish & Launch
+## Phase 9 — Production Polish & Launch ✅ (implemented)
 
 > **Goal:** Everything is tight, fast, mobile-friendly, and ready to share publicly. This phase has no new features — only hardening, performance, and finishing touches.
 >
@@ -969,15 +969,15 @@ Deploy to Vercel. Submit sitemap to Google Search Console.
 | Phase | Name | Key Output | Estimated Days |
 |---|---|---|---|
 | 0 | ✅ Done | Frontend, static data, auth | — |
-| 1 | Supabase Live DB | Real DB, all pages read from Supabase | 4–6 days |
+| 1 | ✅ Supabase Live DB | Real DB, all pages read from Supabase | 4–6 days |
 | 2 | ✅ Admin Interface | Review queue, entity manager, pipeline logs | 8–12 days |
-| 3 | Discovery Pipeline | RSS poller, keyword filter, article queuing | 6–10 days |
-| 4 | Extraction Pipeline | Rule-based + AI extraction, auto-approval | 8–14 days |
-| 5 | Entity Resolution | Fuzzy matching, alias system, dedup | 6–10 days |
-| 6 | Analytics & Reports | Live DB charts, weekly/monthly reports | 5–8 days |
-| 7 | AI Layer | Trend summaries, NL search, sector classifier | 6–10 days |
-| 8 | Public API v1 | Versioned API, API keys, docs | 5–8 days |
-| 9 | Polish & Launch | Perf, mobile, SEO, README | 3–5 days |
+| 3 | ✅ Discovery Pipeline | RSS poller, keyword filter, article queuing | 6–10 days |
+| 4 | ✅ Extraction Pipeline | Rule-based + AI extraction, auto-approval | 8–14 days |
+| 5 | ✅ Entity Resolution | Fuzzy matching, alias system, dedup | 6–10 days |
+| 6 | ✅ Analytics & Reports | Live DB charts, weekly/monthly reports | 5–8 days |
+| 7 | ✅ AI Layer | Trend summaries, NL search, sector classifier | 6–10 days |
+| 8 | ✅ Public API v1 | Versioned API, API keys, docs | 5–8 days |
+| 9 | ✅ Polish & Launch | Perf, mobile, SEO, README | 3–5 days |
 | | **Total** | | **51–83 days** |
 
 ---

@@ -163,7 +163,8 @@ export function formatUsd(amount: number): string {
 
 
 export function absoluteUrl(path: string): string {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "https://ind-startup-funding.vercel.app"
+  const base =
+    process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? "https://arthive.kunthive.in"
   return `${base}${path.startsWith("/") ? path : `/${path}`}`
 }
 

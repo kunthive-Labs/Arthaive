@@ -5,6 +5,7 @@ import {
 } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
 const COLORS = [
   "hsl(var(--primary))", "#06b6d4", "#8b5cf6", "#f59e0b", "#10b981",
@@ -12,7 +13,7 @@ const COLORS = [
   "#14b8a6", "#a855f7", "#eab308", "#22c55e", "#6366f1",
 ]
 
-export function SectorBarChart({ deals, topN = 15 }: { deals: Deal[]; topN?: number }) {
+export function SectorBarChart({ deals, topN = 15, sourceLink }: { deals: Deal[]; topN?: number; sourceLink?: string }) {
   const data = useMemo(() => {
     const map = new Map<string, number>()
     for (const deal of deals) {
@@ -27,6 +28,7 @@ export function SectorBarChart({ deals, topN = 15 }: { deals: Deal[]; topN?: num
   }, [deals, topN])
 
   return (
+    <>
     <div className="h-96">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }}>
@@ -42,5 +44,7 @@ export function SectorBarChart({ deals, topN = 15 }: { deals: Deal[]; topN?: num
         </BarChart>
       </ResponsiveContainer>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

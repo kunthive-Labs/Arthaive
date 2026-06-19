@@ -1,0 +1,32 @@
+name: Funding pipeline
+
+on:
+  schedule:
+    # 02:00 and 14:00 UTC = 7:30 AM and 7:30 PM IST
+    - cron: "0 2,14 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: funding-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r pipeline/requirements.txt
+
+      - name: Run pipeline (discover + extract)
+        run: python -m pipeline.run
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

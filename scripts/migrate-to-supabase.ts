@@ -118,7 +118,9 @@ function slugify(str: string): string {
 
 function parseInvestors(raw: string): { investors: string[]; leadInvestor: string | null } {
   if (!raw || raw.trim() === "") return { investors: [], leadInvestor: null }
-  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean)
+  // Investors are semicolon-separated in the CSV (matches generate-funding-data.js).
+  // Splitting on comma would wrongly break names like "Acme Ventures, LLC".
+  const parts = raw.split(";").map((s) => s.trim()).filter(Boolean)
   return { investors: parts, leadInvestor: parts[0] || null }
 }
 
