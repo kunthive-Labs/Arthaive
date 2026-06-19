@@ -1,3 +1,61 @@
+=======================================================================
+ARTHAIVE DATASET — PROVENANCE & SCOPE OF THIS LICENSE
+=======================================================================
+
+Read this preamble first. It explains EXACTLY what the Creative Commons
+Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license below
+does and does not cover. The CC legal text that follows (everything
+beneath the second divider line) is the unmodified, full CC BY-SA 4.0
+license and is reproduced verbatim.
+
+What IS licensed under CC BY-SA 4.0
+-----------------------------------
+  * The FACTUAL funding records compiled by Arthaive — i.e. the
+    individual data points such as company name, funding amount,
+    round/stage, sector, location, investors, and date.
+  * The DATABASE itself as a compilation: the selection, structuring,
+    normalization, and arrangement of those records authored by
+    Arthaive (including any Sui Generis Database Rights Arthaive holds
+    in that compilation).
+
+These are the only materials offered by Arthaive ("the Licensor")
+under the CC BY-SA 4.0 terms below.
+
+What is NOT licensed (excluded from this grant)
+-----------------------------------------------
+  * The underlying SOURCE ARTICLES and any verbatim source prose,
+    headlines, images, or other original expression published by
+    third parties such as Entrackr (entrackr.com), Inc42 (inc42.com),
+    and YourStory (yourstory.com). Those works retain their own
+    copyright, held by their respective publishers, and are NOT
+    relicensed, sublicensed, or otherwise placed under CC BY-SA 4.0
+    by Arthaive.
+  * Arthaive does not claim copyright in individual facts (facts are
+    not copyrightable); the CC BY-SA 4.0 grant applies to the
+    compilation and to Arthaive's authored contributions, not to any
+    third party's expressive content.
+
+If you reuse this dataset you must NOT treat it as a license to copy
+the source publishers' article text. Quote or reproduce source prose
+only under your own independent right (e.g. fair use/fair dealing or a
+separate permission from the publisher).
+
+Attribution
+-----------
+When you Share the dataset (in whole, in part, or in adapted form), the
+attribution required by Section 3 of the license below is satisfied by
+crediting "Arthaive" as the source of the database compilation and
+linking to the Arthaive dataset. Where practicable, also retain each
+record's stored source URL so the original publisher can be credited.
+
+The remainder of this file is the complete, verbatim CC BY-SA 4.0
+license text. In the event of any tension, this preamble governs the
+SCOPE of what Arthaive offers; the CC text governs the TERMS on which
+the licensed material is offered.
+
+=======================================================================
+
+
 Attribution-ShareAlike 4.0 International
 
 =======================================================================

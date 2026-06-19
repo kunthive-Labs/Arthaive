@@ -52,24 +52,54 @@ function parseCSV(content, weekFolder) {
   return deals;
 }
 
-// Parse CSV line handling quoted values
+// Parse a single CSV line into fields, RFC-4180 style.
+// Handles: quoted fields, commas inside quotes, and escaped double-quotes
+// ("" -> a literal "). A quote only opens a quoted field at the start of a
+// field; quotes appearing mid-unquoted-field are treated as literal text.
 function parseCSVLine(line) {
   const values = [];
   let current = '';
   let inQuotes = false;
+  let i = 0;
 
-  for (let i = 0; i < line.length; i++) {
+  while (i < line.length) {
     const char = line[i];
 
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
+    if (inQuotes) {
+      if (char === '"') {
+        if (line[i + 1] === '"') {
+          // Escaped double-quote ("") -> literal "
+          current += '"';
+          i += 2;
+          continue;
+        }
+        // Closing quote
+        inQuotes = false;
+        i += 1;
+        continue;
+      }
+      current += char;
+      i += 1;
+      continue;
+    }
+
+    // Not currently inside quotes
+    if (char === '"' && current === '') {
+      // Opening quote only at the start of a field
+      inQuotes = true;
+      i += 1;
+      continue;
+    }
+    if (char === ',') {
       values.push(current);
       current = '';
-    } else {
-      current += char;
+      i += 1;
+      continue;
     }
+    current += char;
+    i += 1;
   }
+
   values.push(current);
 
   return values;
@@ -196,6 +226,52 @@ export const fundingData: FundingDeal[] = ${JSON.stringify(sortedDeals, null, 2)
   const outputPath = path.join(__dirname, '../data/funding-data.ts');
   fs.writeFileSync(outputPath, content, 'utf-8');
   console.log(`✅ Generated funding-data.ts with ${sortedDeals.length} deals`);
+}
+
+// Inline self-test for parseCSVLine. Run with: node scripts/generate-funding-data.js --test
+// Kept inline (no separate test harness in this repo) and gated behind a flag so it
+// never runs during the normal prebuild generation path.
+function runParserTests() {
+  const cases = [
+    { in: 'a,b,c', out: ['a', 'b', 'c'] },
+    { in: '', out: [''] },
+    { in: 'a,,c', out: ['a', '', 'c'] },
+    // Quoted field containing a comma
+    { in: 'a,"b,c",d', out: ['a', 'b,c', 'd'] },
+    // Escaped double-quote inside a quoted field ("" -> ")
+    { in: 'a,"she said ""hi""",d', out: ['a', 'she said "hi"', 'd'] },
+    // Quoted field that is entirely a quoted string
+    { in: '"hello"', out: ['hello'] },
+    // Comma inside quotes only; trailing empty field
+    { in: '"x,y",', out: ['x,y', ''] },
+    // Quote that is NOT at the start of a field is treated as literal text
+    { in: 'a,b"c,d', out: ['a', 'b"c', 'd'] },
+    // Investors-style semicolon list inside a quoted field with commas
+    { in: 'Acme,"100","Seq, Accel; Lightspeed"', out: ['Acme', '100', 'Seq, Accel; Lightspeed'] },
+  ];
+
+  let failures = 0;
+  cases.forEach(({ in: input, out: expected }, idx) => {
+    const actual = parseCSVLine(input);
+    const ok = JSON.stringify(actual) === JSON.stringify(expected);
+    if (!ok) {
+      failures += 1;
+      console.error(`✗ case ${idx}: parseCSVLine(${JSON.stringify(input)})`);
+      console.error(`    expected ${JSON.stringify(expected)}`);
+      console.error(`    got      ${JSON.stringify(actual)}`);
+    }
+  });
+
+  if (failures > 0) {
+    console.error(`❌ parseCSVLine: ${failures}/${cases.length} cases failed`);
+    process.exit(1);
+  }
+  console.log(`✅ parseCSVLine: all ${cases.length} cases passed`);
+}
+
+if (process.argv.includes('--test')) {
+  runParserTests();
+  return;
 }
 
 // Main execution
