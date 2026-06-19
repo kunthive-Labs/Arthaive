@@ -45,3 +45,4 @@ pipeline/.extractor_cache.sqlite
 # Claude Code (machine-local)
 .claude/settings.local.json
 .claude/worktrees/
+pipeline/.work/

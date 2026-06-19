@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from datetime import date, datetime
 from pathlib import Path
 
@@ -36,6 +37,9 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--until", default=None, help="YYYY-MM-DD inclusive upper bound (default: no cap)")
     p.add_argument("--limit", type=int, default=None, help="Cap candidate URLs scanned")
     p.add_argument("--body-chars", type=int, default=1500, help="Chars of body to keep")
+    p.add_argument("--sleep", type=float, default=0.0, help="Seconds to pause between fetches (be polite on big crawls)")
+    p.add_argument("--skip-existing", action="store_true",
+                   help="Skip URLs already written to funding_data/*/data.csv (cheap re-crawls)")
     p.add_argument("--out", required=True, help="Output JSONL path")
     return p.parse_args()
 
@@ -53,11 +57,22 @@ def main() -> int:
     written = 0
     scanned = 0
     skipped_date = 0
+    skipped_existing = 0
     failed = 0
 
+    existing_urls: set[str] = set()
+    if args.skip_existing:
+        from pipeline.backfill_local import _existing_source_urls
+        existing_urls = _existing_source_urls()
+
     with out_path.open("w", encoding="utf-8") as fh:
-        for cand in discover_urls(args.source, since, limit=args.limit):
+        for cand in discover_urls(args.source, since, limit=args.limit, until=until):
             scanned += 1
+            if cand.url in existing_urls:
+                skipped_existing += 1
+                continue
+            if args.sleep:
+                time.sleep(args.sleep)
             art = fetch_article(cand.url, args.source, lastmod_fallback=cand.lastmod)
             if art is None or not art.body_text:
                 failed += 1
@@ -91,6 +106,7 @@ def main() -> int:
                 "out": str(out_path),
                 "scanned": scanned,
                 "written": written,
+                "skipped_existing": skipped_existing,
                 "skipped_out_of_window": skipped_date,
                 "fetch_failed": failed,
             }

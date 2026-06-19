@@ -16,6 +16,12 @@ FUNDING_SLUG_HINTS = (
     "snippets",
     "acquires", "acquisition", "acquired",
     "valuation",
+    # broadened to catch funding-deal slugs the original set missed
+    # (hyphen-anchored where the bare word risks false substring matches)
+    "bags", "bagged", "-backs-", "backed-by",
+    "-stake", "bets-", "grabs-",
+    "just-got-funded", "gets-funded", "get-funded",
+    "fundraise", "mops-up", "lands-",
 )
 
 # URL fragments to exclude even if they match a hint (earnings, regulatory news).
@@ -37,7 +43,8 @@ SOURCES: dict[str, dict] = {
         "base_url": "https://entrackr.com",
         "publisher": "Entrackr",
         "reliability_tier": "tier_1",
-        # Daily sitemap names look like sitemap_YYYY-MM-DD.xml
+        # Entrackr publishes one dated sitemap per day: sitemap_YYYY-MM-DD.xml
+        "sitemap_mode": "daily",
         "daily_sitemap_pattern": r"sitemap_(\d{4}-\d{2}-\d{2})\.xml$",
         # CSS selectors tried in order to extract article body
         "article_body_selectors": [
@@ -48,7 +55,74 @@ SOURCES: dict[str, dict] = {
             "main",
         ],
     },
+    "inc42": {
+        "name": "Inc42",
+        "sitemap_index_url": "https://inc42.com/sitemap_index.xml",
+        "base_url": "https://inc42.com",
+        "publisher": "Inc42",
+        "reliability_tier": "tier_1",
+        # Inc42 is WordPress/Yoast: the index lists paginated post sitemaps
+        # (post-sitemap.xml, post-sitemap2.xml ... post-sitemap55.xml) that
+        # collectively reach back to 2015. Each sub-sitemap's <lastmod> marks
+        # its newest article, so we can pick only the ones overlapping a window.
+        "sitemap_mode": "paginated",
+        "paginated_sitemap_pattern": r"post-sitemap\d*\.xml$",
+        "article_body_selectors": [
+            "article",
+            "[itemprop='articleBody']",
+            ".single-article-content",
+            ".entry-content",
+            ".post-content",
+            "main",
+        ],
+    },
+    "yourstory": {
+        "name": "YourStory",
+        "sitemap_index_url": "https://yourstory.com/sitemap_index.xml",
+        "base_url": "https://yourstory.com",
+        "publisher": "YourStory",
+        "reliability_tier": "tier_2",
+        # YourStory's index lists one sitemap per ISO week: sitemap_YYYY_weekNN.xml,
+        # reaching back ~2015 (plus a junk sitemap_1970_week1.xml that the walker drops).
+        "sitemap_mode": "weekly",
+        "weekly_sitemap_pattern": r"sitemap_(\d{4})_week(\d+)\.xml$",
+        "article_body_selectors": [
+            "article",
+            "[itemprop='articleBody']",
+            ".article-content",
+            "main",
+        ],
+    },
 }
+
+
+def source_key_for_publisher(publisher: str) -> str | None:
+    """Map a publisher display name (e.g. "Inc42") to its SOURCES key."""
+    wanted = publisher.strip().lower()
+    for key, cfg in SOURCES.items():
+        if cfg.get("publisher", "").lower() == wanted:
+            return key
+    return None
+
+
+# RSS feeds polled by the discovery step (Phase 3). `publisher` must map to a
+# SOURCES entry via source_key_for_publisher() so the fetcher knows which
+# article_body_selectors to use.
+RSS_FEEDS = [
+    # NOTE: entrackr.com/feed 404s (verified 2026-06-12); /rss is the live feed.
+    {"url": "https://entrackr.com/rss", "publisher": "Entrackr", "tier": "tier_1"},
+    {"url": "https://inc42.com/feed", "publisher": "Inc42", "tier": "tier_1"},
+    {"url": "https://yourstory.com/feed", "publisher": "YourStory", "tier": "tier_2"},
+]
+
+# Funding keywords matched (case-insensitively) against RSS title/summary.
+KEYWORDS = [
+    "raises", "raised", "funding", "funded", "secured", "closed round",
+    "series a", "series b", "series c", "series d", "series e", "series f",
+    "seed round", "pre-seed", "bridge round", "debt round",
+    "backed by", "led by", "co-led by",
+    "crore", "million", "billion",
+]
 
 # Anthropic model for extraction. Haiku is cheap and accurate enough for this shape.
 EXTRACTION_MODEL = "claude-haiku-4-5-20251001"

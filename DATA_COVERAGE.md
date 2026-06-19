@@ -36,7 +36,8 @@ This document tracks **what funding data Arthaive currently holds**, **how it wa
 
 | Source | URL | Status | Notes |
 |---|---|---|---|
-| **Entrackr** | https://entrackr.com | ✅ **In use** | Only source wired in `pipeline/config.py`. Live scraped via sitemap discovery + article fetch. |
+| **Entrackr** | https://entrackr.com | ✅ **In use** | Wired in `pipeline/config.py`. Live scraped via daily-sitemap discovery + article fetch. |
+| **Inc42** | https://inc42.com | 🟡 **Connector built** | Wired in `pipeline/config.py` (`sitemap_mode: paginated`). Validated on a recent window (21 funding articles, May 25–Jun 5 2026). Discovery + fetch proven; full structured harvest pending (needs extraction + scope decision — see §6). Sitemaps reach back to **2015**, so this is the path to the historical backfill. |
 
 **How collection works (no API key, no cost):**
 `pipeline/dump_candidates.py` walks Entrackr's daily sitemaps, fetches each funding article, and saves title + lede + date to JSONL. Structured fields (company, amount, stage, sector, city, investors) are then extracted from that text and written to weekly CSVs under `funding_data/`. Amounts use ₹→USD at the rate in `config/currency.js` (currently ₹83.50/USD). Every deal stores its source URL for audit.
@@ -45,11 +46,9 @@ This document tracks **what funding data Arthaive currently holds**, **how it wa
 
 ## 3. Pending websites (not yet implemented)
 
-These are referenced in the README / architecture docs but are **not** wired into the pipeline (`pipeline/config.py` has only `entrackr`):
-
 | Source | URL | Status |
 |---|---|---|
-| **Inc42** | https://inc42.com | ⛔ Pending — no connector |
+| **Inc42** | https://inc42.com | 🟡 Connector built (see §2) — structured harvest not yet run |
 | **YourStory** | https://yourstory.com | ⛔ Pending — no connector |
 | Wayback Machine | https://archive.org | ⚙️ Fallback only (dead-link recovery), not a primary source |
 
@@ -94,7 +93,7 @@ Target: **continuous coverage from 2015 → present.** Currently only **2024–2
 
 ## 6. Suggested next steps
 
-1. Implement **Inc42** and **YourStory** connectors in `pipeline/config.py`.
-2. Add a **Wayback-based historical crawler** to reach 2015–2023.
+1. ✅ **Inc42 connector** implemented (`sitemap_mode: paginated`, reaches 2015). Next: run the structured harvest (recent first, then backfill) — needs `ANTHROPIC_API_KEY` for the AI extractor. Then add a **YourStory** connector.
+2. Inc42 paginated sitemaps already reach 2015, reducing the need for a separate Wayback crawler for 2015–2023.
 3. Use **period-correct exchange rates** for pre-2026 deals.
 4. Wire a **scheduler** so new deals are collected automatically going forward.

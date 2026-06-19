@@ -147,6 +147,50 @@ def insert_deal(
     return res.data[0]["id"]
 
 
+def fetch_unextracted_items(limit: int = 500) -> list[dict[str, Any]]:
+    """Pending review_queue rows whose raw_extracted_data is still empty, with their source row."""
+    client = get_client()
+    res = (
+        client.table("review_queue")
+        .select(
+            "id, source_id, "
+            "sources(url, title, publication_date, publisher, reliability_tier, raw_text_snapshot)"
+        )
+        .eq("status", "pending")
+        .filter("raw_extracted_data", "eq", "{}")
+        .order("created_at", desc=False)
+        .limit(limit)
+        .execute()
+    )
+    return res.data or []
+
+
+def update_review_item(
+    item_id: str,
+    *,
+    extracted: dict[str, Any] | None = None,
+    status: str | None = None,
+    notes: str | None = None,
+) -> None:
+    """Update an existing review_queue row after an extraction pass."""
+    client = get_client()
+    payload: dict[str, Any] = {}
+    if extracted is not None:
+        payload["raw_extracted_data"] = extracted
+        suggested = extracted.get("suggested_company") or extracted.get("company")
+        if suggested:
+            payload["suggested_company"] = suggested
+        conf = extracted.get("match_confidence", extracted.get("confidence"))
+        if isinstance(conf, (int, float)) and 0 <= conf <= 1:
+            payload["match_confidence"] = float(conf)
+    if status is not None:
+        payload["status"] = status
+    if notes is not None:
+        payload["notes"] = notes
+    if payload:
+        client.table("review_queue").update(payload).eq("id", item_id).execute()
+
+
 def log_job_run(stats: JobStats) -> None:
     client = get_client()
     payload = {
