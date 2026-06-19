@@ -3,11 +3,13 @@
 import { Sankey, Tooltip, ResponsiveContainer } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
-export function SankeyDiagram({ deals, topInvestors = 10, topSectors = 8 }: {
+export function SankeyDiagram({ deals, topInvestors = 10, topSectors = 8, sourceLink }: {
   deals: Deal[]
   topInvestors?: number
   topSectors?: number
+  sourceLink?: string
 }) {
   const { nodes, links } = useMemo(() => {
     const investorTotals = new Map<string, number>()
@@ -62,6 +64,7 @@ export function SankeyDiagram({ deals, topInvestors = 10, topSectors = 8 }: {
   }
 
   return (
+    <>
     <div className="h-96">
       <ResponsiveContainer width="100%" height="100%">
         <Sankey
@@ -76,5 +79,7 @@ export function SankeyDiagram({ deals, topInvestors = 10, topSectors = 8 }: {
         </Sankey>
       </ResponsiveContainer>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

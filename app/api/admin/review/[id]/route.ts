@@ -76,6 +76,35 @@ export async function POST(
     if (insertError) {
       return NextResponse.json({ error: insertError.message }, { status: 500 })
     }
+
+    // Auto-alias (PHASES.md §5.4): if the extracted name differs from the
+    // canonical name the admin approved, record it in startup_aliases.
+    // Non-fatal — alias failures never block the approval.
+    const { data: reviewRow } = await supabase
+      .from("review_queue")
+      .select("raw_extracted_data, suggested_company")
+      .eq("id", id)
+      .single()
+
+    const rawData = reviewRow?.raw_extracted_data as { company?: string } | null
+    const rawName =
+      typeof rawData?.company === "string" ? rawData.company.trim() : ""
+    const canonicalName = (fields.company ?? "").trim()
+
+    if (
+      rawName &&
+      canonicalName &&
+      rawName.toLowerCase() !== canonicalName.toLowerCase()
+    ) {
+      await supabase.from("startup_aliases").upsert(
+        {
+          company: canonicalName,
+          alias_name: rawName,
+          alias_type: "alternate_spelling",
+        },
+        { onConflict: "alias_name", ignoreDuplicates: true }
+      )
+    }
   }
 
   // Update review_queue status

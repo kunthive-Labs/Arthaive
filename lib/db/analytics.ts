@@ -17,17 +17,27 @@ interface RawDeal {
   record_status?: string
 }
 
+// Supabase caps a single select at 1000 rows. With ~13k+ verified deals, any
+// "fetch everything then aggregate in JS" path MUST page through .range() or it
+// silently under-counts every site-wide stat. This helper exhausts all pages.
+const PAGE = 1000
+
 async function fetchAll(): Promise<RawDeal[]> {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from("deals")
-      .select("company,amount_inr,deal_date,sectors,stage,location,investors,record_status")
-      .eq("record_status", "verified")
-      .order("deal_date", { ascending: false })
+    const all: RawDeal[] = []
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("company,amount_inr,deal_date,sectors,stage,location,investors,record_status")
+        .eq("record_status", "verified")
+        .order("deal_date", { ascending: false })
+        .range(from, from + PAGE - 1)
 
-    if (!error && data && data.length > 0) {
-      return data as RawDeal[]
+      if (error) break
+      if (data && data.length) all.push(...(data as RawDeal[]))
+      if (!data || data.length < PAGE) break
     }
+    if (all.length > 0) return all
   }
 
   return fundingData.map((d) => ({
@@ -39,6 +49,32 @@ async function fetchAll(): Promise<RawDeal[]> {
     location: d.location,
     investors: d.investors,
   }))
+}
+
+// Page through a date-filtered (deal_date,amount_inr) projection — same 1000-row
+// cap concern as fetchAll, used by the monthly-trend aggregations.
+async function fetchDatedRows(sinceStr: string): Promise<{ date: string; amount: number }[]> {
+  const all: { date: string; amount: number }[] = []
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase!
+      .from("deals")
+      .select("deal_date,amount_inr")
+      .eq("record_status", "verified")
+      .gte("deal_date", sinceStr)
+      .order("deal_date", { ascending: true })
+      .range(from, from + PAGE - 1)
+
+    if (error) break
+    if (data && data.length)
+      all.push(
+        ...data.map((r: { deal_date: string; amount_inr: number }) => ({
+          date: r.deal_date,
+          amount: r.amount_inr,
+        }))
+      )
+    if (!data || data.length < PAGE) break
+  }
+  return all
 }
 
 // ---------------------------------------------------------------------------
@@ -89,21 +125,8 @@ export async function getMonthlyFunding(months = 24): Promise<MonthlyFunding[]> 
   const sinceStr = since.toISOString().split("T")[0]
 
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from("deals")
-      .select("deal_date,amount_inr")
-      .eq("record_status", "verified")
-      .gte("deal_date", sinceStr)
-      .order("deal_date", { ascending: true })
-
-    if (!error && data && data.length > 0) {
-      return aggregateMonthly(
-        data.map((r: { deal_date: string; amount_inr: number }) => ({
-          date: r.deal_date,
-          amount: r.amount_inr,
-        }))
-      )
-    }
+    const rows = await fetchDatedRows(sinceStr)
+    if (rows.length > 0) return aggregateMonthly(rows)
   }
 
   const filtered = fundingData
@@ -263,22 +286,29 @@ export async function getMonthlyFundingByYear(
   const endDate = `${year}-12-31`
 
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from("deals")
-      .select("deal_date,amount_inr")
-      .eq("record_status", "verified")
-      .gte("deal_date", startDate)
-      .lte("deal_date", endDate)
-      .order("deal_date", { ascending: true })
+    // A single year can exceed the 1000-row cap (2021 alone is ~2.3k), so page through.
+    const rows: { date: string; amount: number }[] = []
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("deal_date,amount_inr")
+        .eq("record_status", "verified")
+        .gte("deal_date", startDate)
+        .lte("deal_date", endDate)
+        .order("deal_date", { ascending: true })
+        .range(from, from + PAGE - 1)
 
-    if (!error && data && data.length > 0) {
-      return aggregateMonthly(
-        data.map((r: { deal_date: string; amount_inr: number }) => ({
-          date: r.deal_date,
-          amount: r.amount_inr,
-        }))
-      )
+      if (error) break
+      if (data && data.length)
+        rows.push(
+          ...data.map((r: { deal_date: string; amount_inr: number }) => ({
+            date: r.deal_date,
+            amount: r.amount_inr,
+          }))
+        )
+      if (!data || data.length < PAGE) break
     }
+    if (rows.length > 0) return aggregateMonthly(rows)
   }
 
   return aggregateMonthly(

@@ -125,19 +125,36 @@ export async function getDealById(id: string): Promise<Deal | null> {
   return found ? mapStaticDeal(found) : null
 }
 
+// Page through a single projected column across all rows (Supabase caps a select
+// at 1000 rows, so distinct-value dropdowns must exhaust every page or they go stale).
+async function fetchColumnAll<T>(column: string): Promise<T[]> {
+  const PAGE = 1000
+  const out: T[] = []
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase!
+      .from("deals")
+      .select(column)
+      .range(from, from + PAGE - 1)
+    if (error) break
+    if (data && data.length) out.push(...(data as unknown as T[]))
+    if (!data || data.length < PAGE) break
+  }
+  return out
+}
+
 export async function getAllLocations(): Promise<string[]> {
   if (isSupabaseConfigured && supabase) {
-    const { data } = await supabase.from("deals").select("location").order("location")
-    const unique = [...new Set((data || []).map((d: { location: string }) => d.location))]
-    return unique.filter(Boolean)
+    const rows = await fetchColumnAll<{ location: string }>("location")
+    const unique = [...new Set(rows.map((d) => d.location))]
+    return unique.filter(Boolean).sort()
   }
   return [...new Set(fundingData.map((d) => d.location))].sort()
 }
 
 export async function getAllSectors(): Promise<string[]> {
   if (isSupabaseConfigured && supabase) {
-    const { data } = await supabase.from("deals").select("sectors")
-    const all = (data || []).flatMap((d: { sectors: string[] }) => d.sectors)
+    const rows = await fetchColumnAll<{ sectors: string[] }>("sectors")
+    const all = rows.flatMap((d) => d.sectors)
     return [...new Set(all)].sort()
   }
   return [...new Set(fundingData.flatMap((d) => d.sectors))].sort()

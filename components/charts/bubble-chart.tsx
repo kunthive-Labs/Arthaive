@@ -5,8 +5,9 @@ import {
 } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
-export function BubbleChart({ deals }: { deals: Deal[] }) {
+export function BubbleChart({ deals, sourceLink }: { deals: Deal[]; sourceLink?: string }) {
   const data = useMemo(() => {
     const map = new Map<string, { count: number; total: number }>()
     for (const deal of deals) {
@@ -28,6 +29,7 @@ export function BubbleChart({ deals }: { deals: Deal[] }) {
   }, [deals])
 
   return (
+    <>
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
         <ScatterChart margin={{ top: 16, right: 16, left: 16, bottom: 24 }}>
@@ -57,5 +59,7 @@ export function BubbleChart({ deals }: { deals: Deal[] }) {
         </ScatterChart>
       </ResponsiveContainer>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

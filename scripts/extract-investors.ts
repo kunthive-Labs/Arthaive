@@ -53,21 +53,14 @@ async function main() {
 
   console.log(`Found ${investorMap.size} unique investors`)
 
-  const records = [...investorMap.entries()].map(([name, { deals, totalDeployed }]) => {
-    const sectors = [...new Set(deals.flatMap((d) => d.sectors))]
-    const stages = [...new Set(deals.map((d) => d.stage))]
-    const cities = [...new Set(deals.map((d) => d.location))]
-    return {
-      name,
-      slug: slugify(name),
-      type: inferType(name),
-      deal_count: deals.length,
-      total_deployed: totalDeployed,
-      sectors,
-      stages,
-      cities,
-    }
-  })
+  // The investors table only stores identity columns (name, slug, type); per-investor
+  // stats (deal_count, total_deployed, sectors, …) are computed on the fly from the deals
+  // array / mv_investor_summary view, so we only persist identity here.
+  const records = [...investorMap.entries()].map(([name]) => ({
+    name,
+    slug: slugify(name),
+    type: inferType(name),
+  }))
 
   const BATCH_SIZE = 100
   for (let i = 0; i < records.length; i += BATCH_SIZE) {

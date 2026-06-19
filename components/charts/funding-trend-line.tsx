@@ -5,10 +5,12 @@ import {
 } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
 interface Props {
   deals: Deal[]
   groupBy?: "month" | "week"
+  sourceLink?: string
 }
 
 function groupDealsByMonth(deals: Deal[]) {
@@ -28,10 +30,11 @@ function groupDealsByMonth(deals: Deal[]) {
     }))
 }
 
-export function FundingTrendLine({ deals }: Props) {
+export function FundingTrendLine({ deals, sourceLink }: Props) {
   const data = useMemo(() => groupDealsByMonth(deals), [deals])
 
   return (
+    <>
     <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
@@ -60,5 +63,7 @@ export function FundingTrendLine({ deals }: Props) {
         </AreaChart>
       </ResponsiveContainer>
     </div>
+    <ViewDataLink href={sourceLink} />
+    </>
   )
 }

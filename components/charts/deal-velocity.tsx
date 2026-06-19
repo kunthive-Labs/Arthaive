@@ -3,6 +3,7 @@
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts"
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
+import { ViewDataLink } from "./view-data-link"
 
 function sparkData(deals: Deal[], sector: string) {
   const weekMap = new Map<string, number>()
@@ -20,7 +21,7 @@ function sparkData(deals: Deal[], sector: string) {
     .map(([week, count]) => ({ week, count }))
 }
 
-export function DealVelocity({ deals, sectors }: { deals: Deal[]; sectors: string[] }) {
+export function DealVelocity({ deals, sectors, sourceLink }: { deals: Deal[]; sectors: string[]; sourceLink?: string }) {
   const rows = useMemo(
     () => sectors.map((sector) => ({ sector, data: sparkData(deals, sector) })),
     [deals, sectors]
@@ -57,6 +58,7 @@ export function DealVelocity({ deals, sectors }: { deals: Deal[]; sectors: strin
           </div>
         )
       })}
+      <ViewDataLink href={sourceLink} />
     </div>
   )
 }
