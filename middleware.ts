@@ -4,7 +4,28 @@ import { rateLimit } from "@/lib/rate-limit"
 import { createServerClient } from "@supabase/ssr"
 import type { Database } from "@/types/database.types"
 
+// Legal / SEO routes that MUST resolve without a session. Google's OAuth
+// verification and crawlers have to reach the privacy policy, terms, and the
+// methodology/about page without signing in. (robots.txt and sitemap.xml are
+// already treated as public by updateSession's own allowlist.) These are the
+// ONLY content pages opened up — the rest of the app stays gated.
+function isPublicLegalPath(pathname: string): boolean {
+  return (
+    pathname === "/privacy" ||
+    pathname === "/terms" ||
+    pathname === "/about" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml"
+  )
+}
+
 export async function middleware(request: NextRequest) {
+  // Let the legal/SEO pages through before the session gate runs, so
+  // unauthenticated crawlers and OAuth reviewers are never redirected.
+  if (isPublicLegalPath(request.nextUrl.pathname)) {
+    return NextResponse.next({ request })
+  }
+
   if (request.nextUrl.pathname.startsWith("/api/")) {
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??

@@ -2,6 +2,8 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { SiteFooter } from "@/components/site-footer"
+import { StructuredData } from "@/components/structured-data"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -54,6 +56,7 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
@@ -69,8 +72,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`font-sans antialiased bg-white text-black`}>
-        {children}
+      <body className={`font-sans antialiased bg-white text-black min-h-screen flex flex-col`}>
+        <StructuredData />
+        <div className="flex flex-1 flex-col">{children}</div>
+        <SiteFooter />
         <Analytics />
       </body>
     </html>

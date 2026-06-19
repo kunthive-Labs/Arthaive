@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { SignInButton } from "@/components/auth/sign-in-button"
 
 // One ticker line: company + the round it raised, set in mono like a tape.
@@ -158,10 +159,23 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
       </main>
 
       {/* ── Footer rule ────────────────────────────────────────── */}
-      <footer className="flex flex-wrap items-center justify-between gap-2 border-t-4 border-black px-4 py-3 font-mono text-[11px] uppercase tracking-widest text-gray-500 md:px-8">
+      <footer className="flex flex-col gap-3 border-t-4 border-black px-4 py-3 font-mono text-[11px] uppercase tracking-widest text-gray-500 md:flex-row md:items-center md:justify-between md:px-8">
         <span>© 2026 Arthaive</span>
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 normal-case tracking-normal">
+          <Link href="/about" className="font-semibold hover:text-green-700">
+            About
+          </Link>
+          <Link href="/privacy" className="font-semibold hover:text-green-700">
+            Privacy
+          </Link>
+          <Link href="/terms" className="font-semibold hover:text-green-700">
+            Terms
+          </Link>
+          <Link href="/about#corrections" className="font-semibold hover:text-green-700">
+            Report a correction / request removal
+          </Link>
+        </nav>
         <span className="hidden md:inline">{count} deals · 2015–2026</span>
-        <span className="inline-block h-3 w-8 bg-green-700" aria-hidden />
       </footer>
     </div>
   )
