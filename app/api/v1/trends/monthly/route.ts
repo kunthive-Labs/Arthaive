@@ -1,6 +1,7 @@
-import { v1Route, intParam } from "@/lib/api/handler"
-import { apiResponse } from "@/lib/api/response"
+import { v1Route } from "@/lib/api/handler"
+import { apiResponse, apiError } from "@/lib/api/response"
 import { getMonthlyFundingByYear, getMonthlyFunding } from "@/lib/db/analytics"
+import { yearSchema } from "@/lib/validation"
 
 export const dynamic = "force-dynamic"
 
@@ -12,10 +13,19 @@ export const dynamic = "force-dynamic"
  * underlying aggregator (best-effort).
  */
 export const GET = v1Route(async (_req, { searchParams, rate }) => {
-  const year = searchParams.get("year")
-  const data = year
-    ? await getMonthlyFundingByYear(intParam(searchParams, "year", new Date().getFullYear()))
-    : await getMonthlyFunding(24)
+  const rawYear = searchParams.get("year")
+
+  let data
+  if (rawYear) {
+    // Range-check the requested year (2000–2100).
+    const parsed = yearSchema.safeParse(rawYear)
+    if (!parsed.success) {
+      return apiError("Invalid 'year' (expected 2000–2100)", 400)
+    }
+    data = await getMonthlyFundingByYear(parsed.data)
+  } else {
+    data = await getMonthlyFunding(24)
+  }
 
   const series = data.map((row) => ({
     month: ("month" in row ? row.month : ""),

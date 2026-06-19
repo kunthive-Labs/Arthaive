@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
+import { getUser } from "@/lib/supabase/session"
 import { generateKey } from "@/lib/api/auth"
 import { rateLimit } from "@/lib/rate-limit"
 
@@ -7,16 +8,22 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 /**
- * POST /api/api-keys  { email, label? }
+ * POST /api/api-keys  { label? }
  *
- * Generates a new API key. The raw key is returned ONCE in the response — only
- * the SHA-256 hash is stored. Subsequent requests authenticate by re-hashing.
+ * Generates a new API key for the AUTHENTICATED user. The email is derived from
+ * the session — never trusted from the request body — so a caller cannot mint a
+ * key bound to someone else's address. The raw key is returned ONCE; only the
+ * SHA-256 hash is stored. Subsequent requests authenticate by re-hashing.
  *
- * Heavily rate-limited per IP (5 keys/hour) to prevent enumeration.
+ * Rate-limited per user (5 keys/hour) to prevent abuse.
  */
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anon"
-  if (!rateLimit(`api-keys:${ip}`, 5, 60 * 60_000)) {
+  const user = await getUser()
+  if (!user || !user.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  if (!rateLimit(`api-keys:${user.id}`, 5, 60 * 60_000)) {
     return NextResponse.json({ error: "Too many key requests. Try again in an hour." }, { status: 429 })
   }
 
@@ -24,19 +31,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "API key service unavailable" }, { status: 503 })
   }
 
-  let body: { email?: string; label?: string }
+  let body: { label?: string }
   try {
-    body = (await req.json()) as { email?: string; label?: string }
+    body = (await req.json().catch(() => ({}))) as { label?: string }
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
   }
 
-  const email = (body.email ?? "").trim().toLowerCase()
+  // Email is derived from the authenticated session, NOT the request body.
+  const email = user.email.trim().toLowerCase()
   const label = (body.label ?? "").trim().slice(0, 80) || null
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: "Valid email required" }, { status: 400 })
-  }
 
   const { raw, hash, prefix } = generateKey()
 
