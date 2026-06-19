@@ -16,13 +16,20 @@
 | 2018 | ✅ Done | 944 |
 | 2019 | ✅ Done | 1,333 |
 | **2020** | ✅ **DONE** | **1,263** |
-| **2021** | ✅ **DONE** | **2,357** |
-| 2022 | ⏳ Not started | 0 |
-| 2023 | ⏳ Not started | 0 |
+| **2021** | ✅ **DONE** | **2,358** |
+| **2022** | ✅ **DONE** | **1,646** |
+| **2023** | ✅ **DONE** | **1,281** |
 | 2024 | ✅ Done | 867 |
 | 2025 | ✅ Done | 860 |
 | 2026 | ✅ Done (partial) | 462 |
-| **Total** | | **10,803** |
+| **Total** | | **13,731** |
+
+**🎉 BACKFILL COMPLETE — dataset is continuous 2015–2026.** 2022/2023 were extracted via per-year
+**Workflow** (`pipeline/.work/extract_<year>.js`, chunks embedded in the script body). Key learning:
+**Workflow subagents CAN write files to disk** (background Agent-tool subagents cannot), so 2022/2023
+needed no transcript harvesting — agents wrote their `*.claude.chunk_XX.jsonl` directly. Also: the
+Workflow `args` param does NOT reach a script loaded via `scriptPath` (arrives `undefined`); embed
+inputs as a literal in the script instead.
 
 ---
 
