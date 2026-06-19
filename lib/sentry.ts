@@ -1,6 +1,27 @@
+/**
+ * Observability layer.
+ *
+ * When a Sentry DSN is configured (NEXT_PUBLIC_SENTRY_DSN or SENTRY_DSN), the
+ * capture/breadcrumb/user helpers forward to @sentry/nextjs. Without a DSN they
+ * fall back to structured console logging — identical to the previous stub — so
+ * the app works the same locally and in any env where Sentry is not set up.
+ *
+ * All exported names + signatures are preserved so existing callers (the
+ * per-route error.tsx files import `captureException`, etc.) keep working
+ * unchanged.
+ */
+
+import * as Sentry from "@sentry/nextjs"
+
 const isProd = process.env.NODE_ENV === "production"
+const sentryEnabled =
+  !!process.env.NEXT_PUBLIC_SENTRY_DSN || !!process.env.SENTRY_DSN
 
 export function captureException(error: unknown, context?: Record<string, unknown>) {
+  if (sentryEnabled) {
+    Sentry.captureException(error, context ? { extra: context } : undefined)
+    return
+  }
   if (isProd) {
     console.error(JSON.stringify({
       level: "error",
@@ -15,6 +36,10 @@ export function captureException(error: unknown, context?: Record<string, unknow
 }
 
 export function captureMessage(message: string, level: "info" | "warning" | "error" = "info") {
+  if (sentryEnabled) {
+    Sentry.captureMessage(message, level)
+    return
+  }
   if (isProd) {
     console.log(JSON.stringify({ level, timestamp: new Date().toISOString(), message }))
   } else {
@@ -28,6 +53,10 @@ export function addBreadcrumb(
   category: string,
   data?: Record<string, unknown>
 ) {
+  if (sentryEnabled) {
+    Sentry.addBreadcrumb({ message, category, data })
+    return
+  }
   if (process.env.NODE_ENV === "development") {
     console.debug(`[Sentry breadcrumb][${category}]`, message, data)
   }
@@ -35,6 +64,10 @@ export function addBreadcrumb(
 
 
 export function setUser(userId: string, email: string) {
+  if (sentryEnabled) {
+    Sentry.setUser({ id: userId, email: email || undefined })
+    return
+  }
   if (process.env.NODE_ENV === "development") {
     console.debug("[Sentry] setUser", { userId, email })
   }
@@ -42,6 +75,11 @@ export function setUser(userId: string, email: string) {
 
 
 export function startTransaction(name: string, op: string) {
+  if (sentryEnabled) {
+    // Sentry v8+ uses spans; model a transaction as a manually-finished span.
+    const span = Sentry.startInactiveSpan({ name, op })
+    return { finish: () => span.end() }
+  }
   if (process.env.NODE_ENV === "development") {
     console.debug(`[Sentry] startTransaction: ${name} (${op})`)
   }
@@ -50,12 +88,28 @@ export function startTransaction(name: string, op: string) {
 
 
 export function trackPageView(path: string, duration: number) {
+  if (sentryEnabled) {
+    Sentry.addBreadcrumb({
+      category: "navigation",
+      message: `pageView: ${path}`,
+      data: { path, duration },
+    })
+    return
+  }
   if (process.env.NODE_ENV === "development") {
     console.debug(`[Sentry] pageView: ${path} in ${duration}ms`)
   }
 }
 
 export function trackApiCall(endpoint: string, status: number, duration: number) {
+  if (sentryEnabled) {
+    Sentry.addBreadcrumb({
+      category: "http",
+      message: `api: ${endpoint}`,
+      data: { endpoint, status, duration },
+    })
+    return
+  }
   if (process.env.NODE_ENV === "development") {
     console.debug(`[Sentry] api: ${endpoint} ${status} ${duration}ms`)
   }
