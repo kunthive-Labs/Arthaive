@@ -1,0 +1,72 @@
+name: Data correction
+description: Report an error in a funding round, investor, or company record.
+title: "[Data]: "
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Arthaive is a source-backed database. Every correction must be backed by a publicly accessible source so we can verify it. Please provide the source URL below.
+  - type: input
+    id: company-name
+    attributes:
+      label: Company / startup name
+      description: The name of the startup whose record is affected.
+      placeholder: e.g. Zerodha
+    validations:
+      required: true
+  - type: dropdown
+    id: whats-wrong
+    attributes:
+      label: What's wrong?
+      description: What kind of error is this?
+      options:
+        - Wrong amount
+        - Wrong stage
+        - Wrong/missing investor
+        - Wrong date
+        - Wrong sector
+        - Wrong location
+        - Duplicate record
+        - Missing round
+        - Dead source link
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: current-value
+    attributes:
+      label: Current (incorrect) value
+      description: What does Arthaive currently show?
+    validations:
+      required: false
+  - type: textarea
+    id: correct-value
+    attributes:
+      label: Correct value
+      description: What should the record say instead?
+    validations:
+      required: true
+  - type: input
+    id: source-url
+    attributes:
+      label: Source URL
+      description: A publicly accessible link that proves the correction (press release, official filing, reputable news outlet, etc.).
+      placeholder: https://...
+    validations:
+      required: true
+  - type: input
+    id: deal-link
+    attributes:
+      label: Link to the deal on Arthaive
+      description: The URL of the affected deal or record on Arthaive, if you have it.
+      placeholder: https://arthive.kunthive.in/...
+    validations:
+      required: false
+  - type: checkboxes
+    id: source-affirmation
+    attributes:
+      label: Source affirmation
+      options:
+        - label: I confirm the source above is publicly accessible and reliable.
+          required: true

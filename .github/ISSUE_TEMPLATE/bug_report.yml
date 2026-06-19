@@ -1,0 +1,70 @@
+name: Bug report
+description: Report something that is broken or behaving unexpectedly in Arthaive.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the fields below so we can reproduce and fix the issue quickly.
+
+        If this is about an incorrect funding figure or data point, please use the **Data correction** template instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+      placeholder: When I do X, Y happens instead of Z.
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this behavior?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen instead?
+    validations:
+      required: false
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Affected area
+      description: Which part of Arthaive is affected?
+      options:
+        - Explore
+        - Analytics
+        - Search
+        - Deal page
+        - Investor page
+        - Admin
+        - API
+        - Auth/Sign-in
+        - Other
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, and device where this occurred.
+      placeholder: e.g. Chrome 124 on macOS 14, MacBook Pro
+    validations:
+      required: false
+  - type: checkboxes
+    id: search-existing
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have searched the existing issues and this bug has not already been reported.
+          required: true
