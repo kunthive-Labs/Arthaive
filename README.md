@@ -221,3 +221,7 @@ Data corrections, source suggestions, and pull requests are welcome. See [CONTRI
 ## License
 
 [MIT](LICENSE)
+
+---
+
+Part of [kunthive-Labs](https://github.com/kunthive-Labs) — open experiments in AI & tooling.
