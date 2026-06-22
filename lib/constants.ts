@@ -68,7 +68,7 @@ export const MAX_DEALS_PER_PAGE = 20
 export const APP_NAME = "Arthaive"
 export const APP_DESCRIPTION = "India's open startup funding intelligence platform"
 export const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://arthive.kunthive.in"
+  process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://arthaive.kunthive.in"
 
 
 export const CHART_COLORS = [

@@ -9,7 +9,7 @@
 
 > *Artha* (अर्थ — wealth, capital) + *hive* (the collective intelligence). A living, source-backed hive of India's funding data.
 
-**Live:** [arthive.kunthive.in](https://arthive.kunthive.in)
+**Live:** [arthaive.kunthive.in](https://arthaive.kunthive.in)
 **Repo:** [github.com/kunthive-Labs/Arthaive](https://github.com/kunthive-Labs/Arthaive)
 
 ---
@@ -128,15 +128,15 @@ python run.py
 
 A read-only REST API for developers and researchers.
 
-- Docs: [`/api-docs`](https://arthive.kunthive.in/api-docs)
-- Get a free key: [`/api-keys`](https://arthive.kunthive.in/api-keys)
+- Docs: [`/api-docs`](https://arthaive.kunthive.in/api-docs)
+- Get a free key: [`/api-keys`](https://arthaive.kunthive.in/api-keys)
 - Rate limits: 30/min anonymous · 120/min with a key
 - Auth: `X-API-Key` header
 
 Quick example:
 
 ```bash
-curl 'https://arthive.kunthive.in/api/v1/funding-rounds?sector=Fintech&stage=series_a&limit=5' \
+curl 'https://arthaive.kunthive.in/api/v1/funding-rounds?sector=Fintech&stage=series_a&limit=5' \
   -H 'X-API-Key: ifk_your_key_here'
 ```
 

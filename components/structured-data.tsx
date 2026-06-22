@@ -4,7 +4,7 @@
 const BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
   process.env.NEXT_PUBLIC_BASE_URL ??
-  "https://arthive.kunthive.in"
+  "https://arthaive.kunthive.in"
 
 const organizationSchema = {
   "@context": "https://schema.org",

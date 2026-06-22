@@ -3,7 +3,7 @@ import { fundingData } from "@/data/funding-data"
 import { listAvailablePeriods } from "@/lib/db/reports"
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? "https://arthive.kunthive.in"
+  process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? "https://arthaive.kunthive.in"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const sectors = [...new Set(fundingData.flatMap((d) => d.sectors ?? []))]

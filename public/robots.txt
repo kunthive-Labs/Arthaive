@@ -5,4 +5,4 @@ Disallow: /auth/
 Disallow: /dashboard/
 Disallow: /profile/
 
-Sitemap: https://arthive.kunthive.in/sitemap.xml
+Sitemap: https://arthaive.kunthive.in/sitemap.xml
