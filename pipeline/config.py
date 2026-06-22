@@ -1,6 +1,8 @@
 """Source registry and tunables for the ingestion pipeline."""
 from __future__ import annotations
 
+import os
+
 # Slug fragments that suggest a URL might be a funding announcement.
 # Coarse pre-filter only — the AI extractor is the real gate.
 FUNDING_SLUG_HINTS = (
@@ -132,7 +134,32 @@ MAX_BODY_CHARS = 5000
 
 # httpx defaults
 HTTP_TIMEOUT_SECONDS = 20
-HTTP_USER_AGENT = "IndStartupFundingBot/0.1 (+pipeline POC; contact: admin)"
+# Identifiable User-Agent with a contact URL + email so site operators can reach
+# us before reaching for a block. Overridable via env for ops/testing.
+HTTP_USER_AGENT = os.environ.get(
+    "PIPELINE_USER_AGENT",
+    "ArthaiveBot/1.0 (+https://arthive.kunthive.in; 8harath.k@gmail.com)",
+)
+
+# --- Crawler politeness ------------------------------------------------------
+# Default polite delay (seconds) between successive HTTP fetches against a host
+# on the main pipeline path. Override with PIPELINE_CRAWL_DELAY (e.g. "2.0").
+# Applied especially to historical backfill sweeps so we don't hammer a source.
+try:
+    CRAWL_DELAY_SECONDS = float(os.environ.get("PIPELINE_CRAWL_DELAY", "1.5"))
+except ValueError:
+    CRAWL_DELAY_SECONDS = 1.5
+
+# Whether to honour robots.txt before fetching a URL. On by default; set
+# PIPELINE_RESPECT_ROBOTS=0 to disable (e.g. for archive-only re-runs).
+RESPECT_ROBOTS = os.environ.get("PIPELINE_RESPECT_ROBOTS", "1").strip().lower() not in (
+    "0",
+    "false",
+    "no",
+)
+
+# How long to cache a parsed robots.txt per host (seconds).
+ROBOTS_CACHE_TTL_SECONDS = 3600
 
 # Wayback CDX
 WAYBACK_AVAILABILITY_URL = "https://archive.org/wayback/available"

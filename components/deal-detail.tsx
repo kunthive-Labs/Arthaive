@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { BackButton } from "@/components/back-button"
+import { DealNotes } from "@/components/deal-notes"
 
 interface DealDetailProps {
   deal: {
@@ -78,6 +79,9 @@ export function DealDetail({ deal }: DealDetailProps) {
             <h2 className="text-xs font-bold uppercase tracking-widest text-green-700 mb-3">About this Deal</h2>
             <p className="text-gray-700 leading-relaxed text-base">{deal.description}</p>
           </div>
+
+          {/* Private research notes + tags */}
+          <DealNotes dealId={deal.id} />
 
           {/* Source */}
           {deal.sourceUrl && (

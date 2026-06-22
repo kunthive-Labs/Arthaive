@@ -38,13 +38,23 @@ npm test           # all green (Vitest)
 
 - Keep PRs focused — one logical change per PR.
 - Match the surrounding code style (TypeScript, Tailwind, shadcn/ui conventions).
+- Use [Conventional Commits](https://www.conventionalcommits.org/) for messages: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`.
 - Reference the issue your PR closes.
 - For data changes, include the source URL in the PR description.
 
 ## Code of conduct
 
-Be respectful and constructive. We're here to build a useful public resource together.
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By participating, you agree to uphold it.
+
+## Reporting security issues
+
+Found a vulnerability? **Don't** open a public issue — follow the disclosure process in [SECURITY.md](SECURITY.md).
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+Arthaive is dual-licensed, and contributions are accepted under the same terms:
+
+- **Code** contributions are licensed under the [GNU AGPL-3.0](LICENSE).
+- **Data** contributions are licensed under [CC BY-SA 4.0](DATA_LICENSE.txt).
+
+By submitting a contribution you certify you have the right to do so and agree to license it accordingly. There is no separate CLA.

@@ -52,9 +52,13 @@ export async function getDeals(filters: DealFilters = {}): Promise<PaginatedDeal
     years = [],
     showUndisclosed = true,
     sortBy = "date",
-    page = 1,
-    limit = 20,
+    page: rawPage = 1,
+    limit: rawLimit = 20,
   } = filters
+
+  // Guard against NaN/invalid values flowing into (page-1)*limit range math.
+  const page = Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1
+  const limit = Number.isFinite(rawLimit) && rawLimit >= 1 ? Math.min(Math.floor(rawLimit), 100) : 20
 
   if (isSupabaseConfigured && supabase) {
     let query = supabase.from("deals").select("*", { count: "exact" })

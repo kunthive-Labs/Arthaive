@@ -5,4 +5,4 @@ Disallow: /auth/
 Disallow: /dashboard/
 Disallow: /profile/
 
-Sitemap: https://ind-startup-funding.vercel.app/sitemap.xml
+Sitemap: https://arthive.kunthive.in/sitemap.xml

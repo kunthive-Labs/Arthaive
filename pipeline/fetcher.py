@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from dataclasses import dataclass
 from datetime import date
 
@@ -15,6 +16,7 @@ from pipeline.config import (
     MAX_BODY_CHARS,
     SOURCES,
 )
+from pipeline.politeness import is_fetch_allowed, polite_sleep
 from pipeline.wayback import find_snapshot
 
 
@@ -107,7 +109,17 @@ def fetch_article(url: str, source_key: str, lastmod_fallback: str | None = None
     cfg = SOURCES[source_key]
     selectors = cfg["article_body_selectors"]
 
-    status, html = _fetch_html(url)
+    # Politeness: honour robots.txt on the live host before fetching it. A
+    # disallowed path skips the live fetch (we may still read it from Wayback,
+    # which is governed by archive.org's own policy, not the publisher's).
+    live_allowed = is_fetch_allowed(url)
+    if not live_allowed:
+        print(f"[fetcher] robots.txt disallows {url}; skipping live fetch", file=sys.stderr, flush=True)
+
+    html = None
+    if live_allowed:
+        polite_sleep(url)  # per-host crawl delay before hitting the source
+        status, html = _fetch_html(url)
     if html is not None:
         title, body = _extract_body(html, selectors)
         if body:
@@ -125,6 +137,7 @@ def fetch_article(url: str, source_key: str, lastmod_fallback: str | None = None
     if snap is None:
         return None
     archive_url = re.sub(r"/(\d{14})/", r"/\1id_/", snap.archive_url, count=1) or snap.archive_url
+    polite_sleep(archive_url)  # throttle archive.org requests too
     status2, html2 = _fetch_html(archive_url)
     if html2 is None:
         return None

@@ -34,7 +34,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  const dealPages = dealIds.slice(0, 500).map((id) => ({
+  // List every deal. The sitemap protocol allows up to 50,000 URLs per file;
+  // the full dataset (~13.7k deals plus static/report/sector pages) stays well
+  // under that, so there's no need to cap. Guard against ever exceeding the
+  // limit if the dataset grows past it.
+  const SITEMAP_MAX_URLS = 50000
+  const nonDealCount =
+    staticPages.length + reportPages.length + sectorPages.length
+  const dealBudget = Math.max(0, SITEMAP_MAX_URLS - nonDealCount)
+  const dealPages = dealIds.slice(0, dealBudget).map((id) => ({
     url: `${BASE_URL}/deal/${encodeURIComponent(id)}`,
     changeFrequency: "monthly" as const,
     priority: 0.5,

@@ -26,6 +26,7 @@ for _env in (".env.local", ".env"):
     if _p.exists():
         load_dotenv(_p, override=False)
 
+from pipeline.config import CRAWL_DELAY_SECONDS  # noqa: E402
 from pipeline.discovery import discover_urls  # noqa: E402
 from pipeline.fetcher import fetch_article  # noqa: E402
 
@@ -37,7 +38,10 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--until", default=None, help="YYYY-MM-DD inclusive upper bound (default: no cap)")
     p.add_argument("--limit", type=int, default=None, help="Cap candidate URLs scanned")
     p.add_argument("--body-chars", type=int, default=1500, help="Chars of body to keep")
-    p.add_argument("--sleep", type=float, default=0.0, help="Seconds to pause between fetches (be polite on big crawls)")
+    p.add_argument("--sleep", type=float, default=0.0,
+                   help="EXTRA seconds to pause between fetches, on top of the built-in "
+                        f"per-host crawl delay (PIPELINE_CRAWL_DELAY, default {CRAWL_DELAY_SECONDS}s) "
+                        "now enforced inside fetch_article")
     p.add_argument("--skip-existing", action="store_true",
                    help="Skip URLs already written to funding_data/*/data.csv (cheap re-crawls)")
     p.add_argument("--out", required=True, help="Output JSONL path")

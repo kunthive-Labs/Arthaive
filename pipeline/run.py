@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 import traceback
@@ -34,6 +35,16 @@ from pipeline.fetcher import fetch_article  # noqa: E402
 AUTO_APPROVE_CONFIDENCE = 0.80
 # Below this, the rule-based extraction is handed to the AI extractor (PHASES.md §4.3).
 AI_FALLBACK_THRESHOLD = 0.70
+
+# --- Silent-failure detection ------------------------------------------------
+# A run that fetched articles but errored on (almost) every one looks "partial"
+# and exits green today; that hides a source-format break ("data is the
+# product"). We escalate a 'partial' run to a hard failure when the error rate
+# over attempted work is at or above this fraction.
+ABNORMAL_ERROR_RATE = float(os.environ.get("PIPELINE_ABNORMAL_ERROR_RATE", "0.5"))
+# Minimum attempted units before the error-rate gate is meaningful (avoids
+# flagging a tiny run where 1 of 2 items errored as catastrophic).
+MIN_ATTEMPTS_FOR_RATE = int(os.environ.get("PIPELINE_MIN_ATTEMPTS_FOR_RATE", "5"))
 
 
 def _parse_args() -> argparse.Namespace:
@@ -443,6 +454,58 @@ def _run_backfill(args, deps: SimpleNamespace | None, ai_extract, stats: dict, e
             error_log_lines.append(f"route:{cand.url}:{e!r}")
 
 
+def _assess_run_health(run_status: str, stats: dict, *, dry_run: bool) -> tuple[str, list[str]]:
+    """Decide whether a 'success'/'partial' run is actually a silent failure.
+
+    Returns ``(effective_status, reasons)``. ``effective_status`` is escalated to
+    'failed' when the data is suspect, while still distinguishing a legitimately
+    quiet run ("nothing new today") from a broken one ("every extraction failed").
+
+    Signals (any one escalates to 'failed'):
+      * High error rate: ``errors`` is >= ABNORMAL_ERROR_RATE of attempted units
+        (fetched articles + errors), once attempts clear MIN_ATTEMPTS_FOR_RATE.
+        This catches a source-format change where extraction blows up per-item.
+      * Productive-but-empty: we extracted records yet auto-approved zero AND
+        errored on some — i.e. work happened but nothing landed and errors are
+        implicated (a routing/format break), not a genuinely quiet day.
+
+    A run that simply found nothing (no fetches, no errors, no records) is NOT
+    escalated — that's "nothing new today" and stays green, but is annotated by
+    the heartbeat note in main().
+    """
+    if dry_run or run_status == "failed":
+        return run_status, []
+
+    reasons: list[str] = []
+    errors = stats.get("errors", 0)
+    fetched = stats.get("articles_fetched", 0)
+    extracted = stats.get("records_extracted", 0)
+    approved = stats.get("records_auto_approved", 0)
+
+    # Attempted units we could meaningfully error on: things we fetched plus
+    # outright errors (some errors happen before a fetch counts).
+    attempts = fetched + errors
+    if attempts >= MIN_ATTEMPTS_FOR_RATE and errors > 0:
+        rate = errors / attempts
+        if rate >= ABNORMAL_ERROR_RATE:
+            reasons.append(
+                f"abnormal error rate {rate:.0%} ({errors}/{attempts} attempted units failed)"
+            )
+
+    # We pulled records out but none were approved AND errors were involved:
+    # the pipeline did work but produced nothing usable — distinct from a quiet
+    # day where extracted==0 and errors==0.
+    if extracted > 0 and approved == 0 and errors > 0:
+        reasons.append(
+            f"extracted {extracted} record(s) but auto-approved 0 with {errors} error(s) "
+            "— possible source-format break"
+        )
+
+    if reasons:
+        return "failed", reasons
+    return run_status, reasons
+
+
 def main() -> int:
     args = _parse_args()
 
@@ -486,8 +549,34 @@ def main() -> int:
         error_log_lines.append(traceback.format_exc())
         _log("run.error", traceback=traceback.format_exc())
 
+    # Distinguish "nothing new today" from "every extraction failed": escalate a
+    # success/partial run to a hard failure when the data looks broken. The
+    # status persisted to job_runs is the *raw* status (so the dashboard still
+    # shows 'partial'); the escalated status drives the exit code + alert.
+    effective_status, health_reasons = _assess_run_health(run_status, stats, dry_run=args.dry_run)
+    if health_reasons:
+        for r in health_reasons:
+            _log("run.health_alert", reason=r, raw_status=run_status)
+        error_log_lines.append("HEALTH: " + "; ".join(health_reasons))
+
+    # Freshness / heartbeat note: make a quiet run legible at a glance.
+    if not args.dry_run and stats["records_auto_approved"] == 0:
+        if effective_status == "failed":
+            _log("run.heartbeat", note="no records approved in last run AND run flagged unhealthy")
+        elif stats["records_extracted"] == 0 and stats["errors"] == 0:
+            _log("run.heartbeat", note="no records approved in last run (nothing new today)")
+        else:
+            _log("run.heartbeat", note="no records approved in last run")
+
     elapsed = round(time.time() - started, 1)
-    _log("run.done", elapsed_s=elapsed, run_status=run_status, **stats)
+    _log(
+        "run.done",
+        elapsed_s=elapsed,
+        run_status=run_status,
+        effective_status=effective_status,
+        exit_code=0 if effective_status != "failed" else 1,
+        **stats,
+    )
 
     if deps is not None:
         try:
@@ -505,7 +594,10 @@ def main() -> int:
         except Exception as e:
             _log("job_log.error", error=repr(e))
 
-    return 0 if run_status != "failed" else 1
+    if effective_status == "failed":
+        _log("run.fail", reason="; ".join(health_reasons) or "run raised an exception")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

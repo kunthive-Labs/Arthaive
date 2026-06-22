@@ -1,5 +1,6 @@
 import { anthropic, isAIConfigured, MODELS, textFromResponse, parseJsonLoose } from "@/lib/ai/client"
 import { logUsage } from "@/lib/ai/usage-logger"
+import { assertWithinBudget } from "@/lib/ai/budget"
 import { getDeals } from "@/lib/db/deals"
 import type { Deal, DealFilters } from "@/lib/types"
 
@@ -68,6 +69,8 @@ export async function naturalLanguageSearch(query: string): Promise<NLSearchResu
 
   if (isAIConfigured && anthropic) {
     try {
+      // Enforced spend ceiling — refuse the paid call if month-to-date is over budget.
+      await assertWithinBudget()
       const message = await anthropic.messages.create({
         model: MODELS.parser,
         max_tokens: 300,

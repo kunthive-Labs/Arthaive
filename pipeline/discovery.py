@@ -21,6 +21,7 @@ from pipeline.config import (
     SOURCES,
     source_key_for_publisher,
 )
+from pipeline.politeness import is_fetch_allowed, polite_sleep
 
 SITEMAP_NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
@@ -44,6 +45,12 @@ def _parse_xml(content: bytes) -> etree._Element:
 
 
 def _fetch_xml(client: httpx.Client, url: str) -> etree._Element | None:
+    # Politeness: respect robots.txt and the per-host crawl delay on sitemap
+    # fetches too — backfill sweeps walk many sitemaps off one host.
+    if not is_fetch_allowed(url):
+        print(f"[discovery] robots.txt disallows sitemap {url}; skipping", file=sys.stderr, flush=True)
+        return None
+    polite_sleep(url)
     try:
         r = client.get(url)
         if r.status_code != 200:
@@ -270,6 +277,10 @@ def poll_feeds(feeds: list[dict] | None = None) -> list[FeedArticle]:
             if source_key is None:
                 print(f"[discovery] no SOURCES entry for publisher {publisher!r}, skipping", file=sys.stderr)
                 continue
+            if not is_fetch_allowed(feed["url"]):
+                print(f"[discovery] robots.txt disallows feed {feed['url']}; skipping", file=sys.stderr)
+                continue
+            polite_sleep(feed["url"])
             try:
                 r = client.get(feed["url"])
                 r.raise_for_status()

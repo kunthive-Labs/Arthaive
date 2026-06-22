@@ -10,6 +10,10 @@ concurrency:
   group: funding-pipeline
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -30,3 +34,55 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      # "Data is the product": a non-zero exit (crash, or a 'partial' run that
+      # auto-approved nothing / had an abnormal error rate — see
+      # pipeline/run.py::_assess_run_health) must page a human, not just glow
+      # red unseen in the Actions tab. Open a fresh issue, or bump an existing
+      # open one so repeated failures don't spam the tracker.
+      - name: Alert on failure (open/update GitHub issue)
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const title = `Funding pipeline failed: run #${context.runNumber}`;
+            const marker = '<!-- funding-pipeline-failure-alert -->';
+            const body = [
+              marker,
+              `The scheduled funding pipeline failed (or self-flagged a silent failure).`,
+              ``,
+              `- Workflow run: ${runUrl}`,
+              `- Trigger: \`${context.eventName}\``,
+              `- Commit: \`${context.sha}\``,
+              ``,
+              `Check the run log for \`run.health_alert\` / \`run.fail\` events — a 'partial'`,
+              `status with zero auto-approvals or a high error rate usually means a`,
+              `source's HTML/sitemap format changed and extraction is silently breaking.`,
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'pipeline-failure',
+              per_page: 20,
+            });
+            const open = existing.data.find(i => (i.body || '').includes(marker));
+
+            if (open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.number,
+                body: `Failed again — run #${context.runNumber}: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['pipeline-failure'],
+              });
+            }

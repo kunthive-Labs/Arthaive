@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a new feature or improvement for Arthaive.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe the problem you're trying to solve before proposing a specific solution.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem are you facing? Describe the problem before the solution.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to happen?
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or features you've considered.
+    validations:
+      required: false
+  - type: checkboxes
+    id: not-duplicate
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have searched the existing issues and this feature has not already been requested.
+          required: true

@@ -1,17 +1,22 @@
 # Arthaive
 
+[![Code license: AGPL-3.0](https://img.shields.io/badge/code-AGPL--3.0-blue.svg)](LICENSE)
+[![Data license: CC BY-SA 4.0](https://img.shields.io/badge/data-CC%20BY--SA%204.0-orange.svg)](DATA_LICENSE.txt)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-purple.svg)](CODE_OF_CONDUCT.md)
+
 **Arthaive** — India's open startup funding intelligence platform. A free, structured, source-backed platform tracking startup funding across India. Built as an open alternative to paid platforms like Tracxn and Crunchbase — focused entirely on India, with every record verified and linked to its original source.
 
 > *Artha* (अर्थ — wealth, capital) + *hive* (the collective intelligence). A living, source-backed hive of India's funding data.
 
-**Live:** [ind-startup-funding.vercel.app](https://ind-startup-funding.vercel.app)
+**Live:** [arthive.kunthive.in](https://arthive.kunthive.in)
 **Repo:** [github.com/kunthive-Labs/Arthaive](https://github.com/kunthive-Labs/Arthaive)
 
 ---
 
 ## Features
 
-- **1,695+ verified funding records** from Q1 FY2024 onwards
+- **13,700+ verified funding records** spanning 2015–2026
 - **Explore & filter** deals by sector, stage, city, amount range, and date
 - **Analytics dashboard** — funding trends, sector breakdowns, stage funnels, investor leaderboards, India choropleth map
 - **Investor profiles** — deal history, sectors covered, co-investor network
@@ -123,15 +128,15 @@ python run.py
 
 A read-only REST API for developers and researchers.
 
-- Docs: [`/api-docs`](https://ind-startup-funding.vercel.app/api-docs)
-- Get a free key: [`/api-keys`](https://ind-startup-funding.vercel.app/api-keys)
+- Docs: [`/api-docs`](https://arthive.kunthive.in/api-docs)
+- Get a free key: [`/api-keys`](https://arthive.kunthive.in/api-keys)
 - Rate limits: 30/min anonymous · 120/min with a key
 - Auth: `X-API-Key` header
 
 Quick example:
 
 ```bash
-curl 'https://ind-startup-funding.vercel.app/api/v1/funding-rounds?sector=Fintech&stage=series_a&limit=5' \
+curl 'https://arthive.kunthive.in/api/v1/funding-rounds?sector=Fintech&stage=series_a&limit=5' \
   -H 'X-API-Key: ifk_your_key_here'
 ```
 
@@ -220,4 +225,9 @@ Data corrections, source suggestions, and pull requests are welcome. See [CONTRI
 
 ## License
 
-[MIT](LICENSE)
+Arthaive is dual-licensed to keep both the software **and** the data open:
+
+- **Code** — [GNU AGPL-3.0](LICENSE). You're free to use, modify, and self-host it; if you run a modified version as a network service, you must release your changes under the same license. This keeps the platform open and prevents closed-source forks.
+- **Data** — the funding dataset (`funding_data/`, `data/`, and records served by the API) is licensed [CC BY-SA 4.0](DATA_LICENSE.txt). Reuse it freely with attribution to Arthaive; derivative datasets must stay under the same license.
+
+Each funding record links to its original source; those sources retain their own rights. See [`DATA_LICENSE.txt`](DATA_LICENSE.txt) for the data terms and attribution requirements.

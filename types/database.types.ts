@@ -301,6 +301,32 @@ export type Database = {
         Update: Record<string, never>
         Relationships: []
       }
+      deal_notes: {
+        Row: {
+          id: string
+          user_id: string
+          deal_id: string
+          content: string
+          tags: string[]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          deal_id: string
+          content?: string
+          tags?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           id: string

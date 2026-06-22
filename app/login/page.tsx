@@ -1,42 +1,12 @@
-import { SignInButton } from "@/components/auth/sign-in-button"
-import { TrendingUp } from "lucide-react"
+import { redirect } from "next/navigation"
 
-export const metadata = {
-  title: "Sign In | Arthaive",
-  description: "Sign in to track Indian startup funding deals",
-}
-
-export default function LoginPage({
+// The sign-in gate now lives at "/". Keep this route as a permanent redirect so
+// old links and the OAuth flow land in one place.
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary">
-            <TrendingUp className="h-7 w-7 text-primary-foreground" />
-          </div>
-          <h1 className="mt-6 text-2xl font-bold">Arthaive</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Track every funding round across Indian startups
-          </p>
-        </div>
-
-        {searchParams.error && (
-          <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            Authentication failed. Please try again.
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <SignInButton />
-          <p className="text-center text-xs text-muted-foreground">
-            Sign up is only available via Google. No password required.
-          </p>
-        </div>
-      </div>
-    </div>
-  )
+  const { error } = await searchParams
+  redirect(error ? `/?error=${error}` : "/")
 }

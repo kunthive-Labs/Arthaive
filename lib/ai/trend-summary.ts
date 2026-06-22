@@ -1,5 +1,6 @@
 import { anthropic, isAIConfigured, MODELS, textFromResponse } from "@/lib/ai/client"
 import { logUsage } from "@/lib/ai/usage-logger"
+import { assertWithinBudget } from "@/lib/ai/budget"
 import { supabaseAdmin } from "@/lib/supabase"
 import type { FundingReport } from "@/lib/db/reports"
 import { formatCurrency } from "@/lib/format"
@@ -39,6 +40,12 @@ export async function generateTrendSummary(
   }
 
   if (!isAIConfigured || !anthropic) return null
+
+  // Enforced spend ceiling — applies only to the cache MISS path (a fresh, paid
+  // Sonnet generation). Cached summaries above returned before reaching here, so
+  // serving cached content never trips the budget. Kept outside the try/catch so
+  // an over-budget condition surfaces to the caller instead of being swallowed.
+  await assertWithinBudget()
 
   // 2. Build prompt input — keep it compact, this is mostly read by Claude.
   const promptData = {
