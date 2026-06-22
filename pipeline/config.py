@@ -94,6 +94,32 @@ SOURCES: dict[str, dict] = {
             ".article-content",
             "main",
         ],
+        # Pre-2015 YourStory is only reachable via the Wayback Machine (the live
+        # site is Cloudflare-gated, and old WordPress URLs are /YYYY/MM/slug).
+        # dump_candidates_wayback.py uses this to harvest the historical backfill.
+        "wayback_host": "yourstory.com",
+        "wayback_date_in_url": r"/(\d{4})/(\d{1,2})/",
+    },
+    "vccircle": {
+        "name": "VCCircle",
+        # VCCircle (founded Nov 2005) is the primary source for the 2005–2014
+        # backfill. The live site has no usable sitemap and is paywalled, so we
+        # harvest exclusively from the Wayback Machine via dump_candidates_wayback.py.
+        # Old WordPress URLs embed the date as /YYYY/MM/DD/slug.
+        "sitemap_index_url": None,
+        "base_url": "https://www.vccircle.com",
+        "publisher": "VCCircle",
+        "reliability_tier": "tier_2",
+        "sitemap_mode": "wayback",
+        "wayback_host": "vccircle.com",
+        "wayback_date_in_url": r"/(\d{4})/(\d{1,2})/(\d{1,2})/",
+        "article_body_selectors": [
+            "article",
+            "[itemprop='articleBody']",
+            ".entry-content",
+            ".post-content",
+            "main",
+        ],
     },
 }
 
