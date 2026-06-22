@@ -75,6 +75,7 @@ export function HeaderAccount() {
       <Link
         href="/dashboard"
         className="hidden max-w-[12rem] truncate text-sm font-bold hover:text-green-700 sm:inline"
+        aria-label="Account menu"
         title={session.email ?? undefined}
       >
         {session.name}

@@ -42,15 +42,21 @@ function cached<A extends unknown[], R>(
 const PAGE = 1000
 
 // Page through a date-filtered (deal_date,amount_inr) projection — same 1000-row
-// cap concern, used by the monthly-trend aggregations.
-async function fetchDatedRows(sinceStr: string): Promise<{ date: string; amount: number }[]> {
+// cap concern, used by the monthly-trend aggregations. When `sector` is given,
+// only deals whose `sectors` array contains it are counted (DB-side array filter).
+async function fetchDatedRows(
+  sinceStr: string,
+  sector?: string
+): Promise<{ date: string; amount: number }[]> {
   const all: { date: string; amount: number }[] = []
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase!
+    let query = supabase!
       .from("deals")
       .select("deal_date,amount_inr")
       .eq("record_status", "verified")
       .gte("deal_date", sinceStr)
+    if (sector) query = query.contains("sectors", [sector])
+    const { data, error } = await query
       .order("deal_date", { ascending: true })
       .range(from, from + PAGE - 1)
 
@@ -150,18 +156,21 @@ export async function getSiteStats(): Promise<SiteStats> {
 // ---------------------------------------------------------------------------
 // getMonthlyFunding
 // ---------------------------------------------------------------------------
-export async function getMonthlyFunding(months = 24): Promise<MonthlyFunding[]> {
+export async function getMonthlyFunding(
+  months = 24,
+  sector?: string
+): Promise<MonthlyFunding[]> {
   const since = new Date()
   since.setMonth(since.getMonth() - months)
   const sinceStr = since.toISOString().split("T")[0]
 
   if (isSupabaseConfigured && supabase) {
-    const rows = await fetchDatedRows(sinceStr)
+    const rows = await fetchDatedRows(sinceStr, sector)
     if (rows.length > 0) return aggregateMonthly(rows)
   }
 
   const filtered = fundingData
-    .filter((d) => d.date >= sinceStr)
+    .filter((d) => d.date >= sinceStr && (!sector || d.sectors.includes(sector)))
     .map((d) => ({ date: d.date, amount: d.amount }))
 
   return aggregateMonthly(filtered)
@@ -476,7 +485,8 @@ export async function getTopInvestorsByActivity(
 // getMonthlyFundingByYear — for the YoY chart: monthly breakdown per year
 // ---------------------------------------------------------------------------
 export async function getMonthlyFundingByYear(
-  year: number
+  year: number,
+  sector?: string
 ): Promise<{ month: string; totalFunding: number; dealCount: number }[]> {
   const startDate = `${year}-01-01`
   const endDate = `${year}-12-31`
@@ -485,12 +495,14 @@ export async function getMonthlyFundingByYear(
     // A single year can exceed the 1000-row cap (2021 alone is ~2.3k), so page through.
     const rows: { date: string; amount: number }[] = []
     for (let from = 0; ; from += PAGE) {
-      const { data, error } = await supabase
+      let query = supabase
         .from("deals")
         .select("deal_date,amount_inr")
         .eq("record_status", "verified")
         .gte("deal_date", startDate)
         .lte("deal_date", endDate)
+      if (sector) query = query.contains("sectors", [sector])
+      const { data, error } = await query
         .order("deal_date", { ascending: true })
         .range(from, from + PAGE - 1)
 
@@ -509,7 +521,10 @@ export async function getMonthlyFundingByYear(
 
   return aggregateMonthly(
     fundingData
-      .filter((d) => d.date >= startDate && d.date <= endDate)
+      .filter(
+        (d) =>
+          d.date >= startDate && d.date <= endDate && (!sector || d.sectors.includes(sector))
+      )
       .map((d) => ({ date: d.date, amount: d.amount }))
   )
 }

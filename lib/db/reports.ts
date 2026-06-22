@@ -4,6 +4,11 @@ import type { Deal } from "@/lib/types"
 
 const UNDISCLOSED_INVESTORS = new Set(["Not Disclosed", "Undisclosed", ""])
 
+// Supabase caps a single select at 1000 rows. With ~13k+ verified deals, any
+// path that streams raw deal rows MUST page through .range() or it silently
+// under-counts. Mirrors the PAGE loop in lib/db/analytics.ts.
+const PAGE = 1000
+
 export interface ReportPeriod {
   id: string // "2026-W20" (ISO week) or "2026-05" (month)
   type: "week" | "month"
@@ -127,17 +132,24 @@ function mapRow(row: Record<string, unknown>): Deal {
 
 async function fetchDealsInRange(start: string, end: string): Promise<Deal[]> {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from("deals")
-      .select("*")
-      .eq("record_status", "verified")
-      .gte("deal_date", start)
-      .lte("deal_date", end)
-      .order("amount_inr", { ascending: false })
+    const rows: Record<string, unknown>[] = []
+    let ok = false
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("*")
+        .eq("record_status", "verified")
+        .gte("deal_date", start)
+        .lte("deal_date", end)
+        .order("amount_inr", { ascending: false })
+        .range(from, from + PAGE - 1)
 
-    if (!error && data) {
-      return (data as Record<string, unknown>[]).map(mapRow)
+      if (error) break
+      ok = true
+      if (data && data.length) rows.push(...(data as Record<string, unknown>[]))
+      if (!data || data.length < PAGE) break
     }
+    if (ok) return rows.map(mapRow)
   }
 
   return fundingData
@@ -221,17 +233,27 @@ export async function getReport(period: string): Promise<FundingReport | null> {
 // ---------------------------------------------------------------------------
 async function fetchAllDealDates(): Promise<{ date: string; amount: number }[]> {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from("deals")
-      .select("deal_date,amount_inr")
-      .eq("record_status", "verified")
+    const all: { date: string; amount: number }[] = []
+    let ok = false
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("deal_date,amount_inr")
+        .eq("record_status", "verified")
+        .range(from, from + PAGE - 1)
 
-    if (!error && data) {
-      return (data as { deal_date: string; amount_inr: number }[]).map((r) => ({
-        date: r.deal_date,
-        amount: r.amount_inr ?? 0,
-      }))
+      if (error) break
+      ok = true
+      if (data && data.length)
+        all.push(
+          ...(data as { deal_date: string; amount_inr: number }[]).map((r) => ({
+            date: r.deal_date,
+            amount: r.amount_inr ?? 0,
+          }))
+        )
+      if (!data || data.length < PAGE) break
     }
+    if (ok) return all
   }
   return fundingData.map((d) => ({ date: d.date, amount: d.amount }))
 }

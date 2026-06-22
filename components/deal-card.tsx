@@ -18,7 +18,10 @@ interface DealCardProps {
 
 export function DealCard({ deal }: DealCardProps) {
   return (
-    <Link href={`/deal/${encodeURIComponent(deal.id)}`}>
+    <Link
+      href={`/deal/${encodeURIComponent(deal.id)}`}
+      aria-label={`${deal.company} — ${deal.stage} round, ${formatFundingAmount(deal.amount)}`}
+    >
       <div className="neo-border neo-hover p-6 bg-white cursor-pointer h-full flex flex-col">
         <div className="flex justify-between items-start gap-4 mb-4">
           <div className="flex-1">
@@ -41,7 +44,7 @@ export function DealCard({ deal }: DealCardProps) {
 
         <div className="mt-auto pt-4 border-t-2 border-gray-200">
           <div className="text-xs font-semibold text-gray-600 uppercase">Led by</div>
-          <div className="text-sm font-bold mt-1 truncate">{deal.investors[0]}</div>
+          <div className="text-sm font-bold mt-1 truncate" title={deal.investors[0]}>{deal.investors[0]}</div>
         </div>
       </div>
     </Link>

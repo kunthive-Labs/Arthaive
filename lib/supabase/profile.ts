@@ -94,14 +94,22 @@ export async function createAlert(
   })
 }
 
-export async function toggleAlert(alertId: string, active: boolean) {
+export async function toggleAlert(userId: string, alertId: string, active: boolean) {
   const supabase = await createClient()
-  return supabase.from("alerts").update({ active }).eq("id", alertId)
+  return supabase
+    .from("alerts")
+    .update({ active })
+    .eq("id", alertId)
+    .eq("user_id", userId)
 }
 
-export async function deleteAlert(alertId: string) {
+export async function deleteAlert(userId: string, alertId: string) {
   const supabase = await createClient()
-  return supabase.from("alerts").delete().eq("id", alertId)
+  return supabase
+    .from("alerts")
+    .delete()
+    .eq("id", alertId)
+    .eq("user_id", userId)
 }
 
 

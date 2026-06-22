@@ -19,6 +19,8 @@ export function BookmarkButton({ dealId }: { dealId: string }) {
       size="icon"
       onClick={() => toggle(dealId)}
       className={cn("h-8 w-8", saved && "text-primary")}
+      aria-label={saved ? "Remove bookmark" : "Add bookmark"}
+      aria-pressed={saved}
       title={saved ? "Remove bookmark" : "Bookmark deal"}
     >
       <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />

@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import { fundingData } from "@/data/funding-data"
 import type { Deal, DealFilters, PaginatedDeals } from "@/lib/types"
+import { filterYearSchema } from "@/lib/validation"
 
 function mapStaticDeal(d: (typeof fundingData)[0]): Deal {
   return {
@@ -60,6 +61,11 @@ export async function getDeals(filters: DealFilters = {}): Promise<PaginatedDeal
   const page = Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1
   const limit = Number.isFinite(rawLimit) && rawLimit >= 1 ? Math.min(Math.floor(rawLimit), 100) : 20
 
+  // `years` are raw strings from searchParams that get interpolated into a
+  // PostgREST .or() filter string, so validate them: keep only sane 4-digit
+  // years and drop anything else before they reach the filter builder.
+  const validYears = years.filter((y) => filterYearSchema.safeParse(y).success)
+
   if (isSupabaseConfigured && supabase) {
     let query = supabase.from("deals").select("*", { count: "exact" })
 
@@ -71,12 +77,12 @@ export async function getDeals(filters: DealFilters = {}): Promise<PaginatedDeal
     if (!showUndisclosed) query = query.gt("amount_inr", 0)
     if (minAmount > 0) query = query.gte("amount_inr", minAmount)
     if (maxAmount < Infinity) query = query.lte("amount_inr", maxAmount)
-    if (years.length) {
+    if (validYears.length) {
       // Each year is an AND of its bounds; the years themselves OR together.
       // Without the and(...) grouping, `.or()` reads the bare gte/lte as a flat
       // OR — "date >= Jan 1 OR date <= Dec 31" — which is true for every row, so
       // the year filter silently matched the entire table.
-      const yearFilters = years.map(
+      const yearFilters = validYears.map(
         (y) => `and(deal_date.gte.${y}-01-01,deal_date.lte.${y}-12-31)`
       )
       query = query.or(yearFilters.join(","))
@@ -112,7 +118,7 @@ export async function getDeals(filters: DealFilters = {}): Promise<PaginatedDeal
   if (!showUndisclosed) data = data.filter((d) => d.amount > 0)
   if (minAmount > 0) data = data.filter((d) => d.amount >= minAmount)
   if (maxAmount < Infinity) data = data.filter((d) => d.amount <= maxAmount)
-  if (years.length) data = data.filter((d) => years.includes(new Date(d.date).getFullYear().toString()))
+  if (validYears.length) data = data.filter((d) => validYears.includes(new Date(d.date).getFullYear().toString()))
 
   data = data.sort((a, b) =>
     sortBy === "amount" ? b.amount - a.amount : new Date(b.date).getTime() - new Date(a.date).getTime()

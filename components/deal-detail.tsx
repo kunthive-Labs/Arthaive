@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { BackButton } from "@/components/back-button"
 import { DealNotes } from "@/components/deal-notes"
+import { formatInrLakhs } from "@/lib/format"
+import { useClipboard } from "@/hooks/use-clipboard"
 
 interface DealDetailProps {
   deal: {
@@ -20,12 +22,6 @@ interface DealDetailProps {
   }
 }
 
-function formatCrores(amount: number) {
-  const cr = amount / 100
-  if (cr >= 1000) return `₹${(cr / 1000).toFixed(1)}K Cr`
-  return `₹${cr.toFixed(0)} Cr`
-}
-
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-IN", {
     day: "numeric",
@@ -36,10 +32,20 @@ function formatDate(dateStr: string) {
 
 export function DealDetail({ deal }: DealDetailProps) {
   const otherInvestors = deal.investors.filter((inv) => inv !== deal.leadInvestor)
+  const { copied, copy } = useClipboard()
 
   return (
     <main className="max-w-5xl mx-auto px-4 md:px-6 py-10">
-      <BackButton fallback="/explore" />
+      <div className="flex items-center justify-between gap-4">
+        <BackButton fallback="/explore" />
+        <button
+          type="button"
+          onClick={() => copy(typeof window !== "undefined" ? window.location.href : "")}
+          className="px-3 py-1.5 text-sm font-bold border-2 border-black hover:bg-black hover:text-white transition-colors"
+        >
+          {copied ? "Copied!" : "Copy link"}
+        </button>
+      </div>
 
       {/* Hero card */}
       <div className="neo-border bg-white mb-6">
@@ -55,7 +61,7 @@ export function DealDetail({ deal }: DealDetailProps) {
               </p>
             </div>
             <div className="text-right">
-              <div className="text-4xl md:text-5xl font-bold text-green-700">{formatCrores(deal.amount)}</div>
+              <div className="text-4xl md:text-5xl font-bold text-green-700">{formatInrLakhs(deal.amount)}</div>
               <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mt-1">Funding Raised</div>
             </div>
           </div>

@@ -5,6 +5,49 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async headers() {
+    // Content-Security-Policy is intentionally emitted as Report-Only (NOT
+    // enforcing) so it cannot break the live site. Violations are reported to
+    // the browser console only. Promote this to an enforcing
+    // "Content-Security-Policy" header once the policy has been verified
+    // against real traffic and no legitimate requests are being flagged.
+    const contentSecurityPolicy = [
+      "default-src 'self'",
+      // 'unsafe-inline' for styles (and inline style attributes from UI libs);
+      // 'unsafe-eval' is omitted so we don't loosen script execution.
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      // self + Supabase + Vercel + Sentry for XHR/fetch/websocket telemetry.
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.app https://vitals.vercel-insights.com https://*.ingest.sentry.io https://*.sentry.io",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join("; ")
+
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: contentSecurityPolicy,
+          },
+        ],
+      },
+    ]
+  },
 }
 
 // Only enable Sentry build-time instrumentation (source map upload, release
