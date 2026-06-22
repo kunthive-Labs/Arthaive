@@ -6,6 +6,11 @@ import {
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
 import { ViewDataLink } from "./view-data-link"
+import { CHART_COLORS, CHART_GRID_COLOR, TOOLTIP_STYLE } from "./chart-colors"
+
+// Comparing every year since 2005 would stack 20+ bars per month with a
+// legend to match — unreadable. Show the most recent N years only.
+const YEARS_SHOWN = 6
 
 export function YoYComparison({ deals, sourceLink }: { deals: Deal[]; sourceLink?: string }) {
   const { data, years } = useMemo(() => {
@@ -21,7 +26,7 @@ export function YoYComparison({ deals, sourceLink }: { deals: Deal[]; sourceLink
       map.get(month)!.set(year, cur + deal.amount)
     }
 
-    const years = Array.from(yearSet).sort()
+    const years = Array.from(yearSet).sort().slice(-YEARS_SHOWN)
     const data = Array.from(map.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, yearMap]) => {
@@ -35,20 +40,18 @@ export function YoYComparison({ deals, sourceLink }: { deals: Deal[]; sourceLink
     return { data, years }
   }, [deals])
 
-  const COLORS = ["hsl(var(--primary))", "#06b6d4", "#f59e0b", "#10b981"]
-
   return (
     <>
-    <div className="h-72">
+    <div className="h-64 md:h-72">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
           <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-          <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />
-          <Tooltip formatter={(val: number) => [`₹${val.toLocaleString("en-IN")} Cr`]} />
-          <Legend />
+          <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} width={48} />
+          <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(val: number) => [`₹${val.toLocaleString("en-IN")} Cr`]} />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
           {years.map((year, i) => (
-            <Bar key={year} dataKey={year} fill={COLORS[i % COLORS.length]} radius={[2, 2, 0, 0]} />
+            <Bar key={year} dataKey={year} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[2, 2, 0, 0]} />
           ))}
         </BarChart>
       </ResponsiveContainer>
