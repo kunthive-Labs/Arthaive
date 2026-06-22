@@ -1,0 +1,626 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arthaive — India's open startup funding intelligence</title>
+<meta name="description" content="Arthaive is a free, open, source-backed platform tracking startup funding across India. Every record is verified and linked to its original source. Built as an open alternative to Tracxn and Crunchbase." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Arthaive — India's open startup funding intelligence" />
+<meta property="og:description" content="A free, source-backed platform tracking startup funding across India. 1,695+ verified records, every one linked to its source. Open source, MIT-licensed." />
+<meta property="og:url" content="https://kunthive-labs.github.io/Arthaive/" />
+<meta name="theme-color" content="#0c0a07" />
+
+<style>
+  :root {
+    --ink: #0c0a07;
+    --ink-2: #14110b;
+    --panel: #1b160d;
+    --line: rgba(214, 170, 84, 0.16);
+    --line-soft: rgba(255, 255, 255, 0.06);
+    --amber: #e0a82e;
+    --amber-bright: #f5c451;
+    --amber-deep: #b07d1c;
+    --text: #f3ead6;
+    --muted: #b3a684;
+    --muted-2: #8a7f63;
+    --green: #6fbf73;
+    --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", sans-serif;
+    --maxw: 1120px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation: none !important; transition: none !important; }
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    background: var(--ink);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--amber);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 18px; height: 1px;
+    background: var(--amber-deep);
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(12px);
+    background: rgba(12, 10, 7, 0.72);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; letter-spacing: -0.01em; }
+  .brand .mark { flex: 0 0 auto; }
+  .brand small {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted-2);
+    border: 1px solid var(--line); padding: 3px 7px; border-radius: 999px;
+    margin-left: 4px;
+  }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a.lnk { font-size: 14px; color: var(--muted); transition: color .2s; }
+  .nav-links a.lnk:hover { color: var(--text); }
+  .nav-links .lnk { display: none; }
+  @media (min-width: 760px) { .nav-links .lnk { display: inline; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; line-height: 1;
+    padding: 11px 18px; border-radius: 10px;
+    border: 1px solid transparent; cursor: pointer;
+    transition: transform .15s ease, background .2s ease, border-color .2s ease;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--amber-bright), var(--amber));
+    color: #1a1304;
+    box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 8px 24px rgba(224,168,46,.18);
+  }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { border-color: var(--line); color: var(--text); background: rgba(255,255,255,.02); }
+  .btn-ghost:hover { border-color: var(--amber-deep); background: rgba(224,168,46,.06); }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; padding: 92px 0 84px; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .hero-bg .glow {
+    position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 560px;
+    background: radial-gradient(ellipse at center, rgba(224,168,46,.16), transparent 62%);
+    filter: blur(8px);
+  }
+  .hero-bg .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 78%);
+  }
+  .hero .wrap { position: relative; z-index: 1; display: grid; gap: 56px; }
+  @media (min-width: 940px) { .hero .wrap { grid-template-columns: 1.05fr 0.95fr; align-items: center; } }
+
+  .h1 {
+    font-size: clamp(40px, 6.4vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    margin: 20px 0 0;
+  }
+  .h1 .accent {
+    background: linear-gradient(120deg, var(--amber-bright), var(--amber-deep));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lede { color: var(--muted); font-size: clamp(16px, 2vw, 19px); margin: 22px 0 0; max-width: 36ch; }
+  .etymo {
+    margin: 18px 0 0; font-size: 14px; color: var(--muted-2);
+    border-left: 2px solid var(--amber-deep); padding-left: 14px; font-style: italic;
+  }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+
+  /* ---------- Hero signature: the verified record card ---------- */
+  .record {
+    background: linear-gradient(180deg, var(--panel), var(--ink-2));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+  .record-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px; border-bottom: 1px solid var(--line-soft);
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted-2);
+  }
+  .verified { display: inline-flex; align-items: center; gap: 6px; color: var(--green); }
+  .verified .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .record-body { padding: 20px 20px 8px; }
+  .rec-co { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .rec-line { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 18px; }
+  .chip {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
+    padding: 4px 9px; border-radius: 6px;
+    border: 1px solid var(--line); color: var(--muted); background: rgba(224,168,46,.04);
+  }
+  .rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: 10px; overflow: hidden; }
+  .rec-cell { background: var(--ink-2); padding: 13px 14px; }
+  .rec-cell .k { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-2); }
+  .rec-cell .v { font-size: 17px; font-weight: 600; margin-top: 4px; }
+  .rec-cell .v.amber { color: var(--amber-bright); }
+  .rec-source {
+    display: flex; align-items: center; gap: 9px; justify-content: space-between;
+    padding: 14px 20px; margin-top: 4px; border-top: 1px solid var(--line-soft);
+    font-size: 12.5px; color: var(--muted-2);
+  }
+  .rec-source .src { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-family: var(--mono); }
+  .conf { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--green); }
+  .conf .bar { width: 64px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .conf .bar i { display: block; height: 100%; width: 94%; background: linear-gradient(90deg, var(--amber), var(--green)); }
+
+  /* ---------- Sections ---------- */
+  section { position: relative; }
+  .band { padding: 88px 0; border-top: 1px solid var(--line-soft); }
+  .sec-head { max-width: 640px; }
+  .sec-head h2 { font-size: clamp(28px, 3.6vw, 38px); letter-spacing: -0.02em; margin: 14px 0 0; line-height: 1.1; }
+  .sec-head p { color: var(--muted); margin: 14px 0 0; font-size: 16.5px; }
+
+  /* stat strip */
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: 14px; overflow: hidden; margin-top: 44px; }
+  @media (min-width: 720px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+  .stat { background: var(--ink-2); padding: 26px 22px; }
+  .stat .n { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: var(--amber-bright); }
+  .stat .l { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  /* feature cards */
+  .cards { display: grid; gap: 16px; margin-top: 44px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 960px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+  .card {
+    background: linear-gradient(180deg, var(--ink-2), var(--ink));
+    border: 1px solid var(--line-soft); border-radius: 14px; padding: 24px;
+    transition: border-color .25s ease, transform .25s ease;
+  }
+  .card:hover { border-color: var(--line); transform: translateY(-3px); }
+  .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+        background: rgba(224,168,46,.08); border: 1px solid var(--line); color: var(--amber-bright); margin-bottom: 16px; }
+  .ic svg { width: 20px; height: 20px; }
+  .card h3 { font-size: 16.5px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .card p { color: var(--muted); font-size: 14.5px; margin: 0; }
+
+  /* how it works */
+  .flow { display: grid; gap: 14px; margin-top: 44px; }
+  @media (min-width: 880px) { .flow { grid-template-columns: repeat(5, 1fr); align-items: stretch; } }
+  .step { position: relative; background: var(--ink-2); border: 1px solid var(--line-soft); border-radius: 12px; padding: 20px 18px; }
+  .step .num { font-family: var(--mono); font-size: 12px; color: var(--amber); letter-spacing: .1em; }
+  .step h4 { margin: 10px 0 6px; font-size: 15px; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: 13px; color: var(--muted-2); }
+  .step .arrow { display: none; }
+  @media (min-width: 880px) {
+    .step .arrow { display: block; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--amber-deep); z-index: 2; }
+    .step:last-child .arrow { display: none; }
+  }
+  .gate { border-color: var(--line); box-shadow: 0 0 0 1px rgba(224,168,46,.12), 0 0 30px rgba(224,168,46,.06); }
+  .gate h4 { color: var(--amber-bright); }
+
+  /* tech */
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 36px; }
+  .pill {
+    font-family: var(--mono); font-size: 13px; padding: 9px 14px; border-radius: 999px;
+    border: 1px solid var(--line-soft); color: var(--muted); background: var(--ink-2);
+    transition: border-color .2s, color .2s;
+  }
+  .pill:hover { border-color: var(--amber-deep); color: var(--text); }
+  .pill b { color: var(--amber-bright); font-weight: 600; }
+
+  /* code */
+  .codewrap { margin-top: 40px; display: grid; gap: 18px; }
+  @media (min-width: 860px) { .codewrap { grid-template-columns: 1fr 1fr; } }
+  .codeblock { background: #0a0805; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .codeblock .bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+  .codeblock .bar .d { width: 11px; height: 11px; border-radius: 50%; background: #2a2417; }
+  .codeblock .bar .name { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--muted-2); letter-spacing: .08em; }
+  pre { margin: 0; padding: 18px 20px; overflow-x: auto; }
+  code { font-family: var(--mono); font-size: 13px; line-height: 1.85; color: var(--text); }
+  code .c { color: var(--muted-2); }
+  code .p { color: var(--amber); }
+  code .s { color: var(--green); }
+
+  /* OSS CTA */
+  .oss { text-align: center; }
+  .oss .panel {
+    margin-top: 8px;
+    background: radial-gradient(ellipse at top, rgba(224,168,46,.10), transparent 65%), var(--ink-2);
+    border: 1px solid var(--line); border-radius: 20px; padding: 56px 28px;
+  }
+  .oss h2 { font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.02em; margin: 16px 0 0; }
+  .oss p { color: var(--muted); max-width: 52ch; margin: 14px auto 0; }
+  .oss .cta-row { justify-content: center; }
+
+  /* footer */
+  footer { border-top: 1px solid var(--line-soft); padding: 46px 0; }
+  .foot { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
+  .foot .small { font-size: 13.5px; color: var(--muted-2); }
+  .foot a { color: var(--muted); transition: color .2s; }
+  .foot a:hover { color: var(--amber-bright); }
+  .foot .links { display: flex; gap: 22px; font-size: 14px; }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+</style>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Arthaive home">
+      <span class="mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <rect x="1" y="1" width="30" height="30" rx="8" stroke="#b07d1c" stroke-width="1.4"/>
+          <path d="M7 21 L13 13 L18 17 L25 8" stroke="#f5c451" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="25" cy="8" r="2.4" fill="#f5c451"/>
+        </svg>
+      </span>
+      Arthaive
+      <small>kunthive-Labs</small>
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="#what">What it is</a>
+      <a class="lnk" href="#how">How it works</a>
+      <a class="lnk" href="#api">API</a>
+      <a class="lnk" href="#start">Quickstart</a>
+      <a class="btn btn-primary" href="https://github.com/kunthive-Labs/Arthaive" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<a id="top"></a>
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="glow"></div>
+    <div class="grid"></div>
+  </div>
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">India's open funding ledger</span>
+      <h1 class="h1">Every Indian funding round, <span class="accent">verified to its source.</span></h1>
+      <p class="lede">A free, open, source-backed platform tracking startup funding across India — an open alternative to Tracxn and Crunchbase, focused entirely on India.</p>
+      <p class="etymo">Artha (अर्थ — wealth, capital) + hive (the collective intelligence). A living, source-backed hive of India's funding data.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/kunthive-Labs/Arthaive" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          View on GitHub
+        </a>
+        <a class="btn btn-ghost" href="https://ind-startup-funding.vercel.app" target="_blank" rel="noopener">
+          Explore the platform
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12 L12 4 M6 4 H12 V10"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Signature: a verified funding record, the atomic unit of Arthaive -->
+    <div class="record" role="img" aria-label="An illustrative verified funding record showing how each deal is structured and linked to its source.">
+      <div class="record-top">
+        <span>Funding record</span>
+        <span class="verified"><span class="dot"></span> Verified</span>
+      </div>
+      <div class="record-body">
+        <div class="rec-co">Sample Startup Pvt Ltd</div>
+        <div class="rec-line">
+          <span class="chip">Fintech</span>
+          <span class="chip">Series A</span>
+          <span class="chip">Bengaluru</span>
+        </div>
+        <div class="rec-grid">
+          <div class="rec-cell"><div class="k">Amount</div><div class="v amber">₹ 1,820 lakh</div></div>
+          <div class="rec-cell"><div class="k">Announced</div><div class="v">May 2026</div></div>
+          <div class="rec-cell"><div class="k">Lead investor</div><div class="v">An Indian VC</div></div>
+          <div class="rec-cell"><div class="k">Round</div><div class="v">Series A</div></div>
+        </div>
+      </div>
+      <div class="rec-source">
+        <span class="src">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M6 10 L10 6 M5 8 L3.5 9.5a2.1 2.1 0 1 0 3 3L8 11 M11 8l1.5-1.5a2.1 2.1 0 1 0-3-3L8 5"/></svg>
+          source: entrackr.com
+        </span>
+        <span class="conf">conf 0.94 <span class="bar"><i></i></span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stat strip -->
+<section class="band" style="padding-top:0;border-top:none;">
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><div class="n">1,695+</div><div class="l">Verified funding records</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Primary sources crawled</div></div>
+      <div class="stat"><div class="n">≥ 0.80</div><div class="l">Confidence gate to auto-approve</div></div>
+      <div class="stat"><div class="n">100%</div><div class="l">Records linked to a source</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- What it is -->
+<section class="band" id="what">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">What it is</span>
+      <h2>Open funding data India can actually trust.</h2>
+      <p>Arthaive collects startup funding deals from India's primary funding press, extracts them into structured records, and verifies each one before it enters the database. Nothing is taken on faith — every deal links back to the article it came from, so you can check the claim yourself.</p>
+      <p>It's a free, MIT-licensed alternative to the paid platforms, focused entirely on India: explore and filter deals by sector, stage, city, amount and date; browse investor profiles and sector deep-dives; read AI-written weekly and monthly trend reports; and build on top of it all through a public REST API.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="band" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Highlights</span>
+      <h2>Built for exploring, not just listing.</h2>
+    </div>
+    <div class="cards">
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+        <h3>Analytics dashboard</h3>
+        <p>Funding trends, sector breakdowns, stage funnels, investor leaderboards and an India choropleth map.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <h3>Explore &amp; filter</h3>
+        <p>Slice deals by sector, stage, city, amount range and date — down to a single company's full history.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div>
+        <h3>Investor profiles</h3>
+        <p>Deal history, sectors covered and co-investor networks for every investor in the dataset.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 3v9l6 4"/></svg></div>
+        <h3>Natural-language search</h3>
+        <p>Ask plain-English questions and get verified deal results back — powered by the AI layer.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+        <h3>Weekly &amp; monthly reports</h3>
+        <p>AI-written trend summaries roll up the latest activity into readable narratives.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12a2 2 0 1 1-2-2M21 12a2 2 0 1 0-2 2"/><path d="M12 5a2 2 0 1 1 0-2M12 21a2 2 0 1 0 0-2"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h3>Live feed</h3>
+        <p>Real-time updates stream in via Supabase Realtime as new records are verified.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 4v16M4 9h5M4 15h5"/><rect x="13" y="4" width="7" height="16" rx="1.5"/></svg></div>
+        <h3>Admin review queue</h3>
+        <p>Approve, reject or flag records, manage entities and sources, bulk-import CSV, and watch AI usage.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div>
+        <h3>Public REST API v1</h3>
+        <p>Versioned endpoints, API keys and rate limits, with full docs at <code style="font-size:12px;">/api-docs</code>.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M19 14V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v8"/><path d="m6 9 6 4 6-4M5 14l-2 5h18l-2-5"/></svg></div>
+        <h3>Bookmarks &amp; alerts</h3>
+        <p>Sign in to save deals, build a watchlist, store searches and get alerts on new matches.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="band" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The pipeline</span>
+      <h2>From an article to a verified record.</h2>
+      <p>A Python pipeline polls India's funding press twice daily and turns each story into a structured deal — but only confident, deduplicated records make it into the public database.</p>
+    </div>
+    <div class="flow">
+      <div class="step reveal">
+        <div class="num">01</div>
+        <h4>Discover</h4>
+        <p>Polls Entrackr, Inc42 &amp; YourStory feeds twice daily, with a Wayback fallback for dead links.</p>
+        <span class="arrow" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="step reveal">
+        <div class="num">02</div>
+        <h4>Extract</h4>
+        <p>A rule-based first pass, with Claude Haiku as the fallback on low-confidence cases.</p>
+        <span class="arrow" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="step reveal">
+        <div class="num">03</div>
+        <h4>Resolve</h4>
+        <p>Currency normalised to INR lakhs, then fuzzy entity resolution + aliases dedup names.</p>
+        <span class="arrow" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="step reveal gate">
+        <div class="num">04</div>
+        <h4>Confidence gate</h4>
+        <p>Auto-approve at confidence ≥ 0.80; anything lower routes to the admin review queue.</p>
+        <span class="arrow" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="step reveal">
+        <div class="num">05</div>
+        <h4>Verified DB</h4>
+        <p>Approved deals land in Supabase — each one still linked back to its original source.</p>
+        <span class="arrow" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section class="band" id="api">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Public API</span>
+      <h2>A read-only API for developers &amp; researchers.</h2>
+      <p>Versioned <code style="font-size:13px;">/api/v1</code> endpoints with API keys, rate limits (30/min anonymous, 120/min with a key) and a free key at <code style="font-size:13px;">/api-keys</code>.</p>
+    </div>
+    <div class="codewrap">
+      <div class="codeblock reveal">
+        <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="name">request</span></div>
+<pre><code><span class="c"># filter funding rounds by sector + stage</span>
+curl <span class="s">'https://ind-startup-funding.vercel.app/api/v1/funding-rounds?sector=Fintech&stage=series_a&limit=5'</span> \
+  <span class="p">-H</span> <span class="s">'X-API-Key: ifk_your_key_here'</span></code></pre>
+      </div>
+      <div class="codeblock reveal">
+        <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="name">v1 endpoints</span></div>
+<pre><code><span class="p">GET</span> /api/v1/startups          <span class="c"># one row per company</span>
+<span class="p">GET</span> /api/v1/startups/:id      <span class="c"># full funding history</span>
+<span class="p">GET</span> /api/v1/funding-rounds    <span class="c"># paginated rounds</span>
+<span class="p">GET</span> /api/v1/investors/:id     <span class="c"># profile + deals</span>
+<span class="p">GET</span> /api/v1/trends/monthly    <span class="c"># counts + totals</span>
+<span class="p">GET</span> /api/v1/trends/sectors    <span class="c"># sector aggregates</span>
+<span class="p">GET</span> /api/v1/search?q=...      <span class="c"># keyword search</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech stack -->
+<section class="band" id="tech">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Tech stack</span>
+      <h2>Modern, typed, and AI-assisted.</h2>
+    </div>
+    <div class="pills reveal">
+      <span class="pill"><b>Next.js 16</b> · App Router</span>
+      <span class="pill"><b>React 19</b></span>
+      <span class="pill"><b>TypeScript</b></span>
+      <span class="pill"><b>Tailwind CSS</b> + shadcn/ui</span>
+      <span class="pill"><b>Supabase</b> · Postgres + Auth</span>
+      <span class="pill"><b>Recharts</b></span>
+      <span class="pill"><b>Anthropic Claude</b> · Sonnet + Haiku</span>
+      <span class="pill"><b>Python</b> pipeline</span>
+      <span class="pill"><b>rapidfuzz</b> entity resolution</span>
+      <span class="pill"><b>Vitest</b></span>
+      <span class="pill"><b>Zod</b></span>
+      <span class="pill"><b>Vercel</b></span>
+    </div>
+  </div>
+</section>
+
+<!-- Quickstart -->
+<section class="band" id="start">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Quickstart</span>
+      <h2>Run it locally in a few commands.</h2>
+      <p>Needs Node.js 18+. Supabase and an Anthropic key are both optional — without them the app falls back to static data and AI features degrade gracefully.</p>
+    </div>
+    <div class="codewrap">
+      <div class="codeblock reveal">
+        <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="name">web app</span></div>
+<pre><code><span class="c"># clone &amp; install</span>
+git clone https://github.com/kunthive-Labs/Arthaive.git
+cd Arthaive
+npm install
+
+<span class="c"># start the dev server → localhost:3000</span>
+npm run dev</code></pre>
+      </div>
+      <div class="codeblock reveal">
+        <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="name">data pipeline</span></div>
+<pre><code><span class="c"># run the Python crawl → extract → write pipeline</span>
+cd pipeline
+pip install <span class="p">-r</span> requirements.txt
+python run.py
+
+<span class="c"># run the test suite</span>
+npm test</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OSS CTA -->
+<section class="band oss" id="oss">
+  <div class="wrap">
+    <div class="panel reveal">
+      <span class="eyebrow" style="justify-content:center;">Open source · MIT</span>
+      <h2>It's free, open, and built in public.</h2>
+      <p>Data corrections, source suggestions and pull requests are all welcome. Star the repo, fork it, or open an issue to discuss a change.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/kunthive-Labs/Arthaive" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          Star on GitHub
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/kunthive-Labs/Arthaive/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing guide</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div class="brand" style="margin-bottom:8px;">
+        <span class="mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="#b07d1c" stroke-width="1.4"/>
+            <path d="M7 21 L13 13 L18 17 L25 8" stroke="#f5c451" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="25" cy="8" r="2.4" fill="#f5c451"/>
+          </svg>
+        </span>
+        Arthaive
+      </div>
+      <div class="small">Part of kunthive-Labs — open experiments in AI &amp; tooling. © <span id="yr">2026</span></div>
+    </div>
+    <div class="links">
+      <a href="https://github.com/kunthive-Labs/Arthaive" target="_blank" rel="noopener">Repo</a>
+      <a href="https://github.com/kunthive-Labs" target="_blank" rel="noopener">kunthive-Labs</a>
+      <a href="https://labs.kunthive.in" target="_blank" rel="noopener">labs.kunthive.in</a>
+      <a href="https://ind-startup-funding.vercel.app" target="_blank" rel="noopener">Live platform</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    document.getElementById("yr").textContent = new Date().getFullYear();
+    var prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var els = document.querySelectorAll(".reveal");
+    if (prefersReduced || !("IntersectionObserver" in window)) {
+      els.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
