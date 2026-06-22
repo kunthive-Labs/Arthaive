@@ -64,7 +64,7 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
         {/* Thesis */}
         <section className="lg:col-span-3">
           <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-green-700">
-            Members only
+            The open ledger
           </p>
           <h1 className="mt-5 text-5xl font-bold leading-[0.95] tracking-tight md:text-7xl">
             Every rupee.
@@ -75,9 +75,24 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
             Arthaive is the continuously-maintained ledger of Indian startup
-            funding — verified, sourced, and searchable. The record is reserved
-            for members. Sign in to open it.
+            funding — verified, sourced, and searchable. Browse, filter and
+            analyze every deal for free. No account required.
           </p>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href="/explore"
+              className="neo-border neo-shadow inline-flex items-center bg-green-700 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-green-800"
+            >
+              Explore the ledger →
+            </Link>
+            <Link
+              href="/analytics"
+              className="neo-border inline-flex items-center bg-white px-6 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:bg-gray-50"
+            >
+              See the analytics
+            </Link>
+          </div>
 
           {/* The signature: the count of the record, set like a ledger total */}
           <div className="mt-10 inline-block neo-border bg-green-50 px-6 py-5">
@@ -111,19 +126,20 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           <div className="neo-border neo-shadow bg-white">
             <div className="flex items-center justify-between border-b-4 border-black bg-green-700 px-5 py-3">
               <span className="text-xs font-bold uppercase tracking-[0.25em] text-white">
-                Member Access
+                Free Account
               </span>
               <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-green-200">
-                No. 001
+                Optional
               </span>
             </div>
 
             <div className="p-6 md:p-7">
               <p className="text-base font-semibold leading-relaxed text-gray-900">
-                The ledger is open to members.
+                Make it yours — for free.
               </p>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                One account, signed in with Google. No passwords to manage.
+                Browsing needs no account. Sign in with Google to save deals,
+                build watchlists, and get alerts. No passwords to manage.
               </p>
 
               {authError && (
@@ -139,9 +155,9 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
               {/* What membership opens */}
               <ul className="mt-7 space-y-2.5 border-t-2 border-gray-200 pt-5">
                 {[
-                  "Search 13,731 verified deals",
-                  "Save deals and build watchlists",
+                  "Bookmark deals and build watchlists",
                   "Private notes and tags on any round",
+                  "Saved searches you can return to",
                   "Alerts when matching deals land",
                 ].map((item) => (
                   <li

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { SearchBar } from "./search-bar"
+import { HeaderAccount } from "./nav/header-account"
 
 export function Header() {
   return (
@@ -35,6 +36,8 @@ export function Header() {
               API
             </Link>
           </nav>
+
+          <HeaderAccount />
         </div>
 
         <SearchBar />
