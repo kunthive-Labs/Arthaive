@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import RGL from "react-grid-layout"
 import "react-grid-layout/css/styles.css"
 import "react-resizable/css/styles.css"
-import { Plus, Pencil, Check, Trash2, Save, LayoutGrid } from "lucide-react"
+import { Plus, Pencil, Check, Trash2, Save, LayoutGrid, AlertTriangle, X } from "lucide-react"
 import type { FundingDeal } from "@/data/funding-data"
 import type { Dashboard, DashboardWidget, GridLayoutItem, WidgetConfig } from "@/lib/dashboard/types"
 import { getWidgetDef } from "@/lib/dashboard/widget-registry"
@@ -38,6 +38,7 @@ export function DashboardBuilder({
   const [editing, setEditing] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // staged working copy of the active dashboard
   const [workLayout, setWorkLayout] = useState<GridLayoutItem[]>([])
@@ -59,10 +60,13 @@ export function DashboardBuilder({
   }, [active?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCreate = useCallback(async () => {
-    const d = await create(`Dashboard ${dashboards.length + 1}`)
-    if (d) {
+    setError(null)
+    try {
+      const d = await create(`Dashboard ${dashboards.length + 1}`)
       setActiveId(d.id)
       setEditing(true)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not create dashboard")
     }
   }, [create, dashboards.length])
 
@@ -112,19 +116,30 @@ export function DashboardBuilder({
 
   const handleSave = useCallback(async () => {
     if (!activeId) return
+    setError(null)
     setSaving(true)
-    await save(activeId, { name: nameDraft, layout: workLayout, widgets: workWidgets })
-    setSaving(false)
-    setDirty(false)
+    try {
+      await save(activeId, { name: nameDraft, layout: workLayout, widgets: workWidgets })
+      setDirty(false)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save dashboard")
+    } finally {
+      setSaving(false)
+    }
   }, [activeId, nameDraft, workLayout, workWidgets, save])
 
   const handleDelete = useCallback(async () => {
     if (!activeId) return
     if (!window.confirm("Delete this dashboard? This cannot be undone.")) return
+    setError(null)
     const remaining = dashboards.filter((d) => d.id !== activeId)
-    await remove(activeId)
-    setActiveId(remaining[0]?.id ?? null)
-    setEditing(false)
+    try {
+      await remove(activeId)
+      setActiveId(remaining[0]?.id ?? null)
+      setEditing(false)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not delete dashboard")
+    }
   }, [activeId, dashboards, remove])
 
   // ---- No dashboards yet ----
@@ -142,6 +157,7 @@ export function DashboardBuilder({
         >
           <Plus className="h-4 w-4" /> New dashboard
         </button>
+        {error && <ErrorBanner message={error} onDismiss={() => setError(null)} className="mt-5 text-left" />}
       </div>
     )
   }
@@ -150,6 +166,8 @@ export function DashboardBuilder({
 
   return (
     <div>
+      {error && <ErrorBanner message={error} onDismiss={() => setError(null)} className="mb-4" />}
+
       {/* Dashboard switcher + toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-[3px] border-black bg-white p-3 shadow-[3px_3px_0_#000]">
         <div className="flex flex-wrap items-center gap-2">
@@ -270,6 +288,40 @@ export function DashboardBuilder({
           ))}
         </ResponsiveGridLayout>
       )}
+    </div>
+  )
+}
+
+function ErrorBanner({
+  message,
+  onDismiss,
+  className = "",
+}: {
+  message: string
+  onDismiss: () => void
+  className?: string
+}) {
+  // The "table not found" error from Supabase is the common first-run case —
+  // make it actionable rather than cryptic.
+  const isMissingTable = /dashboards/i.test(message) && /(could not find|does not exist|schema cache|relation)/i.test(message)
+  return (
+    <div className={`flex items-start gap-3 border-[3px] border-red-600 bg-red-50 p-4 ${className}`}>
+      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+      <div className="min-w-0 flex-1 text-sm">
+        <p className="font-bold text-red-700">Couldn&apos;t save to the database</p>
+        {isMissingTable ? (
+          <p className="mt-1 text-red-700/90">
+            The <code className="font-mono">dashboards</code> table doesn&apos;t exist yet. Apply
+            migration <code className="font-mono">018_dashboards.sql</code> to your Supabase project
+            (SQL editor or <code className="font-mono">supabase db push</code>), then reload.
+          </p>
+        ) : (
+          <p className="mt-1 break-words text-red-700/90">{message}</p>
+        )}
+      </div>
+      <button onClick={onDismiss} aria-label="Dismiss" className="shrink-0 text-red-600 hover:text-red-800">
+        <X className="h-4 w-4" />
+      </button>
     </div>
   )
 }

@@ -16,9 +16,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { id } = await params
   const { name, layout, widgets } = await req.json()
-  const dashboard = await updateDashboard(user.id, id, { name, layout, widgets })
-  if (!dashboard) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  return NextResponse.json(dashboard)
+  const { data, error } = await updateDashboard(user.id, id, { name, layout, widgets })
+  if (error) return NextResponse.json({ error }, { status: 500 })
+  if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  return NextResponse.json(data)
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

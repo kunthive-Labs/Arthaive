@@ -13,10 +13,16 @@ export async function POST(req: Request) {
   const user = await getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { name, layout, widgets, isDefault } = await req.json()
-  const dashboard = await createDashboard(user.id, name ?? "Untitled dashboard", {
+  const { data, error } = await createDashboard(user.id, name ?? "Untitled dashboard", {
     layout,
     widgets,
     isDefault,
   })
-  return NextResponse.json(dashboard)
+  if (error || !data) {
+    return NextResponse.json(
+      { error: error ?? "Could not create dashboard" },
+      { status: 500 }
+    )
+  }
+  return NextResponse.json(data)
 }

@@ -50,9 +50,9 @@ export async function createDashboard(
   userId: string,
   name: string,
   opts: { layout?: GridLayoutItem[]; widgets?: DashboardWidget[]; isDefault?: boolean } = {}
-): Promise<Dashboard | null> {
+): Promise<{ data: Dashboard | null; error: string | null }> {
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("dashboards")
     .insert({
       user_id: userId,
@@ -63,14 +63,14 @@ export async function createDashboard(
     })
     .select()
     .single()
-  return data ? hydrate(data) : null
+  return { data: data ? hydrate(data) : null, error: error?.message ?? null }
 }
 
 export async function updateDashboard(
   userId: string,
   id: string,
   patch: { name?: string; layout?: GridLayoutItem[]; widgets?: DashboardWidget[] }
-): Promise<Dashboard | null> {
+): Promise<{ data: Dashboard | null; error: string | null }> {
   const supabase = await createClient()
   const update: Database["public"]["Tables"]["dashboards"]["Update"] = {
     updated_at: new Date().toISOString(),
@@ -79,14 +79,14 @@ export async function updateDashboard(
   if (patch.layout !== undefined) update.layout = patch.layout as unknown as Json
   if (patch.widgets !== undefined) update.widgets = patch.widgets as unknown as Json
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("dashboards")
     .update(update)
     .eq("user_id", userId)
     .eq("id", id)
     .select()
     .single()
-  return data ? hydrate(data) : null
+  return { data: data ? hydrate(data) : null, error: error?.message ?? null }
 }
 
 export async function deleteDashboard(userId: string, id: string) {
