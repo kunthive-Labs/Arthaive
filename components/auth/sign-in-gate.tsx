@@ -36,7 +36,12 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
       </header>
 
       {/* ── Live deal tape ─────────────────────────────────────── */}
-      <div className="ticker-mask overflow-hidden border-b-4 border-black bg-black">
+      <div className="flex items-stretch border-b-4 border-black bg-black">
+        <div className="hidden items-center gap-2 whitespace-nowrap border-r-4 border-black bg-[#FF5A1F] px-4 font-mono text-[11px] font-bold uppercase tracking-widest text-black sm:flex">
+          <span className="inline-block h-1.5 w-1.5 bg-black" aria-hidden />
+          Latest raises
+        </div>
+        <div className="ticker-mask flex-1 overflow-hidden">
         <div className="ticker-track py-2 text-white">
           {[0, 1].map((copy) => (
             <span key={copy} aria-hidden={copy === 1} className="inline-flex">
@@ -57,13 +62,15 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
             </span>
           ))}
         </div>
+        </div>
       </div>
 
       {/* ── Hero ───────────────────────────────────────────────── */}
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-10 px-4 py-12 md:px-8 md:py-16 lg:grid-cols-5 lg:gap-12">
         {/* Thesis */}
         <section className="lg:col-span-3">
-          <p className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-green-700">
+          <p className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.3em] text-green-700">
+            <span className="inline-block h-2.5 w-2.5 bg-[#FF5A1F]" aria-hidden />
             Members only
           </p>
           <h1 className="mt-5 text-5xl font-bold leading-[0.95] tracking-tight md:text-7xl">
@@ -80,8 +87,8 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           </p>
 
           {/* The signature: the count of the record, set like a ledger total */}
-          <div className="mt-10 inline-block neo-border bg-green-50 px-6 py-5">
-            <div className="font-mono text-6xl font-bold leading-none tracking-tight text-green-700 md:text-7xl">
+          <div className="mt-10 inline-block neo-border neo-shadow bg-green-50 px-6 py-5">
+            <div className="ledger-figure text-6xl font-bold leading-none text-green-700 md:text-7xl">
               {count}
             </div>
             <div className="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-gray-500">

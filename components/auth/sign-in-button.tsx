@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { track } from "@vercel/analytics"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 
@@ -10,6 +11,7 @@ export function SignInButton() {
 
   async function handleSignIn() {
     setLoading(true)
+    track("sign_in_started", { provider: "google" })
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
