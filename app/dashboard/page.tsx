@@ -6,7 +6,8 @@ import { HeroStats } from "@/components/hero-stats"
 import { RecentDealsSection } from "@/components/recent-deals-section"
 import { QuickInsights } from "@/components/quick-insights"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Bookmark, Bell, Search, Star } from "lucide-react"
+import Link from "next/link"
+import { Bookmark, Bell, Search, Star, LayoutGrid, ArrowRight } from "lucide-react"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Dashboard | Arthaive" }
@@ -35,6 +36,22 @@ export default async function DashboardPage() {
         {/* The signed-in user's own workspace */}
         <section className="mt-16 pt-8 border-t-4 border-black">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-8">YOUR WORKSPACE</h2>
+
+          <Link
+            href="/dashboard/custom"
+            className="group mb-8 flex items-center justify-between gap-4 neo-border bg-[#1A5D1A] p-5 text-white shadow-[4px_4px_0_#000] transition-all hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-4">
+              <LayoutGrid className="h-7 w-7 shrink-0" />
+              <div>
+                <p className="text-lg font-bold tracking-tight">Build a custom dashboard</p>
+                <p className="text-sm text-white/70">
+                  Drag, resize, and filter analytics widgets into your own private views.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-6 w-6 shrink-0 transition-transform group-hover:translate-x-1" />
+          </Link>
 
           <Tabs defaultValue="bookmarks">
             <TabsList className="mb-6">

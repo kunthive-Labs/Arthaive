@@ -26,6 +26,9 @@ export function Header() {
             <Link href="/analytics" className="font-bold text-sm hover:text-green-700 transition">
               ANALYTICS
             </Link>
+            <Link href="/dashboard/custom" className="font-bold text-sm hover:text-green-700 transition">
+              MY&nbsp;DASHBOARD
+            </Link>
             <Link href="/reports" className="font-bold text-sm hover:text-green-700 transition">
               REPORTS
             </Link>
