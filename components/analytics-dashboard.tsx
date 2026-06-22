@@ -96,7 +96,10 @@ export function AnalyticsDashboard() {
         totalDeals: current.totalDeals + 1,
       })
     })
-    const byStage = Array.from(stageMap.entries())
+    // Funding rounds have ~70 distinct labels; a pie with that many slices
+    // produces a legend that overflows the card. Keep the top 7 by funding
+    // and fold the long tail into a single "Other rounds" slice.
+    const byStageAll = Array.from(stageMap.entries())
       .map(([stage, { count, amount, totalDeals }]) => ({
         stage,
         count,
@@ -104,6 +107,21 @@ export function AnalyticsDashboard() {
         totalDeals,
       }))
       .sort((a, b) => b.amount - a.amount)
+    const TOP_STAGES = 7
+    const headStages = byStageAll.slice(0, TOP_STAGES)
+    const tailStages = byStageAll.slice(TOP_STAGES)
+    const byStage =
+      tailStages.length > 0
+        ? [
+            ...headStages,
+            {
+              stage: `Other (${tailStages.length} rounds)`,
+              count: tailStages.reduce((s, d) => s + d.count, 0),
+              amount: tailStages.reduce((s, d) => s + d.amount, 0),
+              totalDeals: tailStages.reduce((s, d) => s + d.totalDeals, 0),
+            },
+          ]
+        : headStages
 
     // Top investors (only disclosed amounts)
     const investorMap = new Map<string, { count: number; amount: number; totalDeals: number }>()
@@ -267,22 +285,23 @@ export function AnalyticsDashboard() {
     ]
   }, [])
 
-  const colors = ["#1A5D1A", "#0D3D0D", "#2A7D2A", "#3A9D3A", "#4ABD4A", "#5ACD5A", "#6ADD6A", "#7AED7A"]
+  const colors = ["#1A5D1A", "#FF5A1F", "#0C3A12", "#4ABD4A", "#FFB100", "#1F8A3B", "#7AED7A", "#9CA38F"]
+  const stageTotal = fundingByStage.reduce((s, d) => s + d.amount, 0)
 
   return (
     <div className="py-12 space-y-12">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="neo-border p-6 bg-white">
+        <div className="neo-border neo-shadow-sm p-6 bg-white">
           <div className="text-2xl font-bold text-green-700 mb-1">{dealCounts.total}</div>
           <div className="text-xs font-bold uppercase text-gray-600">Total Deals Tracked</div>
         </div>
-        <div className="neo-border p-6 bg-white">
+        <div className="neo-border neo-shadow-sm p-6 bg-white">
           <div className="text-2xl font-bold text-green-700 mb-1">{dealCounts.disclosed}</div>
           <div className="text-xs font-bold uppercase text-gray-600">Disclosed Amounts</div>
           <div className="text-xs text-gray-500 mt-1">{((dealCounts.disclosed / dealCounts.total) * 100).toFixed(1)}%</div>
         </div>
-        <div className="neo-border p-6 bg-white">
+        <div className="neo-border neo-shadow-sm p-6 bg-white">
           <div className="text-2xl font-bold text-orange-600 mb-1">{dealCounts.undisclosed}</div>
           <div className="text-xs font-bold uppercase text-gray-600">Undisclosed Amounts</div>
           <div className="text-xs text-gray-500 mt-1">{((dealCounts.undisclosed / dealCounts.total) * 100).toFixed(1)}%</div>
@@ -290,14 +309,14 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Funding Over Time */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">FUNDING OVER TIME</h3>
         <p className="text-xs text-gray-600 mb-6">Showing only disclosed amounts</p>
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={fundingByMonth}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="month" stroke="#000" style={{ fontSize: "12px" }} />
-            <YAxis stroke="#000" label={{ value: "Amount (₹ Cr)", angle: -90, position: "insideLeft" }} />
+            <XAxis dataKey="month" stroke="#000" style={{ fontSize: "12px" }} interval="preserveStartEnd" minTickGap={28} />
+            <YAxis stroke="#000" width={56} tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}K` : `${v}`)} />
             <Tooltip
               contentStyle={{ backgroundColor: "#fff", border: "3px solid #000", borderRadius: "0" }}
               formatter={(value, name) => {
@@ -321,7 +340,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Sector Breakdown */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">TOP 10 SECTORS BY FUNDING</h3>
         <p className="text-xs text-gray-600 mb-6">Disclosed amounts only</p>
         <ResponsiveContainer width="100%" height={400}>
@@ -352,10 +371,10 @@ export function AnalyticsDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Stage Distribution */}
-        <div className="neo-border p-6 md:p-8 bg-white">
+        <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">FUNDING BY STAGE</h3>
-          <p className="text-xs text-gray-600 mb-6">Disclosed amounts distribution</p>
-          <ResponsiveContainer width="100%" height={400}>
+          <p className="text-xs text-gray-600 mb-6">Disclosed amounts · top 7 rounds</p>
+          <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
                 data={fundingByStage}
@@ -363,36 +382,55 @@ export function AnalyticsDashboard() {
                 nameKey="stage"
                 cx="50%"
                 cy="50%"
-                outerRadius={110}
-                label={false}
+                innerRadius={50}
+                outerRadius={100}
+                paddingAngle={1}
+                label={({ percent }) =>
+                  (percent ?? 0) >= 0.06 ? `${(((percent ?? 0)) * 100).toFixed(0)}%` : ""
+                }
+                labelLine={false}
+                style={{ fontSize: 11, fontWeight: 700 }}
               >
                 {fundingByStage.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={colors[index % colors.length]} stroke="#000" strokeWidth={2} />
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ backgroundColor: "#fff", border: "3px solid #000", borderRadius: "0" }}
-                formatter={(value, name) => {
-                  if (name === "amount") return [`₹${value}Cr`, "Total Funding"]
-                  return [value, name]
+                contentStyle={{ backgroundColor: "#fff", border: "3px solid #000", borderRadius: "0", boxShadow: "4px 4px 0 #000", fontWeight: 600 }}
+                formatter={(value: number, name, props) => {
+                  const share = stageTotal ? ((value / stageTotal) * 100).toFixed(1) : "0"
+                  return [`₹${value.toLocaleString("en-IN")}Cr · ${share}%`, props?.payload?.stage]
                 }}
-              />
-              <Legend
-                verticalAlign="bottom"
-                height={60}
-                wrapperStyle={{ paddingTop: "20px" }}
-                formatter={(value, entry) => (
-                  <span className="text-xs">
-                    {value}: ₹{(entry.payload as { amount?: number })?.amount}Cr
-                  </span>
-                )}
               />
             </PieChart>
           </ResponsiveContainer>
+
+          {/* Controlled legend — never overflows the card */}
+          <ul className="mt-5 grid grid-cols-1 gap-x-5 gap-y-2 border-t-2 border-black pt-4 sm:grid-cols-2">
+            {fundingByStage.map((entry, index) => {
+              const share = stageTotal ? ((entry.amount / stageTotal) * 100).toFixed(1) : "0"
+              return (
+                <li key={entry.stage} className="flex items-center gap-2 text-xs">
+                  <span
+                    className="inline-block h-3 w-3 flex-shrink-0 border border-black"
+                    style={{ backgroundColor: colors[index % colors.length] }}
+                    aria-hidden
+                  />
+                  <span className="min-w-0 flex-1 truncate font-semibold" title={entry.stage}>
+                    {entry.stage}
+                  </span>
+                  <span className="ledger-figure flex-shrink-0 font-bold text-green-700">
+                    ₹{entry.amount.toLocaleString("en-IN")}
+                  </span>
+                  <span className="ledger-figure w-10 flex-shrink-0 text-right text-gray-500">{share}%</span>
+                </li>
+              )
+            })}
+          </ul>
         </div>
 
         {/* Top Investors */}
-        <div className="neo-border p-6 md:p-8 bg-white">
+        <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">TOP 10 ACTIVE INVESTORS</h3>
           <p className="text-xs text-gray-600 mb-6">Ranked by number of deals</p>
           <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -415,7 +453,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Year-over-Year Comparison */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">YEAR-OVER-YEAR COMPARISON</h3>
         <p className="text-xs text-gray-600 mb-6">Funding trends and deal activity by year</p>
         <ResponsiveContainer width="100%" height={350}>
@@ -434,7 +472,7 @@ export function AnalyticsDashboard() {
             />
             <Legend />
             <Bar yAxisId="left" dataKey="amount" fill="#1A5D1A" name="Funding (₹Cr)" />
-            <Bar yAxisId="right" dataKey="deals" fill="#FFA500" name="Number of Deals" />
+            <Bar yAxisId="right" dataKey="deals" fill="#FF5A1F" name="Number of Deals" />
           </BarChart>
         </ResponsiveContainer>
 
@@ -446,7 +484,7 @@ export function AnalyticsDashboard() {
             const growth = ((year.amount - prevYear.amount) / prevYear.amount * 100).toFixed(1)
             const dealGrowth = ((year.deals - prevYear.deals) / prevYear.deals * 100).toFixed(1)
             return (
-              <div key={year.year} className="border-2 border-gray-200 p-4">
+              <div key={year.year} className="border-[3px] border-black bg-white p-4">
                 <div className="text-xs font-bold text-gray-600">{year.year} vs {prevYear.year}</div>
                 <div className={`text-lg font-bold ${Number(growth) >= 0 ? 'text-green-700' : 'text-red-600'}`}>
                   {Number(growth) >= 0 ? '+' : ''}{growth}%
@@ -462,7 +500,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Quarter-wise Trends */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">QUARTERLY FUNDING TRENDS</h3>
         <p className="text-xs text-gray-600 mb-6">Last 12 quarters performance</p>
         <ResponsiveContainer width="100%" height={350}>
@@ -479,13 +517,13 @@ export function AnalyticsDashboard() {
             />
             <Legend />
             <Line type="monotone" dataKey="amount" stroke="#1A5D1A" strokeWidth={3} name="Funding (₹Cr)" dot={{ r: 4 }} />
-            <Line type="monotone" dataKey="deals" stroke="#FFA500" strokeWidth={2} name="Deals" dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="deals" stroke="#FF5A1F" strokeWidth={2} name="Deals" dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       {/* Sector Deep Dive */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">SECTOR DEEP DIVE</h3>
         <p className="text-xs text-gray-600 mb-6">Top 15 sectors with detailed metrics</p>
         <div className="overflow-x-auto">
@@ -517,7 +555,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Geographic Distribution */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">TOP CITIES BY FUNDING</h3>
         <p className="text-xs text-gray-600 mb-6">Geographic distribution of startup funding</p>
         <ResponsiveContainer width="100%" height={400}>
@@ -542,7 +580,7 @@ export function AnalyticsDashboard() {
       {/* Additional Charts Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Average Deal Size by Stage */}
-        <div className="neo-border p-6 md:p-8 bg-white">
+        <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">AVG DEAL SIZE BY STAGE</h3>
           <p className="text-xs text-gray-600 mb-6">Average funding amount per stage</p>
           <ResponsiveContainer width="100%" height={350}>
@@ -558,13 +596,13 @@ export function AnalyticsDashboard() {
                 }}
               />
               <Legend />
-              <Bar dataKey="avgDeal" fill="#FFA500" name="Avg Deal (₹Cr)" />
+              <Bar dataKey="avgDeal" fill="#FF5A1F" name="Avg Deal (₹Cr)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Deal Velocity */}
-        <div className="neo-border p-6 md:p-8 bg-white">
+        <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">DEAL VELOCITY TREND</h3>
           <p className="text-xs text-gray-600 mb-6">Number of deals per month (last 24 months)</p>
           <ResponsiveContainer width="100%" height={350}>
@@ -588,7 +626,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Top 10 Largest Deals Table */}
-      <div className="neo-border p-6 md:p-8 bg-white">
+      <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">TOP 10 LARGEST DEALS</h3>
         <p className="text-xs text-gray-600 mb-6">Biggest funding rounds by amount</p>
         <div className="overflow-x-auto">

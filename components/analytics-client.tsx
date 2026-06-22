@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { track } from "@vercel/analytics"
 import { Header } from "@/components/header"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -92,18 +93,20 @@ export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
   const tickerLoop = ticker.length ? [...ticker, ...ticker] : []
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#F6F5F1]">
+    <div className="min-h-screen overflow-x-hidden bg-[#EFEDE3]">
       <Header />
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         {/* Masthead */}
-        <header className="neo-border bg-white">
+        <header className="neo-border neo-shadow-lg bg-white">
           <div className="p-6 md:p-8">
-            <div className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#1A5D1A]">
+            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] text-[#1A5D1A]">
+              <span className="inline-block h-2.5 w-2.5 bg-[#FF5A1F]" aria-hidden />
               India · Startup Funding Intelligence
             </div>
             <h1 className="mt-2 text-5xl md:text-7xl font-bold tracking-tighter leading-none">
               ANALYTICS
             </h1>
+            <div className="mt-3 h-1.5 w-24 bg-[#FF5A1F]" aria-hidden />
             <p className="mt-3 max-w-2xl text-gray-600">
               Every disclosed round across India&apos;s startup ecosystem — source-backed,
               de-duplicated, and free to explore.
@@ -128,10 +131,10 @@ export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
         </header>
 
         {/* KPI ledger strip — connected, shared-edge tiles like an exchange board */}
-        <dl className="mt-6 grid grid-cols-2 md:grid-cols-5 neo-border bg-white divide-x-[3px] divide-y-[3px] md:divide-y-0 divide-black">
+        <dl className="mt-6 grid grid-cols-2 md:grid-cols-5 neo-border neo-shadow bg-white divide-x-[3px] divide-y-[3px] md:divide-y-0 divide-black">
           {kpis.map((kpi) => (
             <div key={kpi.label} className="p-4 md:p-5">
-              <dd className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-[#1A5D1A]">
+              <dd className="ledger-figure text-2xl md:text-3xl font-bold text-[#1A5D1A]">
                 {kpi.value}
               </dd>
               <dt className="mt-1 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.15em] text-gray-500">
@@ -150,7 +153,11 @@ export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
           />
         )}
 
-        <Tabs defaultValue="overview" className="mt-8 space-y-8">
+        <Tabs
+          defaultValue="overview"
+          className="mt-8 space-y-8"
+          onValueChange={(tab) => track("analytics_tab", { tab })}
+        >
           <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0">
             {TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value} className={TAB_TRIGGER_CLASS}>

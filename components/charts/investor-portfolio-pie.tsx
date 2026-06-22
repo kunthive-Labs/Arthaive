@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { useMemo } from "react"
-import { CHART_COLORS } from "./chart-colors"
+import { CHART_COLORS, TOOLTIP_STYLE } from "./chart-colors"
 import type { FundingDeal as Deal } from "@/data/funding-data"
 
 export function InvestorPortfolioPie({ deals, investorName }: { deals: Deal[]; investorName: string }) {
@@ -23,16 +23,33 @@ export function InvestorPortfolioPie({ deals, investorName }: { deals: Deal[]; i
   if (!data.length) return null
 
   return (
-    <div className="h-64">
+    <div className="h-72">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="45%"
+            innerRadius={42}
+            outerRadius={78}
+            paddingAngle={1}
+            label={({ percent }) => ((percent ?? 0) >= 0.08 ? `${((percent ?? 0) * 100).toFixed(0)}%` : "")}
+            labelLine={false}
+            style={{ fontSize: 11, fontWeight: 700 }}
+          >
             {data.map((_, i) => (
-              <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+              <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} stroke="#000" strokeWidth={2} />
             ))}
           </Pie>
-          <Tooltip formatter={(v: number) => [v, "Deals"]} />
-          <Legend />
+          <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [v, "Deals"]} />
+          <Legend
+            verticalAlign="bottom"
+            height={48}
+            iconType="square"
+            wrapperStyle={{ fontSize: 11, lineHeight: "16px", overflow: "hidden" }}
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>

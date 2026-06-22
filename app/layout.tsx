@@ -12,7 +12,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  userScalable: false,
+  // Allow pinch-zoom — disabling it is an accessibility regression on mobile.
+  maximumScale: 5,
   themeColor: "#000000",
 }
 
