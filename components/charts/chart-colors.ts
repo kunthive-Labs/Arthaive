@@ -1,21 +1,32 @@
+// Brutalist chart identity: a green ramp (capital) interleaved with the
+// signal accent, ink, and a couple of neutrals — distinguishable adjacent
+// slices without leaving the green/signal/ink world.
 export const CHART_COLORS = [
-  "hsl(var(--primary))", "#06b6d4", "#8b5cf6", "#f59e0b", "#10b981",
-  "#ef4444", "#f97316", "#84cc16", "#3b82f6", "#ec4899",
-  "#14b8a6", "#a855f7", "#eab308", "#22c55e", "#6366f1",
+  "#1A5D1A", // green
+  "#FF5A1F", // signal
+  "#0C3A12", // deep green
+  "#4ABD4A", // mid green
+  "#0B0B0B", // ink
+  "#FFB100", // amber
+  "#7AED7A", // light green
+  "#D9410D", // deep signal
+  "#1F8A3B", // bright green
+  "#9CA38F", // sage grey
 ]
 
 export const CHART_COLORS_MUTED = CHART_COLORS.map((c) => `${c}80`)
 
+// Stage → green ramp by maturity; outliers in signal / ink.
 export const STAGE_COLORS: Record<string, string> = {
-  "Seed": "#6366f1",
-  "Pre-Seed": "#8b5cf6",
-  "Series A": "#3b82f6",
-  "Series B": "#06b6d4",
-  "Series C": "#10b981",
-  "Series D": "#84cc16",
-  "Debt": "#64748b",
-  "Growth": "#f59e0b",
-  "IPO": "#ef4444",
+  "Pre-Seed": "#7AED7A",
+  "Seed": "#4ABD4A",
+  "Series A": "#1F8A3B",
+  "Series B": "#1A5D1A",
+  "Series C": "#155215",
+  "Series D": "#0C3A12",
+  "Debt": "#9CA38F",
+  "Growth": "#FF5A1F",
+  "IPO": "#0B0B0B",
 }
 
 export function colorForIndex(i: number): string {
@@ -23,21 +34,21 @@ export function colorForIndex(i: number): string {
 }
 
 
-export const CHART_GRID_COLOR = "hsl(var(--muted))"
-export const CHART_AXIS_COLOR = "hsl(var(--muted-foreground))"
+export const CHART_GRID_COLOR = "#E5E3DA"
+export const CHART_AXIS_COLOR = "#0B0B0B"
 
 
-export const CHART_COLORS_CATEGORICAL = [
-  "#6366f1","#06b6d4","#10b981","#f59e0b","#ef4444",
-  "#8b5cf6","#f97316","#14b8a6","#84cc16","#ec4899",
-]
+export const CHART_COLORS_CATEGORICAL = CHART_COLORS
 
 
+// Hard-edged brutalist tooltip: white card, thick ink border, no radius.
 export const TOOLTIP_STYLE = {
-  backgroundColor: "hsl(var(--background))",
-  border: "1px solid hsl(var(--border))",
-  borderRadius: "6px",
+  backgroundColor: "#ffffff",
+  border: "3px solid #0B0B0B",
+  borderRadius: "0px",
   fontSize: 12,
+  fontWeight: 600,
+  boxShadow: "4px 4px 0 #0B0B0B",
 }
 
 
