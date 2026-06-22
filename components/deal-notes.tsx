@@ -80,6 +80,7 @@ export function DealNotes({ dealId }: { dealId: string }) {
                     type="button"
                     onClick={() => removeTag(t)}
                     aria-label={`Remove tag ${t}`}
+                    title={`Remove tag ${t}`}
                     className="text-green-700 hover:text-black"
                   >
                     <X className="h-3 w-3" />

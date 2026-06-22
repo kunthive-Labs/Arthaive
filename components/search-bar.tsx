@@ -79,7 +79,7 @@ export function SearchBar() {
         />
         {query && (
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono hidden md:block">
-            ↑↓ navigate · ↵ open
+            ↑↓ navigate · ↵ open · esc close
           </span>
         )}
       </div>
