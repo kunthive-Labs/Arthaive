@@ -15,6 +15,7 @@ import { YoYComparison } from "@/components/charts/yoy-comparison"
 import { DealVelocity } from "@/components/charts/deal-velocity"
 import { CoverageNotice } from "@/components/coverage-notice"
 import { isFundingDisclosed } from "@/lib/utils"
+import { formatInrCrores } from "@/lib/format"
 import type { FundingDeal } from "@/data/funding-data"
 import type { Deal } from "@/lib/types"
 
@@ -39,13 +40,8 @@ interface AnalyticsClientProps {
   coverage?: { earliest: string; latest: string; total: number }
 }
 
-// amounts are stored in INR lakhs → 1 Cr = 100 lakh
-function fmtCr(cr: number): string {
-  if (cr >= 1e5) return `₹${(cr / 1e5).toFixed(2)} L Cr`
-  if (cr >= 1e3) return `₹${(cr / 1e3).toFixed(1)}K Cr`
-  return `₹${Math.round(cr).toLocaleString("en-IN")} Cr`
-}
-
+// KPI/ticker amounts are pre-converted to INR crores at the call sites below
+// (raw deal amounts are in lakhs → divided by 100 first).
 const TAB_TRIGGER_CLASS =
   "rounded-none border-[3px] border-black bg-white px-4 py-2 text-xs font-bold uppercase tracking-wide text-black " +
   "transition-all hover:bg-[#1A5D1A]/10 " +
@@ -73,7 +69,7 @@ export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
     const endYear = coverage ? new Date(coverage.latest).getFullYear() : Math.max(...years)
 
     const kpis = [
-      { label: "Capital Tracked", value: fmtCr(totalLakh / 100) },
+      { label: "Capital Tracked", value: formatInrCrores(totalLakh / 100) },
       { label: "Deals", value: deals.length.toLocaleString("en-IN") },
       { label: "Sectors", value: sectors.size.toLocaleString("en-IN") },
       { label: "Investors", value: investors.size.toLocaleString("en-IN") },
@@ -85,7 +81,7 @@ export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
       .slice(0, 20)
       .map((d) => ({
         company: d.company,
-        amount: fmtCr(d.amount / 100),
+        amount: formatInrCrores(d.amount / 100),
         stage: d.stage,
       }))
 

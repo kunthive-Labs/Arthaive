@@ -1,34 +1,24 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { formatInrLakhs } from '@/lib/format'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Formats funding amount for display
- * @param amount - Amount in lakhs (100 = 1 Crore)
+ * Formats funding amount for display.
+ *
+ * Delegates to the canonical {@link formatInrLakhs} so every surface renders an
+ * amount identically. Kept as a thin alias because many call sites import this
+ * name directly.
+ *
+ * @param amount - Amount in INR lakhs (100 = 1 Crore)
  * @returns Formatted string with ₹ symbol or "Not Disclosed"
  */
 export function formatFundingAmount(amount: number): string {
-  if (amount === 0 || amount === null || amount === undefined) {
-    return "Not Disclosed"
-  }
-
-  const crores = amount / 100
-
-  // For amounts >= 1000 Cr, show in Billions
-  if (crores >= 1000) {
-    return `₹${(crores / 1000).toFixed(2)}B`
-  }
-
-  // For amounts >= 1 Cr, show in Crores
-  if (crores >= 1) {
-    return `₹${crores.toFixed(crores >= 100 ? 0 : 1)}Cr`
-  }
-
-  // For amounts < 1 Cr, show in Lakhs
-  return `₹${amount.toFixed(0)}L`
+  if (!amount) return "Not Disclosed"
+  return formatInrLakhs(amount)
 }
 
 /**
