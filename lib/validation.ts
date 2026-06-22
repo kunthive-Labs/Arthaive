@@ -64,3 +64,15 @@ export const profilePatchSchema = z.object({
 
 // /api/v1/trends/monthly — range-check the requested year.
 export const yearSchema = z.coerce.number().int().min(2000).max(2100)
+
+// Year filter values (searchParams.getAll('year')) flow into a PostgREST .or()
+// filter string, so each must be a sane 4-digit year before interpolation.
+// Stays a string (the filter is built as `YEAR-01-01`) and rejects anything
+// that isn't exactly four digits in a plausible range.
+export const filterYearSchema = z
+  .string()
+  .regex(/^\d{4}$/)
+  .refine((y) => {
+    const n = Number(y)
+    return n >= 1990 && n <= 2100
+  }, "year out of range")
