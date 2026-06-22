@@ -28,7 +28,7 @@ export async function PATCH(req: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id, active } = await req.json()
-  await toggleAlert(id, active)
+  await toggleAlert(user.id, id, active)
   return NextResponse.json({ ok: true })
 }
 
@@ -37,6 +37,6 @@ export async function DELETE(req: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await req.json()
-  await deleteAlert(id)
+  await deleteAlert(user.id, id)
   return NextResponse.json({ ok: true })
 }
