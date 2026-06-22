@@ -1,6 +1,11 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import { fundingData } from "@/data/funding-data"
-import type { Investor } from "@/lib/types"
+import type { Investor, Deal } from "@/lib/types"
+
+// Supabase caps a single select at 1000 rows; a prolific investor can exceed
+// that, so the deals query must page through .range() or it silently truncates.
+// Mirrors the PAGE loop in lib/db/analytics.ts.
+const PAGE = 1000
 
 function slugify(name: string): string {
   return name
@@ -77,7 +82,18 @@ export async function getInvestorBySlug(slug: string): Promise<Investor | null> 
     const { data, error } = await supabase.from("investors").select("*").eq("slug", slug).single()
     if (error || !data) return null
 
-    const { data: deals } = await supabase.from("deals").select("*").contains("investors", [data.name])
+    const deals: Deal[] = []
+    for (let from = 0; ; from += PAGE) {
+      const { data: page, error: pageError } = await supabase
+        .from("deals")
+        .select("*")
+        .contains("investors", [data.name])
+        .range(from, from + PAGE - 1)
+
+      if (pageError) break
+      if (page && page.length) deals.push(...(page as unknown as Deal[]))
+      if (!page || page.length < PAGE) break
+    }
 
     return {
       id: data.id,
