@@ -1,6 +1,6 @@
 # 07 — Frontend
 
-The public site is a Next.js 14 app under `app/`. Every route here is a folder. This page walks through every user-facing page and tells you exactly where its data comes from.
+The public site is a Next.js 16 app under `app/`. Every route here is a folder. This page walks through every user-facing page and tells you exactly where its data comes from.
 
 ## The pages
 
@@ -27,7 +27,7 @@ Every page reads from one of two places, controlled by `lib/supabase.ts:isSupaba
 | Source | When |
 |---|---|
 | **Supabase `deals` table** | When Supabase env vars are set AND the query returns at least one verified row. |
-| **`data/funding-data.ts`** (the static 1695-deal file) | When Supabase is unconfigured (local dev with no env), or when Supabase returns empty. |
+| **`data/funding-data.ts`** (the generated 13,700+ deal file) | When Supabase is unconfigured (local dev with no env), or when Supabase returns empty. |
 
 This is the gradual-migration pattern. The frontend works whether the live DB is fully populated or empty. Today (May 2026) most pages still read from static data; Phase 6 wires the analytics, list, and detail pages to Supabase first.
 
@@ -120,7 +120,7 @@ Standard Supabase auth flows. Email + password and OAuth providers. Profile lets
 | `components/deal-table.tsx` | The table representation (used on /explore) |
 | `components/filter-panel.tsx` | Sidebar filters (sector, stage, amount, date range, investor) |
 | `components/charts/*` | Recharts wrappers — bar, line, pie, choropleth |
-| `components/coverage-notice.tsx` | The "data covers 2024–2026, ~1695 deals; gaps disclosed below" notice (P8: honest data labeling) |
+| `components/coverage-notice.tsx` | The live/static coverage notice used to disclose data range and total records. |
 | `components/live-deal-feed.tsx` | Realtime subscription + animated insert |
 | `components/compare-panel.tsx` | Side-by-side deal comparison (saved deals) |
 | `components/export-button.tsx` | Client-side CSV export of the currently filtered list |
@@ -142,7 +142,7 @@ Server-only endpoints. Used by the frontend (XHR / fetch) and, for some, by exte
 | `/api/admin/*` | Admin actions (approve, reject, merge, alias CRUD, source CRUD) |
 | `/api/auth/*` | Supabase auth callbacks |
 
-The Phase 8 work is to lift the public-facing subset of these (`/api/search`, `/api/stats`, `/api/export`) into a versioned `/api/v1/*` namespace with API keys and rate limiting.
+API v1 now lives under `/api/v1/*` with API keys, rate-limit tiers, and docs at `/api-docs`.
 
 ## State and theming
 

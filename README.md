@@ -21,8 +21,8 @@
 - **Analytics dashboard** — funding trends, sector breakdowns, stage funnels, investor leaderboards, India choropleth map
 - **Investor profiles** — deal history, sectors covered, co-investor network
 - **Sector deep-dives** — per-sector funding timeline and top deals
-- **Weekly & monthly reports** with AI-written trend summaries
-- **Natural-language search** — ask plain-English questions, get verified deal results
+- **Weekly & monthly reports** generated from verified funding records
+- **Natural-language search** — ask plain-English questions, with deterministic fallback when AI is not configured
 - **Live feed** — real-time updates via Supabase Realtime
 - **Admin panel** — review queue, entity manager, source manager, pipeline logs, bulk CSV import, AI usage monitoring
 - **Public REST API v1** — versioned endpoints, API keys, rate limits, full docs at `/api-docs`
@@ -50,7 +50,7 @@
 
 ## Local Development
 
-**Prerequisites:** Node.js 18+, a Supabase project (optional — falls back to static data), an Anthropic API key (optional — AI features degrade gracefully when unset).
+**Prerequisites:** Node.js 18+, a Supabase project for auth/admin/user features, and an Anthropic API key for AI features. Without Supabase env vars, public/static data pages and API fallbacks still build from the generated fixture; auth-gated areas redirect or return an auth-not-configured response.
 
 ```bash
 # 1. Clone and install
@@ -73,7 +73,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ### Environment variables
 
 ```env
-# Supabase (optional — if unset, the app uses the static fundingData fixture)
+# Supabase (required for auth/admin/user features; public data has a static fallback)
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
@@ -81,7 +81,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 # Admin gate
 ADMIN_EMAILS=you@example.com,colleague@example.com
 
-# AI features (Phase 7)
+# AI features
 ANTHROPIC_API_KEY=
 
 # Public site URL — used in sitemap.xml
@@ -109,8 +109,8 @@ The admin panel lives at `/admin`. Access is restricted to emails listed in `ADM
 
 The `pipeline/` directory contains a Python pipeline that:
 
-1. **Discovery** (`pipeline/discovery.py`, `fetcher.py`, `wayback.py`) — polls Entrackr, Inc42, and YourStory feeds twice daily, with Wayback Machine fallback for dead links.
-2. **Extraction** (`pipeline/extractor.py`) — rule-based first pass, Claude Haiku fallback for low-confidence cases.
+1. **Discovery** (`pipeline/discovery.py`, `fetcher.py`, `wayback.py`) — finds funding articles from configured source feeds/sitemaps, with Wayback Machine fallback for dead links.
+2. **Extraction** (`pipeline/rule_extractor.py`, `pipeline/extractor.py`) — rule-based first pass plus Claude fallback for low-confidence cases.
 3. **Currency normalisation** (`pipeline/currency.py`) — USD/INR conversion → INR lakhs canonical.
 4. **Entity resolution** (`pipeline/entity_resolver.py`) — rapidfuzz-based fuzzy matching + alias system to dedup company/investor names.
 5. **Dedup** (`pipeline/dedup.py`) — same-company / same-week / similar-amount deal collapsing.
@@ -190,7 +190,7 @@ Then deploy to Vercel and submit `/sitemap.xml` to Google Search Console.
 | 6 | ✅ Done | Analytics & weekly/monthly reports |
 | 7 | ✅ Done | AI layer (trend summaries, NL search, sector classifier) |
 | 8 | ✅ Done | Public API v1 |
-| 9 | ✅ Done | Polish, performance indexes, SEO, README |
+| 9 | 🔶 In progress | Production hardening, contributor docs, CI checks |
 
 See `PHASES.md` for the full per-phase build log.
 

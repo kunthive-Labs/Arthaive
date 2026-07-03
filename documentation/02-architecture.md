@@ -4,7 +4,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  1. Frontend (Next.js 14, App Router)                       │
+│  1. Frontend (Next.js 16, App Router)                       │
 │     app/, components/, lib/                                 │
 │     Pages: /, /explore, /analytics, /deal/[id],             │
 │            /investors, /sectors, /live, /admin, /submit     │
@@ -35,14 +35,13 @@
 ┌─────────────────────────────────────────────────────────────┐
 │  4. AI Layer (Anthropic Claude)                             │
 │     Today: Claude Haiku for funding-event extraction        │
-│     Tomorrow (Phase 7): trend summaries, NL search,         │
-│                         sector classification               │
+│     Trend summaries, NL search, and sector classification   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## Layer 1 — Frontend
 
-Next.js 14 with the App Router. Server components for SEO-friendly pages, client components for interactivity (filters, charts, live feed).
+Next.js 16 with the App Router. Server components for SEO-friendly pages, client components for interactivity (filters, charts, live feed).
 
 | Directory | What lives there |
 |---|---|
@@ -51,9 +50,9 @@ Next.js 14 with the App Router. Server components for SEO-friendly pages, client
 | `app/admin/` | The admin console (auth-gated) — review, entities, sources, pipeline, import, export |
 | `components/` | Reusable UI — `deal-card.tsx`, `filter-panel.tsx`, `charts/`, etc. |
 | `lib/` | Non-UI logic — Supabase client (`supabase.ts`), DB query helpers (`lib/db/*`), search, formatting, validation |
-| `data/funding-data.ts` | The original static dataset (1695 deals). Still used as a fallback when Supabase is empty or not configured. |
+| `data/funding-data.ts` | Generated static dataset (13,700+ deals). Still used as a fallback when Supabase is empty or not configured. |
 | `hooks/` | React hooks for filters, debouncing, bookmarks, etc. |
-| `middleware.ts` | Auth, geo, and route protection middleware |
+| `proxy.ts` + `lib/supabase/middleware.ts` | Auth, rate-limit, CSRF, and route protection proxy |
 
 **Key file to understand:** `lib/db/deals.ts`. It contains `getDeals(filters)` which tries Supabase first and falls back to `data/funding-data.ts` if Supabase is empty. This dual-source pattern is how we migrate gradually — the frontend works whether or not the live DB is populated.
 
@@ -92,7 +91,7 @@ For the full data flow see [04-pipeline.md](04-pipeline.md).
 
 Today, the only AI dependency is **Anthropic Claude Haiku** for funding-event extraction (`pipeline/extractor.py`). It is called once per fetched article, the JSON response is cached on disk by URL + body hash, and re-runs cost nothing for already-seen articles.
 
-Future AI (Phase 7) will add:
+AI support includes:
 - Weekly trend summaries
 - Natural-language search ("show me Series A fintech rounds led by Peak XV in 2026")
 - Sector classification when keyword matching is ambiguous
