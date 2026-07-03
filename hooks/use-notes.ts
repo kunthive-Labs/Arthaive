@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "./use-auth"
 
@@ -19,7 +19,7 @@ export function useDealNote(dealId: string) {
   const [note, setNote] = useState<DealNote>(EMPTY)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const load = useCallback(async () => {
     if (!user) {
@@ -40,7 +40,7 @@ export function useDealNote(dealId: string) {
         : EMPTY
     )
     setLoading(false)
-  }, [user, dealId])
+  }, [user, dealId, supabase])
 
   useEffect(() => {
     load()
@@ -78,7 +78,7 @@ export function useDealNote(dealId: string) {
       }
       setSaving(false)
     },
-    [user, dealId]
+    [user, dealId, supabase]
   )
 
   return { note, loading, saving, save, reload: load }

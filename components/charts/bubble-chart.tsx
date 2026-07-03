@@ -31,7 +31,7 @@ export function BubbleChart({ deals, sourceLink }: { deals: Deal[]; sourceLink?:
   return (
     <>
     <div className="h-80">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" minWidth={0} height="100%">
         <ScatterChart margin={{ top: 16, right: 16, left: 16, bottom: 24 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
           <XAxis type="number" dataKey="count" name="Deal count" tick={{ fontSize: 11 }}>

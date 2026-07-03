@@ -26,7 +26,7 @@ export function DealCountTrend({ deals, sourceLink }: { deals: Deal[]; sourceLin
   return (
     <>
       <div className="h-full min-h-[200px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" minWidth={0} height="100%">
           <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis dataKey="label" tick={{ fontSize: 11 }} />

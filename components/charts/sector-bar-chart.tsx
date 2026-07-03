@@ -30,7 +30,7 @@ export function SectorBarChart({ deals, topN = 15, sourceLink }: { deals: Deal[]
   return (
     <>
     <div className="h-96">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" minWidth={0} height="100%">
         <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
           <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`} />

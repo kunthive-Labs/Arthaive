@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
@@ -17,7 +17,7 @@ interface LiveDeal {
 
 export function LiveDealFeed() {
   const [deals, setDeals] = useState<LiveDeal[]>([])
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     // Load recent deals
@@ -47,7 +47,7 @@ export function LiveDealFeed() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [])
+  }, [supabase])
 
   if (!deals.length) {
     return (

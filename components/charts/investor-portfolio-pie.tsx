@@ -24,7 +24,7 @@ export function InvestorPortfolioPie({ deals, investorName }: { deals: Deal[]; i
 
   return (
     <div className="h-72">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" minWidth={0} height="100%">
         <PieChart>
           <Pie
             data={data}

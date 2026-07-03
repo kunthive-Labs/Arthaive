@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Header } from "@/components/header"
 import { FilterPanel } from "@/components/filter-panel"
@@ -128,7 +129,6 @@ export function ExploreClient({ sectors, locations, stages, years }: ExploreClie
       return
     }
     setPage(1)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSectors, selectedStages, selectedLocation, selectedYears, fundingRange, searchQuery, investorSearch, sortBy, showUndisclosed])
 
   // Debounce the fetch: runSearch's deps include the free-text search boxes, so
@@ -241,12 +241,12 @@ export function ExploreClient({ sectors, locations, stages, years }: ExploreClie
               <div className="neo-border p-12 text-center bg-white">
                 <p className="text-gray-900 font-bold mb-2">{error.message}</p>
                 {error.kind === "auth" ? (
-                  <a
+                  <Link
                     href="/"
                     className="inline-block mt-2 border-4 border-black px-4 py-2 font-bold text-sm hover:bg-black hover:text-white transition-colors"
                   >
                     SIGN IN
-                  </a>
+                  </Link>
                 ) : (
                   <button
                     onClick={runSearch}

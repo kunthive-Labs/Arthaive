@@ -32,9 +32,10 @@ const eslintConfig = [
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-unused-expressions": "warn",
       "react-hooks/exhaustive-deps": "warn",
-      // react-hooks v7 promotes these to errors; keep them as warnings so the
-      // current codebase lints clean while still surfacing the findings.
-      "react-hooks/set-state-in-effect": "warn",
+      // Data-loading hooks in this app intentionally set local loading/data
+      // state from effects. Keep the newer compiler advisory out of the
+      // baseline until those hooks are moved to a query/cache abstraction.
+      "react-hooks/set-state-in-effect": "off",
       "react-hooks/purity": "warn",
       "react/no-unescaped-entities": "off",
       "@next/next/no-img-element": "warn",

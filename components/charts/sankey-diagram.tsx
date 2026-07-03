@@ -66,7 +66,7 @@ export function SankeyDiagram({ deals, topInvestors = 10, topSectors = 8, source
   return (
     <>
     <div className="h-96">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" minWidth={0} height="100%">
         <Sankey
           data={{ nodes, links }}
           node={{ fill: "hsl(var(--primary))", stroke: "transparent" }}

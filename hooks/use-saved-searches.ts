@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "./use-auth"
 
@@ -14,7 +14,7 @@ interface SavedSearch {
 export function useSavedSearches() {
   const { user } = useAuth()
   const [searches, setSearches] = useState<SavedSearch[]>([])
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const load = useCallback(async () => {
     if (!user) return
@@ -24,7 +24,7 @@ export function useSavedSearches() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
     setSearches((data as SavedSearch[]) ?? [])
-  }, [user])
+  }, [user, supabase])
 
   useEffect(() => { load() }, [load])
 
@@ -36,12 +36,12 @@ export function useSavedSearches() {
       .select()
       .single()
     if (data) setSearches((prev) => [data as SavedSearch, ...prev])
-  }, [user])
+  }, [user, supabase])
 
   const remove = useCallback(async (id: string) => {
     await supabase.from("saved_searches").delete().eq("id", id)
     setSearches((prev) => prev.filter((s) => s.id !== id))
-  }, [])
+  }, [supabase])
 
   return { searches, save, remove }
 }

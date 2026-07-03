@@ -33,7 +33,7 @@ export function CityBarChart({
   return (
     <>
       <div className="h-full min-h-[200px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" minWidth={0} height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" horizontal={false} />
             <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => fmtCr(v)} />

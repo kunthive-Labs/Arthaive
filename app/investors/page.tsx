@@ -12,7 +12,6 @@ export default async function InvestorsPage() {
 
   const vcs = investors.filter((i) => i.type === "VC")
   const angels = investors.filter((i) => i.type === "Angel")
-  const others = investors.filter((i) => i.type !== "VC" && i.type !== "Angel")
 
   return (
     <div className="min-h-screen bg-white">

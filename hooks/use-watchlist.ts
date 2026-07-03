@@ -35,7 +35,11 @@ export function useWatchlist() {
   }, [user, supabase])
 
   const toggle = useCallback((company: string) => {
-    watchlist.includes(company) ? remove(company) : add(company)
+    if (watchlist.includes(company)) {
+      remove(company)
+    } else {
+      add(company)
+    }
   }, [watchlist, add, remove])
 
   return { watchlist, toggle, isWatching: (c: string) => watchlist.includes(c) }

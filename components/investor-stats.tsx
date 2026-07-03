@@ -1,7 +1,6 @@
 "use client"
 
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { formatFundingAmount } from "@/lib/utils"
 import type { Investor } from "@/lib/types"
 
 const COLORS = ["#15803d", "#1d4ed8", "#7c3aed", "#b45309", "#dc2626", "#0891b2", "#db2777"]
@@ -32,7 +31,7 @@ export function InvestorStats({ investor }: InvestorStatsProps) {
       {stageData.length > 0 && (
         <div className="neo-border p-4">
           <h4 className="font-bold text-sm uppercase mb-4">Stage Focus</h4>
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" minWidth={0} height={160}>
             <PieChart>
               <Pie data={stageData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} dataKey="value" paddingAngle={2}>
                 {stageData.map((entry, i) => (
@@ -56,7 +55,7 @@ export function InvestorStats({ investor }: InvestorStatsProps) {
       {sectorData.length > 0 && (
         <div className="neo-border p-4">
           <h4 className="font-bold text-sm uppercase mb-4">Sectors</h4>
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" minWidth={0} height={160}>
             <BarChart data={sectorData} layout="vertical">
               <XAxis type="number" hide />
               <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 10 }} />
