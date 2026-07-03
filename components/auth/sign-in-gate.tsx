@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ArrowRight } from "lucide-react"
 import { SignInButton } from "@/components/auth/sign-in-button"
 
 // One ticker line: company + the round it raised, set in mono like a tape.
@@ -21,18 +22,29 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
   const count = dealCount.toLocaleString("en-IN")
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex flex-1 flex-col overflow-x-hidden bg-[#EFEDE3]">
       {/* ── Masthead ───────────────────────────────────────────── */}
-      <header className="flex items-center justify-between gap-4 border-b-4 border-black px-4 py-3 md:px-8">
-        <span className="text-2xl font-bold leading-none tracking-tight">
-          Arthaive
-        </span>
-        <span className="hidden text-center text-[11px] font-bold uppercase tracking-[0.25em] text-gray-500 md:block">
-          The Indian Startup Funding Ledger
-        </span>
-        <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-green-700">
-          Est. 2015
-        </span>
+      <header className="border-b-4 border-black bg-white px-4 py-3 md:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="neo-border-accent bg-white p-1.5" aria-hidden>
+              <span className="block h-4 w-4 bg-[#1A5D1A] md:h-5 md:w-5" />
+            </span>
+            <span className="text-xl font-bold leading-none tracking-tight md:text-2xl">
+              Arthaive
+            </span>
+          </Link>
+          <span className="hidden text-center text-[11px] font-bold uppercase tracking-[0.25em] text-gray-500 md:block">
+            The Indian Startup Funding Ledger
+          </span>
+          <Link
+            href="/about"
+            className="hidden items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-green-700 transition hover:text-green-900 sm:inline-flex"
+          >
+            Methodology
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </header>
 
       {/* ── Live deal tape ─────────────────────────────────────── */}
@@ -41,27 +53,27 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           <span className="inline-block h-1.5 w-1.5 bg-black" aria-hidden />
           Latest raises
         </div>
-        <div className="ticker-mask flex-1 overflow-hidden">
-        <div className="ticker-track py-2 text-white">
-          {[0, 1].map((copy) => (
-            <span key={copy} aria-hidden={copy === 1} className="inline-flex">
-              {tickerDeals.map((d, i) => (
-                <span
-                  key={`${copy}-${i}`}
-                  className="inline-flex items-center whitespace-nowrap px-5 font-mono text-xs"
-                >
-                  <span className="mr-2 inline-block h-1.5 w-1.5 bg-green-500" aria-hidden />
-                  <span className="font-bold">{d.company}</span>
-                  <span className="mx-2 text-gray-500">·</span>
-                  <span className="text-green-400">{d.amountCr}</span>
-                  <span className="ml-2 uppercase tracking-wider text-gray-500">
-                    {d.stage}
+        <div className="ticker-mask min-w-0 flex-1 overflow-hidden">
+          <div className="ticker-track py-2 text-white">
+            {[0, 1].map((copy) => (
+              <span key={copy} aria-hidden={copy === 1} className="inline-flex">
+                {tickerDeals.map((d, i) => (
+                  <span
+                    key={`${copy}-${i}`}
+                    className="inline-flex items-center whitespace-nowrap px-5 font-mono text-xs"
+                  >
+                    <span className="mr-2 inline-block h-1.5 w-1.5 bg-green-500" aria-hidden />
+                    <span className="font-bold">{d.company}</span>
+                    <span className="mx-2 text-gray-500">·</span>
+                    <span className="text-green-400">{d.amountCr}</span>
+                    <span className="ml-2 uppercase tracking-wider text-gray-500">
+                      {d.stage}
+                    </span>
                   </span>
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
+                ))}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
