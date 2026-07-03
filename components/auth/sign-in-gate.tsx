@@ -78,46 +78,49 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
       </div>
 
       {/* ── Hero ───────────────────────────────────────────────── */}
-      <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-10 px-4 py-12 md:px-8 md:py-16 lg:grid-cols-5 lg:gap-12">
+      <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-8 px-4 py-10 md:px-8 md:py-16 lg:grid-cols-5 lg:gap-12">
         {/* Thesis */}
         <section className="lg:col-span-3">
-          <p className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.3em] text-green-700">
+          <p className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.25em] text-green-700">
             <span className="inline-block h-2.5 w-2.5 bg-[#FF5A1F]" aria-hidden />
             Members only
           </p>
-          <h1 className="mt-5 text-5xl font-bold leading-[0.95] tracking-tight md:text-7xl">
+          <h1 className="mt-5 max-w-3xl text-[clamp(3rem,14vw,4.5rem)] font-bold leading-[0.95] tracking-tight md:text-7xl">
             Every rupee.
             <br />
             Every round.
             <br />
             <span className="text-green-700">On the record.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-700 md:text-lg">
             Arthaive is the continuously-maintained ledger of Indian startup
-            funding — verified, sourced, and searchable. The record is reserved
-            for members. Sign in to open it.
+            funding, built for founders, analysts, investors, and operators who
+            need sourced funding intelligence without spreadsheet drift.
           </p>
 
           {/* The signature: the count of the record, set like a ledger total */}
-          <div className="mt-10 inline-block neo-border neo-shadow bg-green-50 px-6 py-5">
-            <div className="ledger-figure text-6xl font-bold leading-none text-green-700 md:text-7xl">
+          <div className="mt-8 w-full max-w-sm neo-border neo-shadow bg-white px-5 py-5 sm:inline-block sm:w-auto sm:px-6">
+            <div className="ledger-figure text-[clamp(3rem,17vw,4.5rem)] font-bold leading-none text-green-700 md:text-7xl">
               {count}
             </div>
-            <div className="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-gray-500">
+            <div className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-gray-500">
               Funding deals on the record
             </div>
           </div>
 
           {/* Supporting figures */}
-          <dl className="mt-8 grid max-w-xl grid-cols-3 border-t-2 border-black">
+          <dl className="mt-8 grid max-w-2xl grid-cols-1 border-y-2 border-black sm:grid-cols-3 sm:border-t-2">
             {[
               ["8,000+", "Investors tracked"],
-              ["2015–26", "Continuous coverage"],
+              ["2015-26", "Continuous coverage"],
               ["12+", "Sectors"],
             ].map(([n, label]) => (
-              <div key={label} className="border-r-2 border-black py-4 pr-4 last:border-r-0">
+              <div
+                key={label}
+                className="border-b-2 border-black py-4 last:border-b-0 sm:border-b-0 sm:border-r-2 sm:pr-4 sm:last:border-r-0"
+              >
                 <dt className="font-mono text-2xl font-bold tracking-tight">{n}</dt>
-                <dd className="mt-1 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                <dd className="mt-1 text-[11px] font-bold uppercase tracking-wider text-gray-600">
                   {label}
                 </dd>
               </div>
@@ -137,11 +140,11 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
               </span>
             </div>
 
-            <div className="p-6 md:p-7">
-              <p className="text-base font-semibold leading-relaxed text-gray-900">
-                The ledger is open to members.
+            <div className="p-5 md:p-7">
+              <p className="text-lg font-bold leading-relaxed text-gray-950">
+                Open the funding ledger.
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
+              <p className="mt-2 text-sm leading-relaxed text-gray-600">
                 One account, signed in with Google. No passwords to manage.
               </p>
 
@@ -156,7 +159,7 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
               </div>
 
               {/* What membership opens */}
-              <ul className="mt-7 space-y-2.5 border-t-2 border-gray-200 pt-5">
+              <ul className="mt-7 space-y-3 border-t-2 border-gray-200 pt-5">
                 {[
                   `Search ${count} verified deals`,
                   "Bookmark deals and build watchlists",
@@ -168,11 +171,16 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
                     className="flex items-start gap-2.5 text-sm text-gray-700"
                   >
                     <span className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 bg-green-700" aria-hidden />
-                    {item}
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
+          </div>
+
+          <div className="mt-5 border-l-4 border-black bg-white px-4 py-3 text-sm font-semibold text-gray-700">
+            Built from public reporting with source-backed records and a visible
+            correction process.
           </div>
         </section>
       </main>
