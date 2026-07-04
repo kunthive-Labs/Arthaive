@@ -6,8 +6,6 @@ import {
 import { useMemo } from "react"
 import type { FundingDeal as Deal } from "@/data/funding-data"
 
-const METRICS = ["deal_count", "total_funding", "avg_size", "yoy_growth"] as const
-
 export function SectorRadar({
   deals,
   sectors,
@@ -40,7 +38,7 @@ export function SectorRadar({
 
   return (
     <div className="h-72">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" minWidth={0} height="100%">
         <RadarChart data={data}>
           <PolarGrid />
           <PolarAngleAxis dataKey="sector" tick={{ fontSize: 11 }} />

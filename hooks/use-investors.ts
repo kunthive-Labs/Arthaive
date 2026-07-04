@@ -20,6 +20,6 @@ export function useInvestors(query = "") {
     } finally { setLoading(false) }
   }, [])
 
-  useEffect(() => { load(query) }, [query])
+  useEffect(() => { load(query) }, [load, query])
   return { investors, loading, error, refetch: load }
 }

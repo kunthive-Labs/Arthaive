@@ -97,7 +97,7 @@ npm run dev
 
 Open http://localhost:3000.
 
-You should see the home page. With an empty Supabase, the frontend falls back to `data/funding-data.ts` (1695 deals) — so the site is fully browsable even before you run the pipeline.
+You should see the home page. With an empty or unconfigured Supabase, public data surfaces fall back to `data/funding-data.ts` (13,700+ generated deals). Auth-gated features still require Supabase credentials.
 
 ## 5. Run the pipeline
 

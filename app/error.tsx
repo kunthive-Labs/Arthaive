@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import Link from "next/link"
 import { captureException } from "@/lib/sentry"
 
 export default function Error({
@@ -28,12 +29,12 @@ export default function Error({
           >
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="flex-1 text-center bg-white text-black px-6 py-3 font-bold border-4 border-black hover:bg-gray-50 transition-colors"
           >
             Go Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -34,7 +34,7 @@ export function buildBarData(items: Array<{ label: string; value: number }>, col
 
 export function buildLineData(series: Array<{ label: string; points: Array<{ x: string; y: number }> }>): object {
   return {
-    datasets: series.map((s, idx) => ({
+    datasets: series.map((s) => ({
       label: s.label,
       data: s.points,
       tension: 0.3,

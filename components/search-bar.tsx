@@ -11,6 +11,7 @@ export function SearchBar() {
   const [activeIndex, setActiveIndex] = useState(-1)
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
+  const listboxId = "site-search-results"
 
   const results = useMemo(() => {
     if (!query.trim()) return []
@@ -74,7 +75,9 @@ export function SearchBar() {
           onKeyDown={handleKeyDown}
           className="w-full neo-border px-4 py-3 font-semibold text-sm focus:outline-none bg-white pr-32"
           aria-autocomplete="list"
+          aria-controls={listboxId}
           aria-expanded={isOpen && results.length > 0}
+          aria-activedescendant={activeIndex >= 0 ? `${listboxId}-${results[activeIndex]?.id}` : undefined}
           role="combobox"
         />
         {query && (
@@ -86,12 +89,14 @@ export function SearchBar() {
 
       {isOpen && results.length > 0 && (
         <div
+          id={listboxId}
           className="absolute top-full left-0 right-0 neo-border border-t-0 bg-white z-50 shadow-lg"
           role="listbox"
         >
           {results.map((deal, index) => (
             <Link
               key={deal.id}
+              id={`${listboxId}-${deal.id}`}
               href={`/deal/${encodeURIComponent(deal.id)}`}
               role="option"
               aria-selected={index === activeIndex}

@@ -1,4 +1,4 @@
-import { normalizeString, fuzzyMatch, scoreRelevance } from "@/lib/utils"
+import { normalizeString, fuzzyMatch } from "@/lib/utils"
 
 export interface SearchIndex {
   id: string

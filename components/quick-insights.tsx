@@ -37,7 +37,7 @@ export function QuickInsights() {
         <div className="neo-border neo-hover p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-6 text-green-700">Trending Sectors</h3>
           <div className="space-y-3">
-            {trendingSectors.map((item, i) => (
+            {trendingSectors.map((item) => (
               <div key={item.sector} className="flex justify-between items-center pb-3 border-b-2 border-gray-200">
                 <div>
                   <div className="font-bold text-sm">{item.sector}</div>

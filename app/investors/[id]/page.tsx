@@ -16,7 +16,6 @@ export default function InvestorProfilePage({ params }: Props) {
   const deals = fundingData.filter(d => d.investors.includes(name))
   if (!deals.length) notFound()
 
-  const total = deals.reduce((s, d) => s + d.amount, 0)
   const sectors = [...new Set(deals.flatMap(d => d.sectors))]
 
   return (

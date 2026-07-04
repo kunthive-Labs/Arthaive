@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 import type { Database } from "@/types/database.types"
+import { isConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./config"
 
 // Arthaive is gated: the deals, filters, analytics, search and everything else
 // are visible only after signing in. So this public list is deliberately tiny —
@@ -39,10 +40,25 @@ function isOpenApi(pathname: string): boolean {
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
+  const { pathname } = request.nextUrl
+
+  if (!isConfigured) {
+    if (pathname.startsWith("/api") && !isOpenApi(pathname)) {
+      return NextResponse.json({ error: "Authentication is not configured" }, { status: 503 })
+    }
+
+    if (!isPublicPath(pathname)) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/"
+      return NextResponse.redirect(url)
+    }
+
+    return supabaseResponse
+  }
 
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_URL!,
+    SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -62,8 +78,6 @@ export async function updateSession(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
-  const { pathname } = request.nextUrl
 
   // API: respond with 401 JSON rather than an HTML redirect, so fetch() callers
   // get a usable error instead of a redirect to the gate markup.

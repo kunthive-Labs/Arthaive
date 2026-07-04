@@ -39,7 +39,7 @@ export function DealVelocity({ deals, sectors, sourceLink }: { deals: Deal[]; se
           <div key={sector} className="flex items-center gap-4 rounded-lg border px-4 py-2">
             <span className="w-40 truncate text-sm font-medium" title={sector}>{sector}</span>
             <div className="flex-1 h-10">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" minWidth={0} height="100%">
                 <LineChart data={data}>
                   <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" dot={false} strokeWidth={1.5} />
                   <Tooltip

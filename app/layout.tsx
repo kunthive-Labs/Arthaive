@@ -1,13 +1,15 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Space_Grotesk } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { SiteFooter } from "@/components/site-footer"
 import { StructuredData } from "@/components/structured-data"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+})
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -66,14 +68,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className={`font-sans antialiased bg-white text-black min-h-screen flex flex-col`}>
+    <html lang="en" className={spaceGrotesk.variable}>
+      <body className={`${spaceGrotesk.className} font-sans antialiased bg-white text-black min-h-screen flex flex-col`}>
         <StructuredData />
         <div className="flex flex-1 flex-col">{children}</div>
         <SiteFooter />

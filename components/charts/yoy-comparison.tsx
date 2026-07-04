@@ -43,7 +43,7 @@ export function YoYComparison({ deals, sourceLink }: { deals: Deal[]; sourceLink
   return (
     <>
     <div className="h-64 md:h-72">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" minWidth={0} height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
           <XAxis dataKey="month" tick={{ fontSize: 11 }} />

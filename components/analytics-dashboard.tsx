@@ -312,7 +312,7 @@ export function AnalyticsDashboard() {
       <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">FUNDING OVER TIME</h3>
         <p className="text-xs text-gray-600 mb-6">Showing only disclosed amounts</p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" minWidth={0} height={350}>
           <LineChart data={fundingByMonth}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis dataKey="month" stroke="#000" style={{ fontSize: "12px" }} interval="preserveStartEnd" minTickGap={28} />
@@ -343,7 +343,7 @@ export function AnalyticsDashboard() {
       <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">TOP 10 SECTORS BY FUNDING</h3>
         <p className="text-xs text-gray-600 mb-6">Disclosed amounts only</p>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" minWidth={0} height={400}>
           <BarChart data={fundingBySector} layout="vertical" margin={{ left: 20, right: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis type="number" stroke="#000" label={{ value: "Amount (₹ Cr)", position: "bottom" }} />
@@ -374,7 +374,7 @@ export function AnalyticsDashboard() {
         <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">FUNDING BY STAGE</h3>
           <p className="text-xs text-gray-600 mb-6">Disclosed amounts · top 7 rounds</p>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" minWidth={0} height={260}>
             <PieChart>
               <Pie
                 data={fundingByStage}
@@ -456,7 +456,7 @@ export function AnalyticsDashboard() {
       <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">YEAR-OVER-YEAR COMPARISON</h3>
         <p className="text-xs text-gray-600 mb-6">Funding trends and deal activity by year</p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" minWidth={0} height={350}>
           <BarChart data={yearlyComparison}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis dataKey="year" stroke="#000" />
@@ -503,7 +503,7 @@ export function AnalyticsDashboard() {
       <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">QUARTERLY FUNDING TRENDS</h3>
         <p className="text-xs text-gray-600 mb-6">Last 12 quarters performance</p>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" minWidth={0} height={350}>
           <LineChart data={quarterlyTrends}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis dataKey="quarter" stroke="#000" style={{ fontSize: "11px" }} angle={-45} textAnchor="end" height={80} />
@@ -558,7 +558,7 @@ export function AnalyticsDashboard() {
       <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
         <h3 className="text-lg font-bold uppercase mb-2 text-green-700">TOP CITIES BY FUNDING</h3>
         <p className="text-xs text-gray-600 mb-6">Geographic distribution of startup funding</p>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" minWidth={0} height={400}>
           <BarChart data={locationAnalysis} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis type="number" stroke="#000" />
@@ -583,7 +583,7 @@ export function AnalyticsDashboard() {
         <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">AVG DEAL SIZE BY STAGE</h3>
           <p className="text-xs text-gray-600 mb-6">Average funding amount per stage</p>
-          <ResponsiveContainer width="100%" height={350}>
+          <ResponsiveContainer width="100%" minWidth={0} height={350}>
             <BarChart data={avgDealByStage}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="stage" stroke="#000" style={{ fontSize: "11px" }} />
@@ -605,7 +605,7 @@ export function AnalyticsDashboard() {
         <div className="neo-border neo-shadow p-6 md:p-8 bg-white">
           <h3 className="text-lg font-bold uppercase mb-2 text-green-700">DEAL VELOCITY TREND</h3>
           <p className="text-xs text-gray-600 mb-6">Number of deals per month (last 24 months)</p>
-          <ResponsiveContainer width="100%" height={350}>
+          <ResponsiveContainer width="100%" minWidth={0} height={350}>
             <LineChart data={velocityData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="month" stroke="#000" style={{ fontSize: "10px" }} angle={-45} textAnchor="end" height={80} />

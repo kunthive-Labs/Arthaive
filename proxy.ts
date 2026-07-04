@@ -3,6 +3,7 @@ import { updateSession } from "@/lib/supabase/middleware"
 import { rateLimit } from "@/lib/rate-limit"
 import { createServerClient } from "@supabase/ssr"
 import type { Database } from "@/types/database.types"
+import { isConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/config"
 
 // Legal / SEO routes that MUST resolve without a session. Google's OAuth
 // verification and crawlers have to reach the privacy policy, terms, and the
@@ -19,15 +20,19 @@ function isPublicLegalPath(pathname: string): boolean {
   )
 }
 
-// Resolve the authenticated Supabase user inside middleware, threading cookies
+// Resolve the authenticated Supabase user inside proxy, threading cookies
 // through a response object so refreshed tokens are written back. Shared by the
 // /admin (page) and /api/admin (API) auth gates so the wiring lives in one place.
 async function getAuthedUser(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  if (!isConfigured) {
+    return { user: null, supabaseResponse }
+  }
+
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_URL!,
+    SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -53,7 +58,7 @@ async function getAuthedUser(request: NextRequest) {
   return { user, supabaseResponse }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Let the legal/SEO pages through before the session gate runs, so
   // unauthenticated crawlers and OAuth reviewers are never redirected.
   if (isPublicLegalPath(request.nextUrl.pathname)) {
@@ -117,10 +122,4 @@ export async function middleware(request: NextRequest) {
   }
 
   return await updateSession(request)
-}
-
-export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
 }

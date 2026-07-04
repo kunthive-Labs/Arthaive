@@ -30,7 +30,7 @@ export function StagePie({ deals, sourceLink }: { deals: Deal[]; sourceLink?: st
   return (
     <>
       <div className="h-full min-h-[200px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" minWidth={0} height="100%">
           <PieChart>
             <Pie
               data={data}

@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "./use-auth"
 
 export function useBookmarks() {
   const { user } = useAuth()
   const [bookmarks, setBookmarks] = useState<string[]>([])
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const load = useCallback(async () => {
     if (!user) return
@@ -16,7 +16,7 @@ export function useBookmarks() {
       .select("deal_id")
       .eq("user_id", user.id)
     setBookmarks(data?.map((r) => r.deal_id) ?? [])
-  }, [user])
+  }, [user, supabase])
 
   useEffect(() => { load() }, [load])
 
@@ -30,7 +30,7 @@ export function useBookmarks() {
       await supabase.from("bookmarks").insert({ user_id: user.id, deal_id: dealId })
       setBookmarks((prev) => [...prev, dealId])
     }
-  }, [user, bookmarks])
+  }, [user, bookmarks, supabase])
 
   return { bookmarks, toggle, isBookmarked: (id: string) => bookmarks.includes(id) }
 }
