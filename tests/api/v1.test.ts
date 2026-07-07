@@ -79,6 +79,23 @@ describe("GET /api/v1/funding-rounds", () => {
       expect(r.stage.toLowerCase()).toContain("series a")
     }
   })
+
+  it("sanitizes pagination params before building metadata", async () => {
+    const { res, body } = await callAndParse(
+      fundingRoundsGET,
+      "/api/v1/funding-rounds?page=-2&limit=0",
+    )
+    expect(res.status).toBe(200)
+    expect(body.meta.page).toBe(1)
+    expect(body.meta.limit).toBe(1)
+    expect(body.data.length).toBeLessThanOrEqual(1)
+  })
+
+  it("caps oversized limits at the public maximum", async () => {
+    const { body } = await callAndParse(fundingRoundsGET, "/api/v1/funding-rounds?limit=500")
+    expect(body.meta.limit).toBe(100)
+    expect(body.data.length).toBeLessThanOrEqual(100)
+  })
 })
 
 describe("GET /api/v1/search", () => {
@@ -93,6 +110,14 @@ describe("GET /api/v1/search", () => {
     const { res, body } = await callAndParse(searchGET, "/api/v1/search?q=a&limit=5")
     expect(res.status).toBe(200)
     expect(Array.isArray(body.data)).toBe(true)
+  })
+
+  it("sanitizes search pagination params", async () => {
+    const { res, body } = await callAndParse(searchGET, "/api/v1/search?q=a&page=0&limit=-10")
+    expect(res.status).toBe(200)
+    expect(body.meta.page).toBe(1)
+    expect(body.meta.limit).toBe(1)
+    expect(body.data.length).toBeLessThanOrEqual(1)
   })
 })
 

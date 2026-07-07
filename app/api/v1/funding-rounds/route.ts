@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic"
  * Returns paginated funding rounds. One row per deal.
  */
 export const GET = v1Route(async (_req, { searchParams, rate }) => {
-  const page = intParam(searchParams, "page", 1)
-  const limit = intParam(searchParams, "limit", 20, 100)
+  const page = intParam(searchParams, "page", 1, undefined, 1)
+  const limit = intParam(searchParams, "limit", 20, 100, 1)
 
   // Date range → years[] (the existing getDeals filter shape) or undisclosed pass-through.
   const from = searchParams.get("from")

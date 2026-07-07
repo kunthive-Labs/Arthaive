@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic"
  * Each row is the most recent funding event per company.
  */
 export const GET = v1Route(async (_req, { searchParams, rate }) => {
-  const page = intParam(searchParams, "page", 1)
-  const limit = intParam(searchParams, "limit", 20, 100)
+  const page = intParam(searchParams, "page", 1, undefined, 1)
+  const limit = intParam(searchParams, "limit", 20, 100, 1)
 
   // Pull a wide deal page using the existing query layer.
   const result = await getDeals({

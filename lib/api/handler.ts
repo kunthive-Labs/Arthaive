@@ -56,10 +56,18 @@ export function v1Route<T>(
 }
 
 // Helpers used by multiple v1 routes
-export function intParam(sp: URLSearchParams, key: string, fallback: number, max?: number): number {
+export function intParam(
+  sp: URLSearchParams,
+  key: string,
+  fallback: number,
+  max?: number,
+  min = 0,
+): number {
   const raw = sp.get(key)
   if (!raw) return fallback
   const n = Number(raw)
   if (!Number.isFinite(n)) return fallback
-  return max != null ? Math.min(n, max) : n
+  const whole = Math.floor(n)
+  const lowerBounded = Math.max(whole, min)
+  return max != null ? Math.min(lowerBounded, max) : lowerBounded
 }
