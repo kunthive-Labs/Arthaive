@@ -15,6 +15,8 @@ interface Endpoint {
   example: { curl: string; response: string }
 }
 
+const API_BASE_URL = "https://arthaive.kunthive.in"
+
 const ENDPOINTS: Endpoint[] = [
   {
     method: "GET",
@@ -28,7 +30,7 @@ const ENDPOINTS: Endpoint[] = [
       { name: "limit", type: "number", note: "Default 20, max 100." },
     ],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/startups?sector=Fintech&city=Bangalore&limit=2' \\
+      curl: `curl '${API_BASE_URL}/api/v1/startups?sector=Fintech&city=Bangalore&limit=2' \\
   -H 'X-API-Key: ifk_...'`,
       response: `{
   "data": [
@@ -52,7 +54,7 @@ const ENDPOINTS: Endpoint[] = [
     desc: "Full deal history for a startup (id can be a deal id or company name).",
     params: [{ name: "id", type: "string", required: true, note: "Path param — deal id or URL-encoded company name." }],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/startups/ExampleCo'`,
+      curl: `curl '${API_BASE_URL}/api/v1/startups/ExampleCo'`,
       response: `{
   "data": {
     "company": "ExampleCo",
@@ -82,7 +84,7 @@ const ENDPOINTS: Endpoint[] = [
       { name: "limit", type: "number", note: "Default 20, max 100." },
     ],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/funding-rounds?sector=Edtech&stage=series_a&from=2024-01-01&to=2024-12-31'`,
+      curl: `curl '${API_BASE_URL}/api/v1/funding-rounds?sector=Edtech&stage=series_a&from=2024-01-01&to=2024-12-31'`,
       response: `{
   "data": [ { "id": "...", "company": "...", "amount_inr": 5000, "stage": "Series A", "deal_date": "...", "investors": [...] } ],
   "meta": { "total": 18, "page": 1, "limit": 20, "version": "1", "coverage_note": "..." }
@@ -95,7 +97,7 @@ const ENDPOINTS: Endpoint[] = [
     desc: "Investor profile + deal history. :id is the kebab-case slug.",
     params: [{ name: "id", type: "string", required: true, note: "Investor slug (e.g. sequoia-india)." }],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/investors/sequoia-india'`,
+      curl: `curl '${API_BASE_URL}/api/v1/investors/sequoia-india'`,
       response: `{
   "data": {
     "name": "Sequoia India",
@@ -117,7 +119,7 @@ const ENDPOINTS: Endpoint[] = [
       { name: "sector", type: "string", note: "Optional sector filter." },
     ],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/trends/monthly?year=2024'`,
+      curl: `curl '${API_BASE_URL}/api/v1/trends/monthly?year=2024'`,
       response: `{
   "data": [ { "month": "2024-01", "deal_count": 38, "total_funding_inr": 124300 } ],
   "meta": { "total": 12, "version": "1" }
@@ -133,7 +135,7 @@ const ENDPOINTS: Endpoint[] = [
       { name: "to", type: "YYYY-MM-DD", note: "Optional." },
     ],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/trends/sectors'`,
+      curl: `curl '${API_BASE_URL}/api/v1/trends/sectors'`,
       response: `{
   "data": [ { "sector": "Fintech", "deal_count": 312, "total_funding_inr": 850000 } ],
   "meta": { "total": 20, "version": "1" }
@@ -150,7 +152,7 @@ const ENDPOINTS: Endpoint[] = [
       { name: "limit", type: "number", note: "Default 20, max 100." },
     ],
     example: {
-      curl: `curl 'https://ind-startup-funding.vercel.app/api/v1/search?q=razorpay'`,
+      curl: `curl '${API_BASE_URL}/api/v1/search?q=razorpay'`,
       response: `{
   "data": [ { "id": "...", "company": "Razorpay", "amount_inr": ..., "stage": "..." } ],
   "meta": { "total": 5, "page": 1, "limit": 20, "version": "1" }
@@ -186,7 +188,7 @@ export default function ApiDocsPage() {
           <p className="text-sm mt-2">
             <Link href="/api-keys" className="underline text-green-700 font-medium">Register a key →</Link>
           </p>
-          <Code>{`curl https://ind-startup-funding.vercel.app/api/v1/startups \\
+          <Code>{`curl ${API_BASE_URL}/api/v1/startups \\
   -H 'X-API-Key: ifk_your_key_here'`}</Code>
         </section>
 
