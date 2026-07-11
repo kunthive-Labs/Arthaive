@@ -7,7 +7,7 @@ import { SignInGate, type TickerDeal } from "@/components/auth/sign-in-gate"
 export const metadata = {
   title: "Arthaive — The Indian Startup Funding Ledger",
   description:
-    "The continuously-maintained, verified record of Indian startup funding — 13,700+ deals from 2015 to today. Browse, filter and analyze for free; sign in to save deals and build watchlists.",
+    "The continuously-maintained, verified record of Indian startup funding — 14,700+ deals from 2005 to today. Browse, filter and analyze for free; sign in to save deals and build watchlists.",
 }
 
 export default async function Home({

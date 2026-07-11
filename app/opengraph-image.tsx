@@ -40,14 +40,14 @@ export default function OpengraphImage() {
             Indian Startup Funding Intelligence
           </div>
           <div style={{ fontSize: 30, color: "#a1a1aa", maxWidth: 880 }}>
-            Discover, analyze, and track funding across India — continuously from 2015 to today.
+            Discover, analyze, and track funding across India — continuously from 2005 to today.
           </div>
         </div>
 
         <div style={{ display: "flex", gap: 56 }}>
           {[
-            ["13,000+", "deals"],
-            ["2015–2026", "coverage"],
+            ["14,000+", "deals"],
+            ["2005–2026", "coverage"],
             ["8,000+", "investors"],
           ].map(([big, small]) => (
             <div key={small} style={{ display: "flex", flexDirection: "column" }}>

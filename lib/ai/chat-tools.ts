@@ -279,10 +279,10 @@ interface SharedFilterArgs {
 function yearsBetween(yearFrom?: number, yearTo?: number): string[] {
   if (yearFrom === undefined && yearTo === undefined) return []
   const currentYear = new Date().getFullYear()
-  let start = yearFrom ?? 2015
+  let start = yearFrom ?? 2005
   let end = yearTo ?? currentYear
   if (start > end) [start, end] = [end, start]
-  // The dataset spans 2015→present; clamp so a wild range can't explode.
+  // The dataset spans 2005→present; clamp so a wild range can't explode.
   start = Math.max(start, 1990)
   end = Math.min(end, currentYear + 1)
   if (start > end) return []

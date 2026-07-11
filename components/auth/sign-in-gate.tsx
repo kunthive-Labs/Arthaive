@@ -29,7 +29,7 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
     {
       icon: ChartNoAxesCombined,
       title: "Analyze market movement",
-      body: "Compare sectors, cities, stages, investors, and funding velocity from 2015 through today.",
+      body: "Compare sectors, cities, stages, investors, and funding velocity from 2005 through today.",
     },
     {
       icon: Bookmark,
@@ -135,7 +135,7 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
             <dl className="mt-8 grid max-w-2xl grid-cols-1 border-y-2 border-black sm:grid-cols-3 sm:border-t-2">
               {[
                 ["8,000+", "Investors tracked"],
-                ["2015-26", "Continuous coverage"],
+                ["2005-26", "Continuous coverage"],
                 ["12+", "Sectors"],
               ].map(([n, label]) => (
                 <div

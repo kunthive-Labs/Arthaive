@@ -377,7 +377,7 @@ export function ChatPanel({
             <div className="border-2 border-dashed border-black bg-[#F6F5F1] p-4 text-sm text-gray-600">
               <p className="font-bold text-black">Ask the AI analyst</p>
               <p className="mt-1">
-                Totals, rankings and trends across ~13,700 Indian funding deals — or ask it to
+                Totals, rankings and trends across ~14,700 Indian funding deals — or ask it to
                 suggest a chart for this dashboard.
               </p>
               <p className="mt-2 text-xs text-gray-500">

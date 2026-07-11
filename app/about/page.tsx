@@ -21,7 +21,7 @@ export default function AboutPage() {
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-gray-600">
         Arthaive is India&rsquo;s open startup funding intelligence platform — a
         continuously-maintained, sourced record of who raised, how much, from
-        whom, and when, from 2015 to today.
+        whom, and when, from 2005 to today.
       </p>
 
       <div className="mt-10 space-y-8 text-[15px] leading-relaxed text-gray-800">
@@ -30,8 +30,8 @@ export default function AboutPage() {
           <p className="mt-3">
             We track Indian startup funding rounds and the investors behind them
             and present them in one searchable, analysable record — currently
-            13,000+ deals and 8,000+ investors with continuous coverage from
-            2015 onward. The goal is a single, honest, open ledger of Indian
+            14,000+ deals and 8,000+ investors with continuous coverage from
+            2005 onward. The goal is a single, honest, open ledger of Indian
             startup funding that anyone can read and build on.
           </p>
         </section>

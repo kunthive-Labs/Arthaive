@@ -35,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // List every deal. The sitemap protocol allows up to 50,000 URLs per file;
-  // the full dataset (~13.7k deals plus static/report/sector pages) stays well
+  // the full dataset (~14.7k deals plus static/report/sector pages) stays well
   // under that, so there's no need to cap. Guard against ever exceeding the
   // limit if the dataset grows past it.
   const SITEMAP_MAX_URLS = 50000

@@ -16,7 +16,7 @@
 
 ## Features
 
-- **13,700+ verified funding records** spanning 2015–2026
+- **14,700+ verified funding records** spanning 2005–2026
 - **Explore & filter** deals by sector, stage, city, amount range, and date
 - **Analytics dashboard** — funding trends, sector breakdowns, stage funnels, investor leaderboards, India choropleth map
 - **Investor profiles** — deal history, sectors covered, co-investor network

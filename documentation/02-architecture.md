@@ -50,7 +50,7 @@ Next.js 16 with the App Router. Server components for SEO-friendly pages, client
 | `app/admin/` | The admin console (auth-gated) — review, entities, sources, pipeline, import, export |
 | `components/` | Reusable UI — `deal-card.tsx`, `filter-panel.tsx`, `charts/`, etc. |
 | `lib/` | Non-UI logic — Supabase client (`supabase.ts`), DB query helpers (`lib/db/*`), search, formatting, validation |
-| `data/funding-data.ts` | Generated static dataset (13,700+ deals). Still used as a fallback when Supabase is empty or not configured. |
+| `data/funding-data.ts` | Generated static dataset (14,700+ deals). Still used as a fallback when Supabase is empty or not configured. |
 | `hooks/` | React hooks for filters, debouncing, bookmarks, etc. |
 | `proxy.ts` + `lib/supabase/middleware.ts` | Auth, rate-limit, CSRF, and route protection proxy |
 

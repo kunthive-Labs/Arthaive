@@ -27,7 +27,7 @@ Every page reads from one of two places, controlled by `lib/supabase.ts:isSupaba
 | Source | When |
 |---|---|
 | **Supabase `deals` table** | When Supabase env vars are set AND the query returns at least one verified row. |
-| **`data/funding-data.ts`** (the generated 13,700+ deal file) | When Supabase is unconfigured (local dev with no env), or when Supabase returns empty. |
+| **`data/funding-data.ts`** (the generated 14,700+ deal file) | When Supabase is unconfigured (local dev with no env), or when Supabase returns empty. |
 
 This is the gradual-migration pattern. The frontend works whether the live DB is fully populated or empty. Today (May 2026) most pages still read from static data; Phase 6 wires the analytics, list, and detail pages to Supabase first.
 

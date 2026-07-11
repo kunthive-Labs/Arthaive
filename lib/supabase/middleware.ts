@@ -10,6 +10,7 @@ import { isConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./config"
 // allowed separately in the root middleware.)
 function isPublicPath(pathname: string): boolean {
   if (pathname === "/" || pathname === "/login") return true
+  if (pathname.startsWith("/_next/")) return true
   if (pathname.startsWith("/auth")) return true
   if (
     pathname === "/robots.txt" ||

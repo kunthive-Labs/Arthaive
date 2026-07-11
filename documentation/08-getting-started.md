@@ -97,7 +97,7 @@ npm run dev
 
 Open http://localhost:3000.
 
-You should see the home page. With an empty or unconfigured Supabase, public data surfaces fall back to `data/funding-data.ts` (13,700+ generated deals). Auth-gated features still require Supabase credentials.
+You should see the home page. With an empty or unconfigured Supabase, public data surfaces fall back to `data/funding-data.ts` (14,700+ generated deals). Auth-gated features still require Supabase credentials.
 
 ## 5. Run the pipeline
 
