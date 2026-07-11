@@ -1,11 +1,17 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import type { Dashboard, DashboardWidget, GridLayoutItem } from "@/lib/dashboard/types"
+import type { Dashboard, DashboardLayouts, DashboardWidget } from "@/lib/dashboard/types"
 
 interface SavePatch {
   name?: string
-  layout?: GridLayoutItem[]
+  layout?: DashboardLayouts
+  widgets?: DashboardWidget[]
+  isDefault?: boolean
+}
+
+interface CreateOptions {
+  layout?: DashboardLayouts
   widgets?: DashboardWidget[]
 }
 
@@ -23,11 +29,11 @@ export function useDashboards(initial: Dashboard[]) {
     }
   }
 
-  const create = useCallback(async (name: string): Promise<Dashboard> => {
+  const create = useCallback(async (name: string, opts: CreateOptions = {}): Promise<Dashboard> => {
     const res = await fetch("/api/dashboards", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, layout: opts.layout, widgets: opts.widgets }),
     })
     if (!res.ok) throw new Error(await readError(res, "Failed to create dashboard"))
     const d = (await res.json()) as Dashboard
@@ -36,8 +42,16 @@ export function useDashboards(initial: Dashboard[]) {
   }, [])
 
   const save = useCallback(async (id: string, patch: SavePatch) => {
-    // optimistic local update
-    setDashboards((prev) => prev.map((d) => (d.id === id ? { ...d, ...patch } : d)))
+    // optimistic local update (isDefault is exclusive: clear it on siblings)
+    const { isDefault, ...fields } = patch
+    setDashboards((prev) =>
+      prev.map((d) => {
+        if (d.id === id) {
+          return { ...d, ...fields, ...(isDefault !== undefined ? { is_default: isDefault } : {}) }
+        }
+        return isDefault ? { ...d, is_default: false } : d
+      })
+    )
     const res = await fetch(`/api/dashboards/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
