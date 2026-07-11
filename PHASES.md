@@ -2,7 +2,7 @@
 
 > **How to use this document:** Each phase is self-contained. When you say "implement Phase N", every task in that phase gets built. Phases must be completed in order — each one depends on the previous.
 >
-> **Current state:** All phases (0–9) are implemented. This document is kept as the build record; exit criteria for each phase are noted in the phase headers.
+> **Current state:** All phases (0–10) are implemented. This document is kept as the build record; exit criteria for each phase are noted in the phase headers.
 
 ---
 
@@ -891,7 +891,7 @@ Run with `npm test`.
 
 ### 9.1 — Performance
 
-**Database indexes** (`supabase/migrations/015_performance_indexes.sql`):
+**Database indexes** (`supabase/migrations/021_performance_indexes.sql`):
 ```sql
 create index if not exists idx_deals_date on deals(deal_date desc);
 create index if not exists idx_deals_stage on deals(stage);
@@ -964,6 +964,41 @@ Deploy to Vercel. Submit sitemap to Google Search Console.
 
 ---
 
+## Phase 10 — Custom Dashboards & BYOK AI Chat ✅ (implemented)
+
+> **Goal:** Let users build their own analytics dashboards from a widget library and interrogate the dataset through an AI chat panel — without the platform paying for or storing the user's AI credentials.
+>
+> **Exit criteria:** A signed-in user can create, edit, and delete dashboards that persist across sessions and devices. The chat panel streams grounded answers using the user's own Groq key, and that key never touches the database or server logs.
+
+### 10.1 — Custom dashboards
+
+**Page: `app/dashboard/custom/page.tsx`** — the dashboard workspace.
+
+**Builder: `components/dashboard-builder/dashboard-builder.tsx`** — drag-and-drop grid built on `react-grid-layout` (12-column grid, 40px row height), with `widget-frame.tsx`, `widget-renderer.tsx`, `widget-settings.tsx`, and `add-widget-gallery.tsx` alongside it.
+
+**Widget registry: `lib/dashboard/widget-registry.tsx`** — 21 widget types (charts, tables, stat tiles), each declaring `type`, `defaultSize`, `minSize`, supported `filters`, and a `render(deals, config)` function. Per-widget config is filtered client-side via `lib/dashboard/filter-deals.ts`; shared types live in `lib/dashboard/types.ts`.
+
+**Persistence:**
+- Table `public.dashboards` (`supabase/migrations/018_dashboards.sql`): `id`, `user_id`, `name`, `layout` jsonb, `widgets` jsonb, `is_default` — RLS-scoped to the owner
+- Data layer `lib/supabase/dashboards.ts` (with `hydrate()` to validate stored JSON)
+- API: `app/api/dashboards/route.ts` + `app/api/dashboards/[id]/route.ts` (401 JSON when unauthed, rate-limited)
+- Client hook: `hooks/use-dashboards.ts`
+
+Features: multi-breakpoint responsive layouts, a per-user default dashboard, and starter templates so a new user doesn't begin from a blank grid.
+
+### 10.2 — BYOK AI chat
+
+A streaming chat panel on the custom dashboard page, following a **bring-your-own-key** model:
+
+- The user pastes their own Groq API key; it is held only in the browser session and sent per-request to a server-side proxy — it is **never** stored in the database, in cookies, or in server logs
+- The proxy streams model output back to the panel
+- Answers are grounded via tool use over the deals dataset: the model calls query/aggregate tools that run against verified records (same principle as Phase 7.3 — AI interprets, the DB answers)
+- The assistant can suggest widgets from the registry, which the user can add to the current dashboard in one click
+
+Because the key is user-supplied, these calls bypass the platform's Anthropic budget guard (`lib/ai/budget.ts`) — there is no platform spend to meter.
+
+---
+
 ## Phase Summary Table
 
 | Phase | Name | Key Output | Estimated Days |
@@ -978,7 +1013,8 @@ Deploy to Vercel. Submit sitemap to Google Search Console.
 | 7 | ✅ AI Layer | Trend summaries, NL search, sector classifier | 6–10 days |
 | 8 | ✅ Public API v1 | Versioned API, API keys, docs | 5–8 days |
 | 9 | ✅ Polish & Launch | Perf, mobile, SEO, README | 3–5 days |
-| | **Total** | | **51–83 days** |
+| 10 | ✅ Custom Dashboards & BYOK Chat | Widget-based dashboards, BYOK grounded AI chat | 6–10 days |
+| | **Total** | | **57–93 days** |
 
 ---
 
@@ -994,5 +1030,5 @@ When a phase is done, the exit criteria at the top of the phase are verified bef
 
 ---
 
-*Last updated: May 2026*
+*Last updated: July 2026*
 *Based on PROJECT_REFERENCE.md v1.0*

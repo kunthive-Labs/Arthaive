@@ -1,4 +1,5 @@
 import { getMonthlyUsage } from "@/lib/ai/usage-logger"
+import { monthlyBudgetUsd } from "@/lib/ai/budget"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const dynamic = "force-dynamic"
@@ -13,7 +14,7 @@ function fmtUsd(n: number): string {
 
 export default async function AIUsagePage() {
   const { totalCostUsd, rows } = await getMonthlyUsage(30)
-  const budget = 10
+  const budget = monthlyBudgetUsd()
   const pct = Math.min(100, (totalCostUsd / budget) * 100)
 
   return (
@@ -21,7 +22,8 @@ export default async function AIUsagePage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">AI usage</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Claude API spend over the last 30 days. Budget alarm at $10/month.
+          Claude API spend over the last 30 days. Budget alarm at ${budget.toFixed(0)}/month
+          (set via AI_MONTHLY_BUDGET_USD).
         </p>
       </div>
 
