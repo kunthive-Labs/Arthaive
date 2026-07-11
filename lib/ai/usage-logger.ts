@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase"
 
-export type UseCase = "trend_summary" | "nl_search" | "sector_classify"
+export type UseCase = "trend_summary" | "nl_search" | "sector_classify" | "chat_byok"
 
 interface UsageEntry {
   useCase: UseCase
@@ -74,7 +74,12 @@ export async function getMonthlyUsage(
     cached: boolean | null
   }>) {
     const key = row.use_case
-    const cost = costFor(row.model ?? "", row.input_tokens ?? 0, row.output_tokens ?? 0)
+    // BYOK chat runs on the user's own Groq key — it costs the org $0 and must
+    // never count against the Anthropic budget ceiling.
+    const cost =
+      row.use_case === "chat_byok"
+        ? 0
+        : costFor(row.model ?? "", row.input_tokens ?? 0, row.output_tokens ?? 0)
     totalCost += cost
     const existing = byCase.get(key) ?? {
       useCase: key,
