@@ -182,7 +182,7 @@ export async function getAllStages(): Promise<string[]> {
 }
 
 // Years actually present in the dataset, newest first. The deal table spans
-// 2015→present, so a hardcoded "last 5 years" list left a decade of deals
+// 2005→present, so a hardcoded "last 5 years" list left two decades of deals
 // impossible to filter by year. Derive the floor from the oldest row instead.
 export async function getDealYears(): Promise<string[]> {
   const currentYear = new Date().getFullYear()

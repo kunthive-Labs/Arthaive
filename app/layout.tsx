@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     default: "Arthaive — Indian Startup Funding Intelligence",
     template: "%s | Arthaive",
   },
-  description: "Discover, analyze, and track startup funding across India — 13,000+ deals from 2015 to today, 8,000+ investors, real-time insights.",
+  description: "Discover, analyze, and track startup funding across India — 14,000+ deals from 2005 to today, 8,000+ investors, real-time insights.",
   keywords: ["startup funding", "india startups", "VC funding", "angel investors", "seed funding", "series A", "startup investment"],
   authors: [{ name: "Arthaive" }],
   openGraph: {
@@ -35,12 +35,12 @@ export const metadata: Metadata = {
     locale: "en_IN",
     siteName: "Arthaive",
     title: "Arthaive — Indian Startup Funding Intelligence",
-    description: "Discover, analyze, and track startup funding across India — 13,000+ deals from 2015 to today, 8,000+ investors, real-time insights.",
+    description: "Discover, analyze, and track startup funding across India — 14,000+ deals from 2005 to today, 8,000+ investors, real-time insights.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Arthaive — Indian Startup Funding Intelligence",
-    description: "13,000+ Indian startup funding deals from 2015 to today, 8,000+ investors, real-time insights.",
+    description: "14,000+ Indian startup funding deals from 2005 to today, 8,000+ investors, real-time insights.",
   },
   icons: {
     icon: [

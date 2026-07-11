@@ -46,7 +46,7 @@ export function SiteFooter() {
             reporting and built for repeatable market research.
           </p>
           <p className="mt-5 font-mono text-[11px] uppercase tracking-widest text-gray-400">
-            © 2026 Arthaive · Coverage 2015-2026
+            © 2026 Arthaive · Coverage 2005-2026
           </p>
         </div>
 

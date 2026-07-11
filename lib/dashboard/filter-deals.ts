@@ -50,6 +50,6 @@ export function yearRange(deals: FundingDeal[]): [number, number] {
     if (y < min) min = y
     if (y > max) max = y
   }
-  if (!Number.isFinite(min)) return [2015, new Date().getFullYear()]
+  if (!Number.isFinite(min)) return [2005, new Date().getFullYear()]
   return [min, max]
 }

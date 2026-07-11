@@ -49,3 +49,4 @@ pipeline/.extractor_cache.sqlite
 .claude/settings.local.json
 .claude/worktrees/
 pipeline/.work/
+supabase_export/

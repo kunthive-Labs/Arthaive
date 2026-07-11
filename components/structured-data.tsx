@@ -13,7 +13,7 @@ const organizationSchema = {
   url: BASE_URL,
   logo: `${BASE_URL}/icon.svg`,
   description:
-    "Arthaive is India's open startup funding intelligence platform — a continuously-maintained, sourced record of Indian startup funding from 2015 onward.",
+    "Arthaive is India's open startup funding intelligence platform — a continuously-maintained, sourced record of Indian startup funding from 2005 onward.",
   email: "8harath.k@gmail.com",
   foundingDate: "2015",
   areaServed: "IN",
@@ -26,7 +26,7 @@ const datasetSchema = {
   name: "Indian Startup Funding Dataset",
   alternateName: "Arthaive Funding Ledger",
   description:
-    "A continuously-maintained dataset of Indian startup funding rounds from 2015 to today: 13,000+ deals and 8,000+ investors, with each record linked to its reporting source. Covers company, round/stage, amount, date, sector, and investors.",
+    "A continuously-maintained dataset of Indian startup funding rounds from 2005 to today: 14,000+ deals and 8,000+ investors, with each record linked to its reporting source. Covers company, round/stage, amount, date, sector, and investors.",
   url: `${BASE_URL}/explore`,
   keywords: [
     "startup funding",
@@ -48,7 +48,7 @@ const datasetSchema = {
     name: "Arthaive",
     url: BASE_URL,
   },
-  temporalCoverage: "2015/..",
+  temporalCoverage: "2005/..",
   spatialCoverage: {
     "@type": "Place",
     name: "India",

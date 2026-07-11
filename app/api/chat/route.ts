@@ -58,7 +58,7 @@ const bodySchema = z.object({
 })
 
 function buildSystemPrompt(dashboardContext?: string): string {
-  let prompt = `You are the AI analyst embedded in Arthaive, an Indian startup funding intelligence platform tracking roughly 13,700 funding deals from 2015 to 2026. Each deal records: company, amount (in USD and INR), stage, sectors, investors, lead investor, date, and location (city).
+  let prompt = `You are the AI analyst embedded in Arthaive, an Indian startup funding intelligence platform tracking roughly 14,700 funding deals from 2005 to 2026. Each deal records: company, amount (in USD and INR), stage, sectors, investors, lead investor, date, and location (city).
 
 Rules:
 - ALWAYS answer factual or numeric questions about deals by calling the query_deals or aggregate_deals tools. NEVER guess, estimate, or invent figures from memory.

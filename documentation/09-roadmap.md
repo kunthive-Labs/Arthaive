@@ -25,7 +25,7 @@ Phase 9 — Production polish & launch      in progress
 
 ### Frontend Foundation
 
-The app is a Next.js 16 App Router project with a generated 13,700+ deal static fixture. Public/static data views can build without Supabase configuration; auth-gated user/admin areas require Supabase.
+The app is a Next.js 16 App Router project with a generated 14,700+ deal static fixture. Public/static data views can build without Supabase configuration; auth-gated user/admin areas require Supabase.
 
 ### Supabase Live Database
 
