@@ -31,7 +31,7 @@ export interface DashboardWidget {
   config: WidgetConfig
 }
 
-// A single react-grid-layout item (we persist the lg breakpoint layout).
+// A single react-grid-layout item.
 export interface GridLayoutItem {
   i: string
   x: number
@@ -42,11 +42,20 @@ export interface GridLayoutItem {
   minH?: number
 }
 
+// The responsive breakpoints we render (mirrors the builder's breakpoint map).
+export type DashboardBreakpoint = "lg" | "md" | "sm" | "xs" | "xxs"
+
+// Per-breakpoint layouts as reported by react-grid-layout's Responsive grid.
+// Breakpoints the user never visited may be absent — RGL derives them from the
+// closest defined breakpoint. Legacy rows stored a bare array (lg only); the
+// data layer normalizes those to `{ lg: array }` on read.
+export type DashboardLayouts = Partial<Record<DashboardBreakpoint, GridLayoutItem[]>>
+
 export interface Dashboard {
   id: string
   user_id: string
   name: string
-  layout: GridLayoutItem[]
+  layout: DashboardLayouts
   widgets: DashboardWidget[]
   is_default: boolean
   created_at: string
