@@ -62,7 +62,7 @@ npm install
 cp .env.example .env.local   # if you have one, otherwise create from scratch
 
 # 3. Run migrations in Supabase SQL editor (in order)
-# supabase/migrations/001_initial_schema.sql … 018_performance_indexes.sql
+# supabase/migrations/001_initial_schema.sql … 021_performance_indexes.sql
 
 # 4. Start dev server
 npm run dev

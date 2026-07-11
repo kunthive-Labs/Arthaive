@@ -20,6 +20,9 @@ export default async function CustomDashboardPage() {
     listDashboards(user.id),
   ])
 
+  // Open on the user's default dashboard, falling back to the first one.
+  const initialActiveId = (dashboards.find((d) => d.is_default) ?? dashboards[0])?.id ?? null
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#F6F5F1]">
       <Header />
@@ -40,6 +43,7 @@ export default async function CustomDashboardPage() {
         <DashboardBuilder
           initialDeals={deals as unknown as FundingDeal[]}
           initialDashboards={dashboards}
+          initialActiveId={initialActiveId}
         />
       </div>
     </div>
