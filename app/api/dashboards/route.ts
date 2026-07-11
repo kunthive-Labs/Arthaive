@@ -2,6 +2,9 @@ import { NextResponse } from "next/server"
 import { getUser } from "@/lib/supabase/session"
 import { listDashboards, createDashboard } from "@/lib/supabase/dashboards"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   const user = await getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
