@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
       type: "company",
       label: d.company,
       value: d.id,
-      count: 1,
+      sublabel: [d.sectors?.slice(0, 2).join(" · "), d.stage].filter(Boolean).join(" · "),
+      location: d.location,
     }))
 
   return NextResponse.json({ suggestions: results })
