@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { getUser } from "@/lib/supabase/session"
 import { fundingData } from "@/data/funding-data"
 import { formatInrLakhs } from "@/lib/format"
-import { SignInGate, type TickerDeal } from "@/components/auth/sign-in-gate"
+import { Landing, type TickerDeal } from "@/components/landing"
 
 export const metadata = {
   title: "Arthaive — The Indian Startup Funding Ledger",
@@ -34,7 +34,7 @@ export default async function Home({
     }))
 
   return (
-    <SignInGate
+    <Landing
       tickerDeals={tickerDeals}
       dealCount={fundingData.length}
       authError={params.error === "auth"}
