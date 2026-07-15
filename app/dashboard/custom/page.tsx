@@ -13,7 +13,7 @@ export const metadata = {
 
 export default async function CustomDashboardPage() {
   const user = await getUser()
-  if (!user) redirect("/")
+  if (!user) redirect("/login")
 
   const [{ deals }, dashboards] = await Promise.all([
     getDeals({ limit: 9999, sortBy: "date" }),
