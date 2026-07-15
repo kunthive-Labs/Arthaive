@@ -1,8 +1,8 @@
 "use client"
 
 import { useMemo } from "react"
-import { fundingData } from "@/data/funding-data"
 import { isFundingDisclosed } from "@/lib/utils"
+import type { Deal } from "@/lib/types"
 import {
   BarChart,
   Bar,
@@ -19,7 +19,7 @@ import {
   Legend,
 } from "recharts"
 
-export function AnalyticsDashboard() {
+export function AnalyticsDashboard({ deals }: { deals: Deal[] }) {
   const [
     fundingByMonth,
     fundingBySector,
@@ -35,11 +35,11 @@ export function AnalyticsDashboard() {
     topDeals,
   ] = useMemo(() => {
     // Filter only disclosed amounts for monetary calculations
-    const disclosedDeals = fundingData.filter((d) => isFundingDisclosed(d.amount))
+    const disclosedDeals = deals.filter((d) => isFundingDisclosed(d.amount))
 
     // Funding over time (only disclosed amounts)
     const monthMap = new Map<string, { amount: number; count: number; totalCount: number }>()
-    fundingData.forEach((d) => {
+    deals.forEach((d) => {
       const month = new Date(d.date).toLocaleString("default", { month: "short", year: "2-digit" })
       const current = monthMap.get(month) || { amount: 0, count: 0, totalCount: 0 }
       monthMap.set(month, {
@@ -66,7 +66,7 @@ export function AnalyticsDashboard() {
 
     // By sector (only disclosed amounts)
     const sectorMap = new Map<string, { count: number; amount: number; totalDeals: number }>()
-    fundingData.forEach((d) => {
+    deals.forEach((d) => {
       d.sectors.forEach((sector) => {
         const current = sectorMap.get(sector) || { count: 0, amount: 0, totalDeals: 0 }
         sectorMap.set(sector, {
@@ -88,7 +88,7 @@ export function AnalyticsDashboard() {
 
     // By stage (only disclosed amounts)
     const stageMap = new Map<string, { count: number; amount: number; totalDeals: number }>()
-    fundingData.forEach((d) => {
+    deals.forEach((d) => {
       const current = stageMap.get(d.stage) || { count: 0, amount: 0, totalDeals: 0 }
       stageMap.set(d.stage, {
         count: current.count + (isFundingDisclosed(d.amount) ? 1 : 0),
@@ -125,7 +125,7 @@ export function AnalyticsDashboard() {
 
     // Top investors (only disclosed amounts)
     const investorMap = new Map<string, { count: number; amount: number; totalDeals: number }>()
-    fundingData.forEach((d) => {
+    deals.forEach((d) => {
       d.investors.forEach((inv) => {
         const current = investorMap.get(inv) || { count: 0, amount: 0, totalDeals: 0 }
         investorMap.set(inv, {
@@ -147,9 +147,9 @@ export function AnalyticsDashboard() {
 
     // Deal count summary
     const counts = {
-      total: fundingData.length,
+      total: deals.length,
       disclosed: disclosedDeals.length,
-      undisclosed: fundingData.length - disclosedDeals.length,
+      undisclosed: deals.length - disclosedDeals.length,
     }
 
     // Year-over-Year Analysis
@@ -283,7 +283,7 @@ export function AnalyticsDashboard() {
       velocityData,
       topDeals,
     ]
-  }, [])
+  }, [deals])
 
   const colors = ["#1A5D1A", "#FF5A1F", "#0C3A12", "#4ABD4A", "#FFB100", "#1F8A3B", "#7AED7A", "#9CA38F"]
   const stageTotal = fundingByStage.reduce((s, d) => s + d.amount, 0)
