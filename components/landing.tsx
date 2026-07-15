@@ -1,5 +1,14 @@
 import Link from "next/link"
-import { ArrowRight, Bell, Bookmark, ChartNoAxesCombined, Search } from "lucide-react"
+import {
+  ArrowRight,
+  Bell,
+  Bookmark,
+  ChartNoAxesCombined,
+  FileText,
+  Layers,
+  Search,
+  Sparkles,
+} from "lucide-react"
 import { SignInButton } from "@/components/auth/sign-in-button"
 
 // One ticker line: company + the round it raised, set in mono like a tape.
@@ -9,37 +18,49 @@ export interface TickerDeal {
   stage: string
 }
 
-interface SignInGateProps {
+interface LandingProps {
   tickerDeals: TickerDeal[]
   dealCount: number
   authError?: boolean
 }
 
-// The gate is the public face of an otherwise fully-private product: a members'
-// broadsheet whose front page you can read, but whose ledger is sealed until you
-// sign in. Server-rendered — the only client island is <SignInButton>.
-export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProps) {
+// The public face of the ledger: a members'-broadsheet front page anyone can
+// read. Browsing is open — no account required — so the primary action is to
+// start exploring; signing in is the secondary path that unlocks saving.
+// Server-rendered; the only client island is <SignInButton>.
+export function Landing({ tickerDeals, dealCount, authError }: LandingProps) {
   const count = dealCount.toLocaleString("en-IN")
-  const accessItems = [
+
+  // What you can do — every card links straight into the live product, so the
+  // landing is a launcher, not a wall.
+  const exploreItems = [
     {
       icon: Search,
-      title: "Search the full ledger",
-      body: `${count} verified funding rounds with source-backed company, investor, stage, date, and sector records.`,
+      title: "Explore the full ledger",
+      body: `${count} verified rounds — filter by sector, stage, city, amount and date across two decades.`,
+      href: "/explore",
+      cta: "Open Explore",
     },
     {
       icon: ChartNoAxesCombined,
-      title: "Analyze market movement",
-      body: "Compare sectors, cities, stages, investors, and funding velocity from 2005 through today.",
+      title: "Analyze the market",
+      body: "Sector breakdowns, stage funnels, investor leaderboards and an India funding map.",
+      href: "/analytics",
+      cta: "See Analytics",
     },
     {
-      icon: Bookmark,
-      title: "Save your research",
-      body: "Bookmark rounds, keep private notes, and build watchlists around companies or investment themes.",
+      icon: Layers,
+      title: "Go sector by sector",
+      body: "Per-sector funding timelines, top deals and the investors most active in each vertical.",
+      href: "/sectors",
+      cta: "Browse sectors",
     },
     {
-      icon: Bell,
-      title: "Track new activity",
-      body: "Create alerts for sectors, investors, stages, and companies so relevant updates do not get missed.",
+      icon: FileText,
+      title: "Read the reports",
+      body: "Weekly and monthly funding recaps generated from source-backed records.",
+      href: "/reports",
+      cta: "Read reports",
     },
   ]
 
@@ -59,13 +80,21 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           <span className="hidden text-center text-[11px] font-bold uppercase tracking-[0.25em] text-gray-500 md:block">
             The Indian Startup Funding Ledger
           </span>
-          <Link
-            href="/about"
-            className="hidden items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-green-700 transition hover:text-green-900 sm:inline-flex"
-          >
-            Methodology
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/explore"
+              className="hidden items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-green-700 transition hover:text-green-900 sm:inline-flex"
+            >
+              Explore
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link
+              href="/about"
+              className="hidden items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 transition hover:text-gray-900 sm:inline-flex"
+            >
+              Methodology
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -106,7 +135,7 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           <div className="lg:col-span-3">
             <p className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.25em] text-green-700">
               <span className="inline-block h-2.5 w-2.5 bg-[#FF5A1F]" aria-hidden />
-              Members only
+              Free &amp; open · no account needed to browse
             </p>
             <h1 className="mt-5 max-w-3xl text-[clamp(3rem,14vw,4.5rem)] font-bold leading-[0.95] tracking-tight md:text-7xl">
               Every rupee.
@@ -117,12 +146,31 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-gray-700 md:text-lg">
               Arthaive is the continuously-maintained ledger of Indian startup
-              funding, built for founders, analysts, investors, and operators who
-              need sourced funding intelligence without spreadsheet drift.
+              funding, built for founders, analysts, investors, students, and the
+              plain curious. Browse it all for free — filter, chart, and dig into
+              every deal, no sign-up required.
             </p>
 
+            {/* Primary path: start exploring. Signing in is secondary (right card). */}
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/explore"
+                className="inline-flex items-center justify-center gap-2 neo-border neo-shadow bg-green-700 px-6 py-4 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-green-800"
+              >
+                Explore the ledger
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/analytics"
+                className="inline-flex items-center justify-center gap-2 neo-border bg-white px-6 py-4 text-sm font-bold uppercase tracking-wide transition hover:bg-green-50"
+              >
+                <ChartNoAxesCombined className="h-4 w-4" />
+                View analytics
+              </Link>
+            </div>
+
             {/* The signature: the count of the record, set like a ledger total */}
-            <div className="mt-8 w-full max-w-sm neo-border neo-shadow bg-white px-5 py-5 sm:inline-block sm:w-auto sm:px-6">
+            <div className="mt-10 w-full max-w-sm neo-border neo-shadow bg-white px-5 py-5 sm:inline-block sm:w-auto sm:px-6">
               <div className="ledger-figure text-[clamp(3rem,17vw,4.5rem)] font-bold leading-none text-green-700 md:text-7xl">
                 {count}
               </div>
@@ -135,7 +183,7 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
             <dl className="mt-8 grid max-w-2xl grid-cols-1 border-y-2 border-black sm:grid-cols-3 sm:border-t-2">
               {[
                 ["8,000+", "Investors tracked"],
-                ["2005-26", "Continuous coverage"],
+                ["2005–26", "Continuous coverage"],
                 ["12+", "Sectors"],
               ].map(([n, label]) => (
                 <div
@@ -151,24 +199,25 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
             </dl>
           </div>
 
-          {/* Member-access credential card */}
+          {/* Free-account card — the secondary, save-your-research path */}
           <div className="lg:col-span-2">
             <div className="neo-border neo-shadow bg-white">
               <div className="flex items-center justify-between border-b-4 border-black bg-green-700 px-5 py-3">
                 <span className="text-xs font-bold uppercase tracking-[0.25em] text-white">
-                  Member Access
+                  Free account
                 </span>
                 <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-green-200">
-                  No. 001
+                  Optional
                 </span>
               </div>
 
               <div className="p-5 md:p-7">
                 <p className="text-lg font-bold leading-relaxed text-gray-950">
-                  Open the funding ledger.
+                  Make it your research desk.
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  One account, signed in with Google. No passwords to manage.
+                  Everything above is free to browse. Sign in — one tap with
+                  Google, no passwords — to save what you find.
                 </p>
 
                 {authError && (
@@ -181,20 +230,17 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
                   <SignInButton />
                 </div>
 
-                {/* What membership opens */}
+                {/* What an account adds */}
                 <ul className="mt-7 space-y-3 border-t-2 border-gray-200 pt-5">
                   {[
-                    `Search ${count} verified deals`,
-                    "Bookmark deals and build watchlists",
-                    "Private notes and tags on any round",
-                    "Alerts when matching deals land",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2.5 text-sm text-gray-700"
-                    >
-                      <span className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 bg-green-700" aria-hidden />
-                      <span>{item}</span>
+                    { icon: Bookmark, text: "Bookmark deals and build watchlists" },
+                    { icon: FileText, text: "Private notes and tags on any round" },
+                    { icon: Bell, text: "Alerts when matching deals land" },
+                    { icon: Sparkles, text: "Build your own custom dashboards" },
+                  ].map(({ icon: Icon, text }) => (
+                    <li key={text} className="flex items-start gap-2.5 text-sm text-gray-700">
+                      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-green-700" aria-hidden />
+                      <span>{text}</span>
                     </li>
                   ))}
                 </ul>
@@ -208,37 +254,57 @@ export function SignInGate({ tickerDeals, dealCount, authError }: SignInGateProp
           </div>
         </section>
 
+        {/* ── What you can do — launcher cards ───────────────────── */}
         <section className="border-y-4 border-black bg-white">
           <div className="mx-auto grid max-w-7xl grid-cols-1 divide-y-4 divide-black px-4 md:grid-cols-4 md:divide-x-4 md:divide-y-0 md:px-8">
-            {accessItems.map(({ icon: Icon, title, body }) => (
-              <article key={title} className="py-6 md:px-5 md:py-8 first:md:pl-0 last:md:pr-0">
+            {exploreItems.map(({ icon: Icon, title, body, href, cta }) => (
+              <Link
+                key={title}
+                href={href}
+                className="group flex flex-col py-6 transition hover:bg-green-50 md:px-5 md:py-8 md:first:pl-0 md:last:pr-0"
+              >
                 <div className="mb-4 inline-flex h-10 w-10 items-center justify-center border-2 border-black bg-[#EFEDE3]">
                   <Icon className="h-5 w-5 text-green-700" aria-hidden />
                 </div>
                 <h2 className="text-base font-bold tracking-tight">{title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">{body}</p>
-              </article>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-600">{body}</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-green-700">
+                  {cta}
+                  <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                </span>
+              </Link>
             ))}
           </div>
         </section>
 
+        {/* ── Closing strip ──────────────────────────────────────── */}
         <section className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-8">
           <div>
             <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-green-700">
-              Research-grade coverage
+              Ask it anything
             </p>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-gray-700 md:text-base">
-              Browse, filter, compare, export, and monitor the Indian startup
-              funding market from one structured source of truth.
+              Type a plain-English question — &ldquo;fintech Series A in Bangalore
+              in 2024&rdquo; — and get a source-backed answer, or open the raw data
+              and slice it yourself.
             </p>
           </div>
-          <Link
-            href="/about"
-            className="inline-flex w-full items-center justify-center gap-2 neo-border bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide transition hover:bg-green-50 sm:w-auto"
-          >
-            Read methodology
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/search"
+              className="inline-flex w-full items-center justify-center gap-2 neo-border bg-green-700 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-green-800 sm:w-auto"
+            >
+              <Sparkles className="h-4 w-4" />
+              Ask AI
+            </Link>
+            <Link
+              href="/about"
+              className="inline-flex w-full items-center justify-center gap-2 neo-border bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide transition hover:bg-green-50 sm:w-auto"
+            >
+              Read methodology
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </section>
       </main>
     </div>

@@ -3,16 +3,19 @@ import { NextResponse, type NextRequest } from "next/server"
 import type { Database } from "@/types/database.types"
 import { isConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./config"
 
-// Arthaive is gated: the deals, filters, analytics, search and everything else
-// are visible only after signing in. So this public list is deliberately tiny —
-// the sign-in gate itself, the auth handshake, and the SEO/social/PWA assets
-// that must resolve so the gate's own link unfurls and indexes. (Legal pages are
-// allowed separately in the root middleware.)
-function isPublicPath(pathname: string): boolean {
-  if (pathname === "/" || pathname === "/login") return true
-  if (pathname.startsWith("/_next/")) return true
-  if (pathname.startsWith("/auth")) return true
-  if (
+// Arthaive is public by default: the ledger, filters, analytics, search, and the
+// deal / investor / sector / report pages are all readable — and crawlable —
+// without an account, so visitors and search engines can reach the data. Only the
+// *personal* layer (things tied to a specific member) requires signing in. Keeping
+// this as a small deny-list rather than an allow-list means new public content
+// pages open automatically and can never be accidentally walled off.
+
+// Framework / auth / SEO assets that resolve before any session logic and never
+// need a user. Short-circuited first so static requests don't pay for auth.
+function isStaticOrAuthPath(pathname: string): boolean {
+  return (
+    pathname.startsWith("/_next/") ||
+    pathname.startsWith("/auth") ||
     pathname === "/robots.txt" ||
     pathname === "/sitemap.xml" ||
     pathname === "/manifest.webmanifest" ||
@@ -21,21 +24,45 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith("/icon") ||
     pathname.startsWith("/apple-icon") ||
     pathname.startsWith("/favicon")
-  ) {
-    return true
-  }
-  return false
+  )
 }
 
-// API routes that serve without a logged-in session: the auth handshake, the
-// key-authenticated public API (/api/v1, which gates itself by API key), and the
-// health probe. Every other API — including the deal/analytics data — requires a
-// session, so the gated UI's own data can't be scraped anonymously.
-function isOpenApi(pathname: string): boolean {
+// Pages that require a signed-in member. Everything else (the landing, explore,
+// analytics, deals, investors, sectors, reports, search, live, api-docs…) is
+// public. `/admin` is gated separately in the root proxy.
+function isGatedPage(pathname: string): boolean {
   return (
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/v1") ||
-    pathname.startsWith("/api/health")
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/") ||
+    pathname === "/profile" ||
+    pathname.startsWith("/profile/") ||
+    pathname === "/submit" ||
+    pathname.startsWith("/submit/")
+  )
+}
+
+// Personal / state-changing APIs that require a session. Read-only content APIs
+// (deals, analytics, sectors, stats, investors, search, reports, compare,
+// recommendations, export, weekly) stay open, as do the key-gated public
+// /api/v1, the auth handshake, and the health probe. `/api/admin` is gated in the
+// root proxy.
+const GATED_API_PREFIXES = [
+  "/api/bookmarks",
+  "/api/notes",
+  "/api/watchlist",
+  "/api/saved-searches",
+  "/api/alerts",
+  "/api/profile",
+  "/api/dashboards",
+  "/api/api-keys",
+  "/api/notify",
+  "/api/submit",
+  "/api/chat",
+]
+
+function isGatedApi(pathname: string): boolean {
+  return GATED_API_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
   )
 }
 
@@ -43,14 +70,23 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
   const { pathname } = request.nextUrl
 
+  // Static / framework / auth assets never need a session — straight through.
+  if (isStaticOrAuthPath(pathname)) return supabaseResponse
+
   if (!isConfigured) {
-    if (pathname.startsWith("/api") && !isOpenApi(pathname)) {
-      return NextResponse.json({ error: "Authentication is not configured" }, { status: 503 })
+    // No Supabase configured: personal/write APIs say so clearly; read-only
+    // content APIs still serve from the static fallback. Gated pages fall back to
+    // the login screen; public pages render normally.
+    if (pathname.startsWith("/api")) {
+      if (isGatedApi(pathname)) {
+        return NextResponse.json({ error: "Authentication is not configured" }, { status: 503 })
+      }
+      return supabaseResponse
     }
 
-    if (!isPublicPath(pathname)) {
+    if (isGatedPage(pathname)) {
       const url = request.nextUrl.clone()
-      url.pathname = "/"
+      url.pathname = "/login"
       return NextResponse.redirect(url)
     }
 
@@ -80,20 +116,20 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // API: respond with 401 JSON rather than an HTML redirect, so fetch() callers
-  // get a usable error instead of a redirect to the gate markup.
+  // API: personal/write endpoints require a session (401 JSON, not an HTML
+  // redirect, so fetch() callers get a usable error). Read-only APIs stay open.
   if (pathname.startsWith("/api")) {
-    if (!isOpenApi(pathname) && !user) {
+    if (isGatedApi(pathname) && !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
     return supabaseResponse
   }
 
-  // Everything that isn't explicitly public requires a session: unauthenticated
-  // visitors are sent to the sign-in gate at "/".
-  if (!isPublicPath(pathname) && !user) {
+  // Personal pages require a session; unauthenticated visitors go to /login.
+  // Public content pages render for everyone.
+  if (isGatedPage(pathname) && !user) {
     const url = request.nextUrl.clone()
-    url.pathname = "/"
+    url.pathname = "/login"
     return NextResponse.redirect(url)
   }
 

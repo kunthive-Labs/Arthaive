@@ -15,7 +15,7 @@ export const metadata = { title: "Dashboard | Arthaive" }
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect("/")
+  if (!user) redirect("/login")
 
   const [bookmarks, watchlist, savedSearches, alerts] = await Promise.all([
     getBookmarks(user.id),

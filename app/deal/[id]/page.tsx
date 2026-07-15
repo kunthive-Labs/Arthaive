@@ -1,38 +1,62 @@
-"use client"
-
+import type { Metadata } from "next"
+import { notFound } from "next/navigation"
 import { Header } from "@/components/header"
 import { DealDetail } from "@/components/deal-detail"
-import { fundingData } from "@/data/funding-data"
-import { useParams } from "next/navigation"
-import { formatCurrency } from "@/lib/format"
+import { getDealById } from "@/lib/db/deals"
+import { formatInrLakhs } from "@/lib/format"
+import type { Deal } from "@/lib/types"
 
-export default function DealPage() {
-  const params = useParams()
-  const raw = Array.isArray(params?.id) ? params.id[0] : params?.id
-  const id = raw ? decodeURIComponent(raw) : ""
-  const deal = fundingData.find((d) => d.id === id)
+// Deal pages are the bulk of the sitemap; render them on the server (indexable,
+// with per-deal metadata + OG) and cache with ISR rather than shipping the whole
+// dataset to the client.
+export const revalidate = 3600
 
-  if (!deal) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl font-bold mb-4">Deal Not Found</h1>
-          <p className="text-gray-600">The deal you&apos;re looking for doesn&apos;t exist.</p>
-        </div>
-      </div>
-    )
+interface DealPageProps {
+  params: Promise<{ id: string }>
+}
+
+// The one-line headline reused across the title, JSON-LD, and OG card so a shared
+// deal always reads identically wherever it surfaces.
+function dealHeadline(deal: Deal): string {
+  return deal.amount > 0
+    ? `${deal.company} raises ${formatInrLakhs(deal.amount)} · ${deal.stage}`
+    : `${deal.company} · ${deal.stage}`
+}
+
+export async function generateMetadata({ params }: DealPageProps): Promise<Metadata> {
+  const { id } = await params
+  const deal = await getDealById(decodeURIComponent(id))
+  if (!deal) return { title: "Deal not found | Arthaive" }
+
+  const title = dealHeadline(deal)
+  const sectors = deal.sectors.slice(0, 3).join(", ")
+  const description = deal.description?.trim()
+    ? deal.description
+    : `${deal.company}${sectors ? ` (${sectors})` : ""} raised ${
+        deal.amount > 0 ? formatInrLakhs(deal.amount) : "an undisclosed amount"
+      } at ${deal.stage}${deal.location ? ` in ${deal.location}` : ""}. A source-backed Indian startup funding record on Arthaive.`
+
+  return {
+    title: `${title} | Arthaive`,
+    description,
+    // The image is supplied by the sibling opengraph-image.tsx; leaving `images`
+    // unset here lets Next attach that dynamic card automatically.
+    openGraph: { title, description, type: "article" },
+    twitter: { card: "summary_large_image", title, description },
   }
+}
 
-  // Article-style JSON-LD for funding announcement pages. Google/Bing index this
-  // even from client components; pairing it with the existing deal copy lets us
-  // appear in funding-news rich snippets.
+export default async function DealPage({ params }: DealPageProps) {
+  const { id } = await params
+  const deal = await getDealById(decodeURIComponent(id))
+  if (!deal) notFound()
+
+  // Article-style JSON-LD for funding announcements — lets deal pages appear in
+  // funding-news rich snippets. Server-rendered so crawlers see it immediately.
   const ldJson = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: deal.amount > 0
-      ? `${deal.company} raises ${formatCurrency(deal.amount)} ${deal.stage}`
-      : `${deal.company} raises ${deal.stage}`,
+    headline: dealHeadline(deal),
     datePublished: deal.date,
     dateModified: deal.date,
     about: {
@@ -41,10 +65,7 @@ export default function DealPage() {
       industry: deal.sectors?.[0],
       location: deal.location,
     },
-    publisher: {
-      "@type": "Organization",
-      name: "Arthaive",
-    },
+    publisher: { "@type": "Organization", name: "Arthaive" },
     isBasedOn: deal.sourceUrl || undefined,
   }
 

@@ -178,7 +178,7 @@ export function AnalyticsClient({ deals, coverage }: AnalyticsClientProps) {
             </Section>
 
             <Divider label="Detailed Breakdown" />
-            <AnalyticsDashboard />
+            <AnalyticsDashboard deals={deals} />
           </TabsContent>
 
           <TabsContent value="deepdive" className="space-y-6">
