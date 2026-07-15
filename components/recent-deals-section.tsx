@@ -1,11 +1,12 @@
-"use client"
-
 import Link from "next/link"
-import { fundingData } from "@/data/funding-data"
+import { getDeals } from "@/lib/db/deals"
 import { DealCard } from "./deal-card"
 
-export function RecentDealsSection() {
-  const recentDeals = fundingData.slice(0, 6)
+// Server component: fetches the six most-recent rounds on the server instead of
+// importing the whole dataset into the client. (It used to `fundingData.slice(0, 6)`,
+// which shipped the 7.9MB file to the browser just to show six cards.)
+export async function RecentDealsSection() {
+  const { deals } = await getDeals({ limit: 6, sortBy: "date" })
 
   return (
     <section className="mb-16">
@@ -17,7 +18,7 @@ export function RecentDealsSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {recentDeals.map((deal) => (
+        {deals.map((deal) => (
           <DealCard key={deal.id} deal={deal} />
         ))}
       </div>
