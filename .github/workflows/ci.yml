@@ -31,3 +31,9 @@ jobs:
 
       - name: Test
         run: npm test
+
+      # Run the real production build so app-router codegen, metadata, and the
+      # prebuild data-generation step are exercised in CI — not only on Vercel.
+      # A failed deploy should never be the first signal of breakage.
+      - name: Build
+        run: npm run build
