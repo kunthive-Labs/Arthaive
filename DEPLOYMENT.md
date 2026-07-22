@@ -47,6 +47,8 @@ Variables and secrets**. Configure runtime secrets with Wrangler, for example:
 
 ```bash
 npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_URL
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_ANON_KEY
 npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 npx wrangler secret put DATABASE_URL
 npx wrangler secret put BETTER_AUTH_SECRET
@@ -55,7 +57,13 @@ npx wrangler secret put GOOGLE_CLIENT_SECRET
 ```
 
 Set `BETTER_AUTH_URL` as a non-secret runtime variable to the canonical HTTPS
-origin of the deployment (for example, `https://arthaive.example.com`).
+origin of the deployment. The checked-in production configuration uses
+`https://arthaive.kunthive.in`.
+
+`wrangler.jsonc` declares the seven secrets required for the core application.
+Wrangler warns during local builds when they are absent and validates them for
+deployment. `ANTHROPIC_API_KEY`, Upstash, and Sentry remain optional: their
+features degrade gracefully when those values are not configured.
 
 Public `NEXT_PUBLIC_*` values are embedded during the Next.js build and must be
 available to the build. Do not put secret values in `wrangler.jsonc` or commit a
@@ -84,9 +92,22 @@ Or upload an immutable Worker version for a later/gradual rollout:
 npm run upload
 ```
 
-The Worker name and runtime settings live in `wrangler.jsonc`. Add custom
-domains, routes, and Cloudflare resource bindings there so the file remains the
+The Worker name, required secrets, runtime settings, and the
+`arthaive.kunthive.in` Custom Domain live in `wrangler.jsonc`. Cloudflare creates
+the Custom Domain DNS record and certificate during the first successful
+deployment. Keep routes and resource bindings in that file so it remains the
 deployment source of truth.
+
+For a first deployment, when the Worker does not exist yet, provide the complete
+secret set alongside the code using a local, ignored `.env.production` file:
+
+```bash
+npm run build:cloudflare
+npx wrangler deploy --secrets-file .env.production
+```
+
+Never commit `.env.production`. Later secret changes can use the interactive
+`wrangler secret put NAME` command.
 
 ## Cloudflare dashboard builds
 
@@ -98,6 +119,16 @@ When connecting the repository to Workers Builds, use:
 
 Add every variable required by `next build` to the dashboard's build variables.
 Runtime-only secrets should remain Worker secrets.
+
+## Funding pipeline secrets
+
+The scheduled GitHub Actions pipeline requires these repository secrets:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+`ANTHROPIC_API_KEY` is optional. When it is absent, the workflow explicitly
+runs the rule-based extractor with `--no-ai` instead of failing after discovery.
 
 ## Caching
 
