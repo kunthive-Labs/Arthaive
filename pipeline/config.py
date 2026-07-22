@@ -164,7 +164,7 @@ HTTP_TIMEOUT_SECONDS = 20
 # us before reaching for a block. Overridable via env for ops/testing.
 HTTP_USER_AGENT = os.environ.get(
     "PIPELINE_USER_AGENT",
-    "ArthaiveBot/1.0 (+https://arthive.kunthive.in; 8harath.k@gmail.com)",
+    "ArthaiveBot/1.0 (+https://arthaive.kunthive.in; 8harath.k@gmail.com)",
 )
 
 # --- Crawler politeness ------------------------------------------------------
