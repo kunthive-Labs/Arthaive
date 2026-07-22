@@ -50,9 +50,11 @@ There is **no bug bounty** and no monetary reward — just our thanks.
 
 ## Scope
 
-Arthaive is a Next.js 16 (App Router, TypeScript) app on Vercel, backed by
-Supabase (PostgreSQL + Supabase Auth via Google OAuth), exposing a public REST
-API v1 with user-registerable API keys and rate limits.
+Arthaive is a Next.js 16 (App Router, TypeScript) application deployed as a
+Cloudflare Worker through OpenNext. Supabase provides PostgreSQL, Realtime,
+Storage, and the Data API; Better Auth owns application sessions and Google
+OAuth. The application exposes a public REST API v1 with user-registerable API
+keys and rate limits.
 
 **In scope** (examples):
 
