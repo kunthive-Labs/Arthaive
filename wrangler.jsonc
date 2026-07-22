@@ -4,6 +4,31 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-07-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [
+    {
+      "pattern": "arthaive.kunthive.in",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "BETTER_AUTH_URL": "https://arthaive.kunthive.in",
+    "NEXT_PUBLIC_APP_URL": "https://arthaive.kunthive.in",
+    "NEXT_PUBLIC_BASE_URL": "https://arthaive.kunthive.in",
+    "NEXT_PUBLIC_APP_VERSION": "0.1.0"
+  },
+  "secrets": {
+    "required": [
+      "DATABASE_URL",
+      "BETTER_AUTH_SECRET",
+      "GOOGLE_CLIENT_ID",
+      "GOOGLE_CLIENT_SECRET",
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "SUPABASE_SERVICE_ROLE_KEY"
+    ]
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
