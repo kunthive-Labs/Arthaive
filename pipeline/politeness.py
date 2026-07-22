@@ -20,8 +20,11 @@ import time
 from urllib.parse import urlsplit
 from urllib.robotparser import RobotFileParser
 
+import httpx
+
 from pipeline.config import (
     CRAWL_DELAY_SECONDS,
+    HTTP_TIMEOUT_SECONDS,
     HTTP_USER_AGENT,
     RESPECT_ROBOTS,
     ROBOTS_CACHE_TTL_SECONDS,
@@ -49,10 +52,25 @@ def _load_robots(url: str) -> RobotFileParser | None:
     """Fetch + parse robots.txt for the URL's host. Returns None on any failure
     (caller treats None as 'allowed')."""
     rp = RobotFileParser()
-    rp.set_url(_robots_url(url))
+    robots_url = _robots_url(url)
+    rp.set_url(robots_url)
     try:
-        rp.read()
-    except Exception as exc:  # network error, timeout, malformed content
+        response = httpx.get(
+            robots_url,
+            headers={"User-Agent": HTTP_USER_AGENT},
+            timeout=HTTP_TIMEOUT_SECONDS,
+            follow_redirects=True,
+        )
+        if response.status_code in (401, 403):
+            # A deliberate access denial is not a transient fetch failure.
+            rp.disallow_all = True
+            return rp
+        if response.status_code in (404, 410):
+            rp.allow_all = True
+            return rp
+        response.raise_for_status()
+        rp.parse(response.text.splitlines())
+    except (httpx.HTTPError, ValueError) as exc:  # network error or malformed response
         print(
             f"[politeness] could not read robots.txt for {_host_of(url)}: {exc!r} (failing open)",
             file=sys.stderr,
