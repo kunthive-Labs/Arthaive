@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+import { getAuthUser } from "@/lib/auth/server"
 import { getProfile } from "@/lib/supabase/user"
 import { getWatchlist, getBookmarks, getSavedSearches, getAlerts } from "@/lib/supabase/profile"
 
@@ -7,8 +7,7 @@ export const dynamic = "force-dynamic"
 export const metadata = { title: "Profile | Arthaive" }
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthUser()
   if (!user) redirect("/login")
 
   const [profile, watchlist, bookmarks, savedSearches, alerts] = await Promise.all([

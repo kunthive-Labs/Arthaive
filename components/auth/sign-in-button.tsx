@@ -2,22 +2,20 @@
 
 import { useState } from "react"
 import { track } from "@vercel/analytics"
-import { createClient } from "@/lib/supabase/client"
+import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 
-export function SignInButton() {
+export function SignInButton({ callbackURL = "/dashboard" }: { callbackURL?: string }) {
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
 
   async function handleSignIn() {
     setLoading(true)
     track("sign_in_started", { provider: "google" })
-    await supabase.auth.signInWithOAuth({
+    const { error } = await authClient.signIn.social({
       provider: "google",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
+      callbackURL,
     })
+    if (error) setLoading(false)
   }
 
   return (

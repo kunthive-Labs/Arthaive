@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+import { getAuthUser } from "@/lib/auth/server"
 import { getProfile } from "@/lib/supabase/user"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Edit Profile | Arthaive" }
 
 export default async function EditProfilePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthUser()
   if (!user) redirect("/login")
 
   const profile = await getProfile(user.id)

@@ -15,7 +15,7 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { consumeAsync, RATE_TIERS } from "@/lib/rate-limit"
 import {
   DEFAULT_GROQ_MODEL,

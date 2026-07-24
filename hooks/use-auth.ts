@@ -1,28 +1,13 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import type { User } from "@supabase/supabase-js"
+import { authClient } from "@/lib/auth-client"
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const supabase = useMemo(() => createClient(), [])
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      setLoading(false)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null)
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [supabase])
-
-  return { user, loading }
+  const { data, isPending, error, refetch } = authClient.useSession()
+  return {
+    user: data?.user ?? null,
+    loading: isPending,
+    error,
+    refetch,
+  }
 }

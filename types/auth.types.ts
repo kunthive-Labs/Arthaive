@@ -1,6 +1,7 @@
-import type { User, Session } from "@supabase/supabase-js"
+import type { AuthSession, AuthUser } from "@/lib/auth"
 
-export type { User, Session }
+export type User = AuthUser
+export type Session = AuthSession["session"]
 
 export interface AuthState {
   user: User | null

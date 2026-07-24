@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getReport } from "@/lib/db/reports"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { consume } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"

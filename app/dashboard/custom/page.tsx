@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { Header } from "@/components/header"
 import { DashboardBuilder } from "@/components/dashboard-builder/dashboard-builder"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { listDashboards } from "@/lib/supabase/dashboards"
 import { getDeals } from "@/lib/db/deals"
 import type { FundingDeal } from "@/data/funding-data"

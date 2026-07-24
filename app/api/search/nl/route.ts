@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { naturalLanguageSearch } from "@/lib/ai/nl-search"
 import { consume } from "@/lib/rate-limit"
 import { isBudgetExceededError } from "@/lib/ai/budget"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
