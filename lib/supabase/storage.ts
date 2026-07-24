@@ -1,9 +1,9 @@
-import { createClient } from "./server"
+import { createPrivilegedClient } from "./privileged"
 
 const BUCKET = "avatars"
 
 export async function uploadAvatar(userId: string, file: File): Promise<string> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const ext = file.name.split(".").pop()
   const path = `${userId}/avatar.${ext}`
 
@@ -19,7 +19,7 @@ export async function uploadAvatar(userId: string, file: File): Promise<string> 
 
 
 export async function getAvatarUrl(userId: string): Promise<string | null> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const extensions = ["jpg", "png", "webp"]
   for (const ext of extensions) {
     const { data } = supabase.storage.from("avatars").getPublicUrl(`${userId}/avatar.${ext}`)

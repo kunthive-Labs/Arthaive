@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import { Badge } from "@/components/ui/badge"
 
 export const dynamic = "force-dynamic"
@@ -17,7 +17,7 @@ function RunStatusBadge({ status }: { status: string }) {
 }
 
 export default async function PipelineLogsPage() {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const { data: jobs } = await supabase
     .from("pipeline_jobs")

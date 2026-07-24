@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,7 @@ export default async function ReviewItemPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const { data: item } = await supabase
     .from("review_queue")

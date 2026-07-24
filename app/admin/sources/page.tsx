@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { AddSourceForm } from "./add-source-form"
@@ -29,7 +29,7 @@ export default async function SourcesPage({
   searchParams: Promise<{ tier?: string }>
 }) {
   const { tier } = await searchParams
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   let query = supabase
     .from("sources")

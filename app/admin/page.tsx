@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -23,7 +23,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const [
     { count: pendingCount },

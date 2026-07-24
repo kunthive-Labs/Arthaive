@@ -1,5 +1,6 @@
-import { createClient } from "@/lib/supabase/server"
-import { isAdmin } from "@/lib/supabase/admin"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
+import { isAdmin } from "@/lib/auth/admin"
+import { getAuthUser } from "@/lib/auth/server"
 import { NextRequest, NextResponse } from "next/server"
 
 interface ReviewBody {
@@ -35,12 +36,10 @@ export async function POST(
     return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   // Get reviewer email
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getAuthUser()
   const reviewerEmail = user?.email ?? "unknown"
 
   if (action === "approve" && fields) {

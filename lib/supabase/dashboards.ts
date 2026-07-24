@@ -1,4 +1,4 @@
-import { createClient } from "./server"
+import { createPrivilegedClient } from "./privileged"
 import type { Database, Json } from "@/types/database.types"
 import type { Dashboard, DashboardLayouts, DashboardWidget, GridLayoutItem } from "@/lib/dashboard/types"
 
@@ -37,7 +37,7 @@ function hydrate(row: {
 // A user has at most one default dashboard: clear the flag on every other row
 // before setting it. Two queries, but this is a low-frequency operation.
 async function clearOtherDefaults(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createPrivilegedClient>,
   userId: string,
   exceptId?: string
 ) {
@@ -47,7 +47,7 @@ async function clearOtherDefaults(
 }
 
 export async function listDashboards(userId: string): Promise<Dashboard[]> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("dashboards")
     .select("*")
@@ -57,7 +57,7 @@ export async function listDashboards(userId: string): Promise<Dashboard[]> {
 }
 
 export async function getDashboard(userId: string, id: string): Promise<Dashboard | null> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("dashboards")
     .select("*")
@@ -72,7 +72,7 @@ export async function createDashboard(
   name: string,
   opts: { layout?: DashboardLayouts; widgets?: DashboardWidget[]; isDefault?: boolean } = {}
 ): Promise<{ data: Dashboard | null; error: string | null }> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   if (opts.isDefault) await clearOtherDefaults(supabase, userId)
   const { data, error } = await supabase
     .from("dashboards")
@@ -93,7 +93,7 @@ export async function updateDashboard(
   id: string,
   patch: { name?: string; layout?: DashboardLayouts; widgets?: DashboardWidget[]; isDefault?: boolean }
 ): Promise<{ data: Dashboard | null; error: string | null }> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   if (patch.isDefault) await clearOtherDefaults(supabase, userId, id)
   const update: Database["public"]["Tables"]["dashboards"]["Update"] = {
     updated_at: new Date().toISOString(),
@@ -114,6 +114,6 @@ export async function updateDashboard(
 }
 
 export async function deleteDashboard(userId: string, id: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase.from("dashboards").delete().eq("user_id", userId).eq("id", id)
 }

@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { isAdmin } from "@/lib/supabase/admin"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
+import { isAdmin } from "@/lib/auth/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "url is required" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const { data: source, error: sourceError } = await supabase
     .from("sources")
@@ -76,7 +76,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "id and reliability_tier are required" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const { error } = await supabase
     .from("sources")
