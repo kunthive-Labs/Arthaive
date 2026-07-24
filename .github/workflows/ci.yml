@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -32,8 +32,10 @@ jobs:
       - name: Test
         run: npm test
 
-      # Run the real production build so app-router codegen, metadata, and the
-      # prebuild data-generation step are exercised in CI — not only on Vercel.
-      # A failed deploy should never be the first signal of breakage.
-      - name: Build
-        run: npm run build
+      # Build the same OpenNext artifact that is deployed to Workers. This also
+      # invokes the regular Next.js build and the prebuild data-generation step.
+      - name: Build Cloudflare Worker
+        run: npm run build:cloudflare
+
+      - name: Validate Worker bundle
+        run: npx wrangler deploy --dry-run

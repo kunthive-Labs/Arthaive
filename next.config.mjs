@@ -1,7 +1,15 @@
 import { withSentryConfig } from "@sentry/nextjs"
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare"
+
+// Expose locally configured Worker bindings while using the regular Next.js
+// development server. Production builds are handled by OpenNext.
+initOpenNextCloudflareForDev()
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Keep the PostgreSQL driver packages intact so OpenNext copies their
+  // Cloudflare socket implementation into the Worker bundle.
+  serverExternalPackages: ["pg", "pg-cloudflare"],
   images: {
     unoptimized: true,
   },

@@ -9,6 +9,8 @@ const eslintConfig = [
     // Don't lint build output, deps, generated data, or vendored UI primitives.
     ignores: [
       ".next/**",
+      ".open-next/**",
+      ".wrangler/**",
       "node_modules/**",
       "out/**",
       "build/**",
