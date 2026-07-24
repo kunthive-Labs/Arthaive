@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { generateKey } from "@/lib/api/auth"
 import { rateLimit } from "@/lib/rate-limit"
 
@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
   const { raw, hash, prefix } = generateKey()
 
   const { error } = await supabaseAdmin.from("api_keys").insert({
+    user_id: user.id,
     key_hash: hash,
     key_prefix: prefix,
     label,
