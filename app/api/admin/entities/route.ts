@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { isAdmin } from "@/lib/supabase/admin"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
+import { isAdmin } from "@/lib/auth/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "canonical and alias are required" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   if (type === "startup") {
     const { data, error } = await supabase
@@ -72,7 +72,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "alias_id is required" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   if (type === "startup") {
     const { error } = await supabase

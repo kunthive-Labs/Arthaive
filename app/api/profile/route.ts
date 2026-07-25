@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { getProfile, upsertProfile } from "@/lib/supabase/user"
 import { profilePatchSchema } from "@/lib/validation"
 

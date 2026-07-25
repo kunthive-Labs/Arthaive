@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { isAdmin } from "@/lib/supabase/admin"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
+import { isAdmin } from "@/lib/auth/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 interface DealRow {
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "format must be csv or json" }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const { data: deals, error } = await supabase
     .from("deals")

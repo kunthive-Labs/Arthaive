@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
@@ -41,7 +41,7 @@ export default async function ReviewQueuePage({
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   const { data: items, count } = await supabase
     .from("review_queue")

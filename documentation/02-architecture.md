@@ -8,7 +8,7 @@
 │     app/, components/, lib/                                 │
 │     Pages: /, /explore, /analytics, /deal/[id],             │
 │            /investors, /sectors, /live, /admin, /submit     │
-│     Hosted on Vercel.                                       │
+│     Hosted on Cloudflare Workers through OpenNext.           │
 └─────────────────────────────────────────────────────────────┘
                           │
                           │   Server-side reads + auth
@@ -52,13 +52,13 @@ Next.js 16 with the App Router. Server components for SEO-friendly pages, client
 | `lib/` | Non-UI logic — Supabase client (`supabase.ts`), DB query helpers (`lib/db/*`), search, formatting, validation |
 | `data/funding-data.ts` | Generated static dataset (14,700+ deals). Still used as a fallback when Supabase is empty or not configured. |
 | `hooks/` | React hooks for filters, debouncing, bookmarks, etc. |
-| `proxy.ts` + `lib/supabase/middleware.ts` | Auth, rate-limit, CSRF, and route protection proxy |
+| `lib/auth*` | Better Auth server/client integration and protected-route session checks |
 
 **Key file to understand:** `lib/db/deals.ts`. It contains `getDeals(filters)` which tries Supabase first and falls back to `data/funding-data.ts` if Supabase is empty. This dual-source pattern is how we migrate gradually — the frontend works whether or not the live DB is populated.
 
 ## Layer 2 — Database
 
-Supabase is hosted Postgres + auth + realtime + storage. We use Postgres and auth heavily, realtime for the `/live` feed, storage not yet.
+Supabase provides hosted Postgres, realtime, and storage. Better Auth owns Google OAuth identities and sessions in the private `better_auth` schema; server routes use explicit owner filters for private data.
 
 | Tab | What it covers |
 |---|---|
@@ -124,7 +124,7 @@ AI support includes:
 
 | Component | Host |
 |---|---|
-| Frontend | Vercel (auto-deploy on push to `main`) |
+| Frontend | Cloudflare Workers through OpenNext |
 | Database | Supabase managed Postgres |
 | Pipeline | Currently runs locally / on demand. Production cron is Phase 3 wrap-up. |
 | AI | Anthropic API (cloud) |

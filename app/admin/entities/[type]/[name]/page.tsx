@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { AliasManager } from "./alias-manager"
@@ -17,7 +17,7 @@ export default async function EntityDetailPage({
   }
 
   const canonical = decodeURIComponent(name)
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   // Fetch aliases
   let aliases: Array<{ id: string; alias_name: string }> = []

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { supabaseAdmin } from "@/lib/supabase"
+import { getAuthUser } from "@/lib/auth/server"
 
 const submitSchema = z.object({
   company: z.string().min(2).max(200),
@@ -18,6 +19,11 @@ const submitSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await getAuthUser()
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const body = await req.json()
     const parsed = submitSchema.safeParse(body)
 
@@ -42,7 +48,7 @@ export async function POST(req: NextRequest) {
         city: data.city,
         deal_date: data.date,
         source_url: data.sourceUrl,
-        submitted_by: data.submittedBy || null,
+        submitted_by: user.email,
         status: "pending",
       })
 

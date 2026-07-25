@@ -20,6 +20,6 @@ Welcome. If you are new to the Arthaive (India's open startup funding intelligen
 - `PROJECT_REFERENCE.md` — the original product brief, the source of truth for the long-term vision.
 - `PHASES.md` — the detailed nine-phase implementation plan with exit criteria.
 - `README.md` — the repo's quick-start.
-- `DEPLOYMENT.md` — how Vercel hosting is wired.
+- `DEPLOYMENT.md` — how Cloudflare Workers/OpenNext hosting is wired.
 
 If anything in this folder contradicts `PROJECT_REFERENCE.md`, that doc wins — it is the spec. These pages are the explanation.

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
-import { getUser } from "@/lib/supabase/session"
+import { getAuthUser } from "@/lib/auth/server"
 import { getProfile } from "@/lib/supabase/user"
 
 export async function GET() {
-  const user = await getUser()
+  const user = await getAuthUser()
   if (!user) return NextResponse.json({ user: null, profile: null })
 
   const profile = await getProfile(user.id)

@@ -115,12 +115,14 @@ export default function PrivacyPage() {
           </p>
           <ul className="mt-3 list-disc space-y-2 pl-6">
             <li>
-              <strong>Supabase</strong> — our database and authentication backend.
-              Stores your account record and the activity data listed above.
+              <strong>Supabase</strong> — our PostgreSQL database and storage
+              backend. Stores your account record and the activity data listed above.
             </li>
             <li>
-              <strong>Vercel</strong> — application hosting and privacy-respecting
-              usage analytics.
+              <strong>Cloudflare</strong> — application hosting and edge delivery.
+            </li>
+            <li>
+              <strong>Vercel</strong> — privacy-respecting usage analytics.
             </li>
             <li>
               <strong>Google</strong> — identity provider for Sign-In (OAuth).

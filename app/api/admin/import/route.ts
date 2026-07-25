@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server"
-import { isAdmin } from "@/lib/supabase/admin"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
+import { isAdmin } from "@/lib/auth/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 const REQUIRED_COLUMNS = ["company"] as const
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   let queued = 0
   const errors: string[] = []
 

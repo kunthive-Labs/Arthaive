@@ -6,14 +6,12 @@ import { formatInrLakhs } from "@/lib/format"
 // company, amount, stage and sector on the brand's neo-brutalist template
 // instead of the generic site card — so every share advertises a real deal.
 //
-// Edge runtime (like the root OG card) — ImageResponse's renderer runs there.
 // The deal is fetched from the public /api/deals/[id] rather than importing the
-// 7.9MB dataset (which would bloat/oom the edge function). Any failure falls back
+// 7.9MB dataset (which would bloat/oom the Worker). Any failure falls back
 // to a branded card, so a shared link never yields a broken image.
 //
 // NOTE: satori (next/og) requires every <div> with >1 child to set an explicit
 // `display: flex`, so every container below sets it.
-export const runtime = "edge"
 export const alt = "Arthaive — Indian startup funding record"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"

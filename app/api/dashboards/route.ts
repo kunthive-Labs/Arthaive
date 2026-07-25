@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { listDashboards, createDashboard } from "@/lib/supabase/dashboards"
 
 export const runtime = "nodejs"

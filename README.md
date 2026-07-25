@@ -26,7 +26,7 @@
 - **Live feed** — real-time updates via Supabase Realtime
 - **Admin panel** — review queue, entity manager, source manager, pipeline logs, bulk CSV import, AI usage monitoring
 - **Public REST API v1** — versioned endpoints, API keys, rate limits, full docs at `/api-docs`
-- **User features** — bookmarks, watchlist, saved searches, deal alerts (auth via Supabase)
+- **User features** — bookmarks, watchlist, saved searches, deal alerts (auth via Better Auth)
 
 ---
 
@@ -38,19 +38,19 @@
 | Language | TypeScript |
 | Styling | Tailwind CSS + shadcn/ui |
 | Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth (SSR) |
+| Auth | Better Auth (Google OAuth, PostgreSQL sessions) |
 | Charts | Recharts |
 | AI | Anthropic Claude (Sonnet for prose, Haiku for parsing) |
 | Pipeline | Python (RSS discovery → rule-based + Claude extraction → entity resolution) |
 | Tests | Vitest |
-| Deployment | Vercel |
+| Deployment | Cloudflare Workers (OpenNext) |
 | Error tracking | Sentry-compatible shim (`lib/sentry.ts`) |
 
 ---
 
 ## Local Development
 
-**Prerequisites:** Node.js 18+, a Supabase project for auth/admin/user features, and an Anthropic API key for AI features. Without Supabase env vars, public/static data pages and API fallbacks still build from the generated fixture; auth-gated areas redirect or return an auth-not-configured response.
+**Prerequisites:** Node.js 22+, a Supabase project, Google OAuth credentials, and an Anthropic API key for AI features. Public/static data pages still build from the generated fixture when Supabase is unavailable.
 
 ```bash
 # 1. Clone and install
@@ -62,7 +62,7 @@ npm install
 cp .env.example .env.local   # if you have one, otherwise create from scratch
 
 # 3. Run migrations in Supabase SQL editor (in order)
-# supabase/migrations/001_initial_schema.sql … 021_performance_indexes.sql
+# supabase/migrations/001_initial_schema.sql … 023_cutover_to_better_auth.sql
 
 # 4. Start dev server
 npm run dev
@@ -73,10 +73,17 @@ Open [http://localhost:3000](http://localhost:3000).
 ### Environment variables
 
 ```env
-# Supabase (required for auth/admin/user features; public data has a static fallback)
+# Supabase database, storage, and realtime
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# Better Auth and Google OAuth
+DATABASE_URL=
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 
 # Admin gate
 ADMIN_EMAILS=you@example.com,colleague@example.com
@@ -169,11 +176,13 @@ The API tests in `tests/api/v1.test.ts` call route handlers directly, without sp
 
 ```bash
 npx tsc --noEmit   # zero TypeScript errors
-npm run build      # clean build
+npm run deploy:dry-run # build and validate the Cloudflare Worker bundle
 npm test           # all green
 ```
 
-Then deploy to Vercel and submit `/sitemap.xml` to Google Search Console.
+Then run `npm run deploy` (or use Workers Builds) and submit `/sitemap.xml` to
+Google Search Console. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for environment,
+preview, and deployment details.
 
 ---
 

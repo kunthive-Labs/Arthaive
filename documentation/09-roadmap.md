@@ -25,7 +25,7 @@ Phase 9 — Production polish & launch      in progress
 
 ### Frontend Foundation
 
-The app is a Next.js 16 App Router project with a generated 14,700+ deal static fixture. Public/static data views can build without Supabase configuration; auth-gated user/admin areas require Supabase.
+The app is a Next.js 16 App Router project with a generated 14,700+ deal static fixture. Public/static data views can build without Supabase configuration; auth-gated user/admin areas use Better Auth.
 
 ### Supabase Live Database
 
@@ -33,7 +33,7 @@ Migrations cover deals, sources, review queue, aliases, pipeline jobs, API keys,
 
 ### Admin Interface
 
-`/admin` includes review, entity management, source management, pipeline status, import/export, and AI usage views. Route protection now runs through the Next.js `proxy.ts` convention.
+`/admin` includes review, entity management, source management, pipeline status, import/export, and AI usage views. Its layout and route handlers validate Better Auth sessions and the `ADMIN_EMAILS` allowlist.
 
 ### Pipeline
 
@@ -57,7 +57,7 @@ API v1 endpoints, API keys, rate-limit tiers, API docs, and direct route-handler
 
 ### Production Polish
 
-Recent hardening includes a clean lint baseline, Next 16 proxy migration, and a production build that works without Supabase env vars for public/static fallback paths. Ongoing work should focus on CI, monitoring, mobile filter UX, chart prerender warnings, and source coverage disclosure.
+Recent hardening includes a clean lint baseline, Better Auth migration, and an OpenNext Cloudflare Worker build. Ongoing work should focus on CI, monitoring, mobile filter UX, chart prerender warnings, and source coverage disclosure.
 
 ## Risks Worth Tracking
 

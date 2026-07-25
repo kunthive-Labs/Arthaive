@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { fundingData } from "@/data/funding-data"
 import { formatInrLakhs } from "@/lib/format"
 import { Landing, type TickerDeal } from "@/components/landing"

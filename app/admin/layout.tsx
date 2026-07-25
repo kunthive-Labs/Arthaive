@@ -1,5 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import { requireAdmin } from "@/lib/auth/admin"
 import Link from "next/link"
 import type React from "react"
 
@@ -21,23 +20,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect("/login")
-  }
-
-  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim())
-    .filter(Boolean)
-
-  if (!adminEmails.includes(user.email ?? "")) {
-    redirect("/")
-  }
+  const user = await requireAdmin()
 
   return (
     <div className="min-h-screen flex bg-gray-50">

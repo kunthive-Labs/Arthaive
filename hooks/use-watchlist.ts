@@ -1,22 +1,18 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { useEffect, useState, useCallback } from "react"
 import { useAuth } from "./use-auth"
 
 export function useWatchlist() {
   const { user } = useAuth()
   const [watchlist, setWatchlist] = useState<string[]>([])
-  const supabase = useMemo(() => createClient(), [])
-
   const load = useCallback(async () => {
     if (!user) return
-    const { data } = await supabase
-      .from("watchlist")
-      .select("company")
-      .eq("user_id", user.id)
-    setWatchlist(data?.map((r) => r.company) ?? [])
-  }, [user, supabase])
+    const response = await fetch("/api/watchlist")
+    if (!response.ok) return
+    const data = (await response.json()) as Array<{ company: string }>
+    setWatchlist(data.map((row) => row.company))
+  }, [user])
 
   useEffect(() => {
     void load()
@@ -24,15 +20,25 @@ export function useWatchlist() {
 
   const add = useCallback(async (company: string) => {
     if (!user) return
-    await supabase.from("watchlist").insert({ user_id: user.id, company })
+    const response = await fetch("/api/watchlist", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ company }),
+    })
+    if (!response.ok) return
     setWatchlist((prev) => [...prev, company])
-  }, [user, supabase])
+  }, [user])
 
   const remove = useCallback(async (company: string) => {
     if (!user) return
-    await supabase.from("watchlist").delete().eq("user_id", user.id).eq("company", company)
+    const response = await fetch("/api/watchlist", {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ company }),
+    })
+    if (!response.ok) return
     setWatchlist((prev) => prev.filter((c) => c !== company))
-  }, [user, supabase])
+  }, [user])
 
   const toggle = useCallback((company: string) => {
     if (watchlist.includes(company)) {

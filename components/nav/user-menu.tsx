@@ -1,11 +1,10 @@
-import { createClient } from "@/lib/supabase/server"
+import { getAuthUser } from "@/lib/auth/server"
 import { getProfile } from "@/lib/supabase/user"
 import { UserAvatar } from "@/components/auth/user-avatar"
 import { SignInButton } from "@/components/auth/sign-in-button"
 
 export async function UserMenu() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getAuthUser()
 
   if (!user) {
     return (
@@ -19,9 +18,9 @@ export async function UserMenu() {
 
   return (
     <UserAvatar
-      name={profile?.full_name ?? null}
-      email={profile?.email ?? user.email!}
-      avatarUrl={profile?.avatar_url ?? null}
+      name={profile?.full_name ?? user.name ?? null}
+      email={profile?.email ?? user.email}
+      avatarUrl={profile?.avatar_url ?? user.image ?? null}
     />
   )
 }

@@ -9,6 +9,12 @@ node_modules
 # Next.js
 /.next/
 /out/
+/.open-next/
+/.wrangler/
+
+# Cloudflare local secrets
+.dev.vars*
+!.dev.vars.example
 
 # Production
 /build

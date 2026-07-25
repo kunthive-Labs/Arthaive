@@ -1,8 +1,8 @@
-import { createBrowserClient } from "@supabase/ssr"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/database.types"
 import { isConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./config"
 
-type BrowserClient = ReturnType<typeof createBrowserClient<Database>>
+type BrowserClient = ReturnType<typeof createSupabaseClient<Database>>
 
 function missingConfigClient(): BrowserClient {
   return {
@@ -55,7 +55,7 @@ function missingConfigClient(): BrowserClient {
 export function createClient() {
   if (!isConfigured) return missingConfigClient()
 
-  return createBrowserClient<Database>(
+  return createSupabaseClient<Database>(
     SUPABASE_URL!,
     SUPABASE_ANON_KEY!
   )

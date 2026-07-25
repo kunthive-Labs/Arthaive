@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { getDeals } from "@/lib/db/deals"
 import { exportDealsCSV, exportDealsJSON } from "@/lib/export"
 import { exportQuerySchema, EXPORT_MAX_LIMIT } from "@/lib/validation"

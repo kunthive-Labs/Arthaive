@@ -1,10 +1,10 @@
-import { createClient } from "./server"
+import { createPrivilegedClient } from "./privileged"
 import type { Database } from "@/types/database.types"
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"]
 
 export async function getProfile(userId: string): Promise<Profile | null> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("profiles")
     .select("*")
@@ -19,7 +19,7 @@ export async function upsertProfile(
   fullName?: string | null,
   avatarUrl?: string | null
 ) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data, error } = await supabase
     .from("profiles")
     .upsert({
@@ -38,7 +38,7 @@ export async function upsertProfile(
 
 
 export async function getPublicProfile(userId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("profiles")
     .select("id, full_name, avatar_url")
@@ -49,6 +49,6 @@ export async function getPublicProfile(userId: string) {
 
 
 export async function deleteAccount(userId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   await supabase.from("profiles").delete().eq("id", userId)
 }

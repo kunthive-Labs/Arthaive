@@ -1,6 +1,0 @@
-export { createClient as createBrowserClient } from "./client"
-export { createClient as createServerClient } from "./server"
-export { updateSession } from "./middleware"
-export { getUser, getSession } from "./session"
-export { getProfile, upsertProfile } from "./user"
-export { isConfigured } from "./config"

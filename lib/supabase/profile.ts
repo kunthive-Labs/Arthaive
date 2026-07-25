@@ -1,4 +1,4 @@
-import { createClient } from "./server"
+import { createPrivilegedClient } from "./privileged"
 import type { Database } from "@/types/database.types"
 
 type Watchlist = Database["public"]["Tables"]["watchlist"]["Row"]
@@ -8,7 +8,7 @@ type Alert = Database["public"]["Tables"]["alerts"]["Row"]
 type DealNote = Database["public"]["Tables"]["deal_notes"]["Row"]
 
 export async function getWatchlist(userId: string): Promise<Watchlist[]> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("watchlist")
     .select("*")
@@ -18,12 +18,12 @@ export async function getWatchlist(userId: string): Promise<Watchlist[]> {
 }
 
 export async function addToWatchlist(userId: string, company: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase.from("watchlist").insert({ user_id: userId, company })
 }
 
 export async function removeFromWatchlist(userId: string, company: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase
     .from("watchlist")
     .delete()
@@ -32,7 +32,7 @@ export async function removeFromWatchlist(userId: string, company: string) {
 }
 
 export async function getBookmarks(userId: string): Promise<Bookmark[]> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("bookmarks")
     .select("*")
@@ -42,7 +42,7 @@ export async function getBookmarks(userId: string): Promise<Bookmark[]> {
 }
 
 export async function toggleBookmark(userId: string, dealId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data: existing } = await supabase
     .from("bookmarks")
     .select("id")
@@ -57,7 +57,7 @@ export async function toggleBookmark(userId: string, dealId: string) {
 }
 
 export async function getSavedSearches(userId: string): Promise<SavedSearch[]> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("saved_searches")
     .select("*")
@@ -67,12 +67,12 @@ export async function getSavedSearches(userId: string): Promise<SavedSearch[]> {
 }
 
 export async function saveSearch(userId: string, name: string, filters: Record<string, unknown>) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase.from("saved_searches").insert({ user_id: userId, name, filters: filters as import("@/types/database.types").Json })
 }
 
 export async function getAlerts(userId: string): Promise<Alert[]> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("alerts")
     .select("*")
@@ -85,7 +85,7 @@ export async function createAlert(
   userId: string,
   opts: { sector?: string; stage?: string; minAmount?: number }
 ) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase.from("alerts").insert({
     user_id: userId,
     sector: opts.sector ?? null,
@@ -95,7 +95,7 @@ export async function createAlert(
 }
 
 export async function toggleAlert(userId: string, alertId: string, active: boolean) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase
     .from("alerts")
     .update({ active })
@@ -104,7 +104,7 @@ export async function toggleAlert(userId: string, alertId: string, active: boole
 }
 
 export async function deleteAlert(userId: string, alertId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase
     .from("alerts")
     .delete()
@@ -114,7 +114,7 @@ export async function deleteAlert(userId: string, alertId: string) {
 
 
 export async function getBookmarkCount(userId: string): Promise<number> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { count } = await supabase
     .from("bookmarks")
     .select("*", { count: "exact", head: true })
@@ -124,7 +124,7 @@ export async function getBookmarkCount(userId: string): Promise<number> {
 
 
 export async function getWatchlistCount(userId: string): Promise<number> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { count } = await supabase
     .from("watchlist")
     .select("*", { count: "exact", head: true })
@@ -134,7 +134,7 @@ export async function getWatchlistCount(userId: string): Promise<number> {
 
 
 export async function deactivateAllAlerts(userId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase.from("alerts").update({ active: false }).eq("user_id", userId)
 }
 
@@ -155,7 +155,7 @@ export async function countAlertMatches(
 
 
 export async function getActiveAlerts(userId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("alerts")
     .select("*")
@@ -166,7 +166,7 @@ export async function getActiveAlerts(userId: string) {
 
 
 export async function clearBookmarks(userId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase.from("bookmarks").delete().eq("user_id", userId)
 }
 
@@ -174,7 +174,7 @@ export async function clearBookmarks(userId: string) {
 // --- Deal notes (private per-user notes + tags on a single deal) ---
 
 export async function getNote(userId: string, dealId: string): Promise<DealNote | null> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("deal_notes")
     .select("*")
@@ -185,7 +185,7 @@ export async function getNote(userId: string, dealId: string): Promise<DealNote 
 }
 
 export async function getNotes(userId: string): Promise<DealNote[]> {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const { data } = await supabase
     .from("deal_notes")
     .select("*")
@@ -202,7 +202,7 @@ export async function saveNote(
   content: string,
   tags: string[]
 ) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   const trimmed = content.trim()
   const cleanTags = Array.from(
     new Set(tags.map((t) => t.trim()).filter(Boolean))
@@ -231,7 +231,7 @@ export async function saveNote(
 }
 
 export async function deleteNote(userId: string, dealId: string) {
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
   return supabase
     .from("deal_notes")
     .delete()

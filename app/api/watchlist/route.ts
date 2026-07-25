@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { getWatchlist, addToWatchlist, removeFromWatchlist } from "@/lib/supabase/profile"
 
 export async function GET() {

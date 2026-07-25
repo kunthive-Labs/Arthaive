@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getUser } from "@/lib/supabase/session"
+import { getUser } from "@/lib/auth/server"
 import { getNote, getNotes, saveNote, deleteNote } from "@/lib/supabase/profile"
 import { dealIdSchema } from "@/lib/validation"
 

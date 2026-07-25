@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPrivilegedClient } from "@/lib/supabase/privileged"
 import Link from "next/link"
 
 export const dynamic = "force-dynamic"
@@ -15,7 +15,7 @@ export default async function EntitiesPage({
   const { tab } = await searchParams
   const activeTab = tab === "investors" ? "investors" : "startups"
 
-  const supabase = await createClient()
+  const supabase = createPrivilegedClient()
 
   let startups: Array<{ company: string; deal_count: number; aliases: string[] }> = []
   let investors: Array<{ investor_name: string; deal_count: number; aliases: string[] }> = []
