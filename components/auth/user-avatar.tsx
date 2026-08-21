@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SignOutButton } from "./sign-out-button"
+import { resolveAvatarUrl } from "@/lib/avatar"
 import Link from "next/link"
 
 interface UserAvatarProps {
@@ -19,13 +20,17 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ name, email, avatarUrl }: UserAvatarProps) {
+  // Off-allow-list hosts would 400 at the image optimizer, so fall through
+  // to the placeholder instead of rendering a broken avatar.
+  const src = resolveAvatarUrl(avatarUrl)
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
-          {avatarUrl ? (
+          {src ? (
             <Image
-              src={avatarUrl}
+              src={src}
               alt={name ?? email}
               width={32}
               height={32}

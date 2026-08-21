@@ -1,17 +1,19 @@
 import { withSentryConfig } from "@sentry/nextjs"
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare"
-
-// Expose locally configured Worker bindings while using the regular Next.js
-// development server. Production builds are handled by OpenNext.
-initOpenNextCloudflareForDev()
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Keep the PostgreSQL driver packages intact so OpenNext copies their
-  // Cloudflare socket implementation into the Worker bundle.
-  serverExternalPackages: ["pg", "pg-cloudflare"],
+  // `pg` is a native/CJS PostgreSQL driver: leave it external so Next never
+  // bundles it and it is required straight from node_modules at runtime.
+  serverExternalPackages: ["pg"],
   images: {
-    unoptimized: true,
+    // Vercel's built-in image optimizer handles these, so every remote host a
+    // <Image> can render must be allow-listed here or the request 400s.
+    remotePatterns: [
+      // Supabase Storage avatars (lib/supabase/storage.ts -> getPublicUrl).
+      { protocol: "https", hostname: "**.supabase.co" },
+      // Google account photos from Better Auth social sign-in (`user.image`).
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+    ],
   },
   async headers() {
     // Content-Security-Policy is intentionally emitted as Report-Only (NOT
@@ -27,6 +29,9 @@ const nextConfig = {
       "img-src 'self' data: https:",
       "font-src 'self' data:",
       // self + Supabase + Vercel + Sentry for XHR/fetch/websocket telemetry.
+      // The app is first-party on Vercel now, so no extra origins are needed;
+      // this policy is still Report-Only (see the note above) — verify against
+      // real traffic before promoting it to enforcing.
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.app https://vitals.vercel-insights.com https://*.ingest.sentry.io https://*.sentry.io",
       "frame-ancestors 'none'",
       "base-uri 'self'",

@@ -1,17 +1,24 @@
 import type { ReactElement } from "react"
 import { ImageResponse } from "next/og"
+import { getDealById } from "@/lib/db/deals"
 import { formatInrLakhs } from "@/lib/format"
 
 // Per-deal social card. When someone shares a deal link, this renders the
 // company, amount, stage and sector on the brand's neo-brutalist template
 // instead of the generic site card — so every share advertises a real deal.
 //
-// The deal is fetched from the public /api/deals/[id] rather than importing the
-// 7.9MB dataset (which would bloat/oom the Worker). Any failure falls back
-// to a branded card, so a shared link never yields a broken image.
+// The deal is read straight from the server-side data layer (getDealById, the
+// same accessor app/deal/[id]/page.tsx uses), so the card stays consistent with
+// the page and costs no extra network hop during ISR. Any miss or failure falls
+// back to a branded card, so a shared link never yields a broken image.
 //
 // NOTE: satori (next/og) requires every <div> with >1 child to set an explicit
 // `display: flex`, so every container below sets it.
+// Cache the rendered card on the same cadence as the deal page itself
+// (app/deal/[id]/page.tsx sets revalidate = 3600). Without this, every
+// crawler hit re-runs satori and re-queries the deal.
+export const revalidate = 3600
+
 export const alt = "Arthaive — Indian startup funding record"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
@@ -31,21 +38,10 @@ interface DealLite {
   date?: string
 }
 
-function baseUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://arthaive.kunthive.in")
-  )
-}
-
-async function fetchDeal(id: string): Promise<DealLite | null> {
+async function loadDeal(id: string): Promise<DealLite | null> {
   try {
-    const res = await fetch(`${baseUrl()}/api/deals/${encodeURIComponent(id)}`, {
-      headers: { accept: "application/json" },
-    })
-    if (!res.ok) return null
-    const d = (await res.json()) as DealLite
-    return d && d.company ? d : null
+    const deal = await getDealById(id)
+    return deal && deal.company ? deal : null
   } catch {
     return null
   }
@@ -103,7 +99,7 @@ function brandedFallback() {
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const deal = await fetchDeal(decodeURIComponent(id))
+  const deal = await loadDeal(decodeURIComponent(id))
   if (!deal || !deal.company) return brandedFallback()
 
   const amount = deal.amount && deal.amount > 0 ? formatInrLakhs(deal.amount) : "Undisclosed"

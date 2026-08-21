@@ -1,13 +1,18 @@
 import Image from "next/image"
 import { User } from "lucide-react"
 import type { UserProfile } from "@/types/auth.types"
+import { resolveAvatarUrl } from "@/lib/avatar"
 
 export function ProfileCard({ profile }: { profile: UserProfile }) {
+  // See lib/avatar.ts — anything outside remotePatterns 400s once the
+  // Vercel image optimizer is in play, so degrade to the placeholder.
+  const src = resolveAvatarUrl(profile.avatar_url)
+
   return (
     <div className="flex items-center gap-4 rounded-lg border p-6">
-      {profile.avatar_url ? (
+      {src ? (
         <Image
-          src={profile.avatar_url}
+          src={src}
           alt={profile.full_name ?? profile.email}
           width={64}
           height={64}

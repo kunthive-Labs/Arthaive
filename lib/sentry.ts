@@ -171,10 +171,8 @@ export function getErrorRecoverySuggestion(err: unknown): string {
 }
 
 
-export function assertProductionReady() {
-  const missing = (["NEXT_PUBLIC_SUPABASE_URL","NEXT_PUBLIC_SUPABASE_ANON_KEY"] as string[])
-    .filter((k) => !process.env[k])
-  if (missing.length) {
-    console.warn(`[Config] Missing env vars: ${missing.join(", ")}`)
-  }
-}
+// NOTE: an `assertProductionReady()` helper used to live here. It had no
+// callers and only console.warn'd despite the "assert" name, so a
+// misconfigured deployment sailed straight past it. Real enforcement now lives
+// in `requireSupabaseConfigured()` in lib/supabase.ts, which throws at
+// data-access time on a deployed environment.
