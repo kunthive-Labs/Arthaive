@@ -9,13 +9,18 @@ design of this cutover is that everything is proven on a `*.vercel.app` URL
 first, so the DNS flip is the only irreversible-feeling moment and it is
 reversible in minutes.
 
-> ### BLOCKER — must be resolved before this cutover can complete
+> ### RESOLVED — the Better Auth backfill blocker is closed
 >
-> `better_auth."user"` currently has **0 rows** (confirmed via both the direct
-> and the pooler connection). If existing users are expected to survive, every
-> one of them effectively loses their account. This is a **data** problem, not a
-> hosting one — resolve it in **Step 4b** before touching DNS in Step 7, or a
-> pre-existing migration gap will be misdiagnosed as a cutover failure.
+> `better_auth."user"` previously had **0 rows**, which would have cost every
+> existing user their account at cutover. Root cause: migration
+> `023_cutover_to_better_auth.sql` had never been applied to this project —
+> `022` had. It was applied on **2026-08-21** inside a single transaction,
+> gated on eight verification checks, with a pre-migration backup taken first.
+>
+> All 4 users are present with their original UUIDs, and all 7 dashboards
+> remain attached to their owners. **Step 4b** is now a re-confirmation, not an
+> investigation. Re-run it anyway before DNS — it is cheap, and it proves the
+> environment you are about to cut over is the one that was fixed.
 
 ## Scope
 
@@ -274,42 +279,57 @@ failures.
 
 ---
 
-## Step 4b — BLOCKER: confirm the Better Auth user table is populated
+## Step 4b — Re-confirm the Better Auth backfill
 
-> **STOP. This is a hard gate. Do not move DNS until it is resolved.**
+> **Previously a hard gate. Resolved on 2026-08-21 — now a re-confirmation.**
 
-**Observed:** `better_auth."user"` currently contains **0 rows**, confirmed via
-both the direct and the pooler connection.
+**What was wrong:** `better_auth."user"` contained **0 rows**. Migration `022`
+(which creates the `better_auth` schema) had been applied to this project;
+migration `023_cutover_to_better_auth.sql` (which backfills users from
+`auth.users` and repoints everything at the new table) **never had**. Four
+independent symptoms all traced to that single omission:
 
-Migration `023`'s backfill from `auth.users` has either not run against this
-project or matched nothing. The consequence is concrete: if existing users are
-expected to survive the cutover, **every one of them effectively loses their
-account** — their bookmarks, watchlists, saved searches, notes, and dashboards
-remain in the database owned by UUIDs that no Better Auth user row claims.
+| Symptom | Before | After `023` |
+| --- | --- | --- |
+| `better_auth."user"` | 0 rows | 4 users, original UUIDs |
+| `on_auth_user_created` on `auth.users` | still present | dropped |
+| `on_better_auth_user_created` | missing | created |
+| `public.profiles.id` references | `auth.users` | `better_auth."user"` |
+| `public.api_keys.user_id` | column absent | added |
 
-This is independent of hosting. Moving DNS neither causes nor fixes it, which
-is exactly why it must be settled first — otherwise a data problem will be
-misdiagnosed as a cutover failure.
+The consequence had it gone unnoticed: a Google sign-in would have minted a
+**new** UUID rather than matching the existing one, so bookmarks, watchlists,
+saved searches, notes and dashboards would have stayed in the database owned by
+UUIDs no Better Auth user row claimed. `better_auth."verification"` already held
+2 rows — a sign-in had been attempted and had failed exactly this way.
 
-Do not speculate about the cause from this document. Establish the facts:
+**How it was applied:** a pre-migration backup was written outside the repo
+(`arthaive-db-backups/pre-023-<timestamp>.sql`, containing the data plus DDL for
+the foreign key, function, trigger and all 9 RLS policies `023` drops), then
+`023` ran inside a single `BEGIN`/`COMMIT` gated on eight checks, set to
+`ROLLBACK` if any failed. All eight passed.
 
-1. Confirm which Supabase project `DATABASE_URL` points at, and that it is the
-   one holding production `auth.users`.
-2. Confirm whether migration `023_cutover_to_better_auth.sql` has actually been
-   applied to that project.
-3. Run the **user-count parity** and **preserved user IDs** verification queries
-   from Phase 14 of
+**Re-confirm before moving DNS.** Cheap, and it proves the environment you are
+cutting over is the one that was fixed:
+
+1. Confirm `DATABASE_URL` points at the Supabase project holding production
+   `auth.users`.
+2. Run the **user-count parity** and **preserved user IDs** queries from Phase
+   14 of
    [`EXISTING_SUPABASE_VERCEL_MIGRATION.md`](EXISTING_SUPABASE_VERCEL_MIGRATION.md).
    Parity between `auth.users` (email-bearing) and `better_auth."user"`, with
-   zero rows returned by the preserved-ID query, is the definition of resolved.
+   zero rows from the preserved-ID query, is the definition of resolved.
 
-- [ ] `better_auth."user"` row count matches the expected migrated user count.
+- [ ] `better_auth."user"` row count matches `auth.users` (email-bearing).
 - [ ] The preserved-user-ID query returns zero rows.
-- [ ] `public.profiles.id` references `better_auth.user(id)`.
+- [ ] `public.profiles.id` references `better_auth."user"(id)`.
+- [ ] A real Google sign-in reuses the existing UUID rather than minting a new
+      one. This is the one check the SQL cannot make for you — do it on the
+      `*.vercel.app` URL in Step 5, before DNS.
 
-If this is a **greenfield** deployment with no users to preserve, 0 rows is
-expected and correct — record that decision explicitly and tick the gate. If
-existing users are expected, resolve it before continuing.
+`023` is safe to re-run if you are unsure whether it applied: the backfill is
+`ON CONFLICT DO UPDATE`, the drops are `IF EXISTS`, and the column add is
+`IF NOT EXISTS`.
 
 ## Step 5 — First Vercel build, verified on `*.vercel.app`
 
@@ -363,7 +383,7 @@ This is the cutover. Everything before it was reversible by doing nothing.
 **Gate check — all four must be true before you change a record:**
 
 - [ ] Step 4 preflight (`npm run check-db -- --strict`) passes.
-- [ ] Step 4b resolved: `better_auth."user"` is populated, or 0 rows has been
+- [ ] Step 4b re-confirmed: `better_auth."user"` is populated (applied 2026-08-21), or 0 rows has been
       explicitly accepted as correct for a greenfield deployment.
 - [ ] Step 5 verification passed on the `*.vercel.app` URL.
 - [ ] Step 6 shows the domain added in Vercel, awaiting DNS.
