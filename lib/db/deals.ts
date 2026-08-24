@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { supabase, isSupabaseConfigured, requireSupabaseConfigured } from "@/lib/supabase"
 import { fundingData } from "@/data/funding-data"
 import type { Deal, DealFilters, PaginatedDeals } from "@/lib/types"
 import { filterYearSchema } from "@/lib/validation"
@@ -107,6 +107,8 @@ export async function getDeals(filters: DealFilters = {}): Promise<PaginatedDeal
     }
   }
 
+  requireSupabaseConfigured("getDeals")
+
   let data = fundingData.map(mapStaticDeal)
 
   if (search) data = data.filter((d) => d.company.toLowerCase().includes(search.toLowerCase()))
@@ -137,6 +139,8 @@ export async function getDealById(id: string): Promise<Deal | null> {
     return mapSupabaseDeal(data)
   }
 
+  requireSupabaseConfigured("getDealById")
+
   const found = fundingData.find((d) => d.id === id)
   return found ? mapStaticDeal(found) : null
 }
@@ -151,7 +155,10 @@ async function fetchColumnAll<T>(column: string): Promise<T[]> {
       .from("deals")
       .select(column)
       .range(from, from + PAGE - 1)
-    if (error) break
+    // Surface the failure instead of returning a silently truncated column:
+    // the static fallback is empty, so swallowing this would render an empty
+    // filter dropdown that looks like a legitimately empty dataset.
+    if (error) throw error
     if (data && data.length) out.push(...(data as unknown as T[]))
     if (!data || data.length < PAGE) break
   }
@@ -164,6 +171,7 @@ export async function getAllLocations(): Promise<string[]> {
     const unique = [...new Set(rows.map((d) => d.location))]
     return unique.filter(Boolean).sort()
   }
+  requireSupabaseConfigured("getAllLocations")
   return [...new Set(fundingData.map((d) => d.location))].sort()
 }
 
@@ -173,6 +181,7 @@ export async function getAllSectors(): Promise<string[]> {
     const all = rows.flatMap((d) => d.sectors)
     return [...new Set(all)].sort()
   }
+  requireSupabaseConfigured("getAllSectors")
   return [...new Set(fundingData.flatMap((d) => d.sectors))].sort()
 }
 
@@ -197,6 +206,7 @@ export async function getDealYears(): Promise<string[]> {
     const oldest = data?.[0]?.deal_date as string | undefined
     if (oldest) minYear = new Date(oldest).getFullYear()
   } else {
+    requireSupabaseConfigured("getDealYears")
     const years = fundingData
       .map((d) => new Date(d.date).getFullYear())
       .filter((y) => Number.isFinite(y))

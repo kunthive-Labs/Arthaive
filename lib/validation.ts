@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { isAllowedAvatarUrl } from "@/lib/avatar"
 
 export const dealIdSchema = z.string().min(1).max(100)
 
@@ -54,11 +55,14 @@ export const compareIdsSchema = z
 const sanitizeText = (s: string) => s.replace(/[<>]/g, "").trim()
 export const profilePatchSchema = z.object({
   full_name: z.string().max(120).transform(sanitizeText).optional(),
+  // Bounded to the same hosts next.config.mjs allows the image optimizer to
+  // fetch (see lib/avatar.ts). Accepting an arbitrary origin here would both
+  // render as a broken image and let the optimizer be pointed at any URL.
   avatar_url: z
     .string()
     .max(2048)
     .url()
-    .refine((u) => /^https?:\/\//i.test(u), "must be http(s) URL")
+    .refine(isAllowedAvatarUrl, "must be an https URL on an allowed avatar host")
     .optional(),
 })
 

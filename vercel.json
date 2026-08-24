@@ -4,5 +4,13 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["bom1"],
-  "cleanUrls": true
+  "cleanUrls": true,
+  "functions": {
+    "app/api/chat/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/search/nl/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

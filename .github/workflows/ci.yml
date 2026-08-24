@@ -32,10 +32,28 @@ jobs:
       - name: Test
         run: npm test
 
-      # Build the same OpenNext artifact that is deployed to Workers. This also
-      # invokes the regular Next.js build and the prebuild data-generation step.
-      - name: Build Cloudflare Worker
-        run: npm run build:cloudflare
-
-      - name: Validate Worker bundle
-        run: npx wrangler deploy --dry-run
+      # Same production build Vercel's Git integration runs on every push, so a
+      # build break is caught here instead of in a deployment. The `prebuild`
+      # hook regenerates data/funding-data.ts first — now an intentionally empty
+      # placeholder, since Supabase is the single runtime source of truth.
+      #
+      # Deployment itself is NOT done here: Vercel builds and deploys straight
+      # from Git, so this job needs no Vercel token and no deploy step.
+      #
+      # No env vars are set on purpose, and none should be added:
+      #   * every NEXT_PUBLIC_* consumer has a safe default (lib/constants.ts,
+      #     app/layout.tsx, app/sitemap.ts), so nothing inlines a wrong origin;
+      #   * the fail-loud guard in lib/supabase.ts keys off VERCEL_ENV, which
+      #     GitHub Actions never sets, so an unconfigured Supabase is permitted
+      #     here and prerendering makes no network calls. The build stays
+      #     hermetic, offline and deterministic.
+      # Placeholder Supabase credentials would be worse than no credentials:
+      # they flip `isSupabaseConfigured` on and make prerendering
+      # (app/explore, app/sectors, app/reports, app/api/stats, ...) issue real
+      # requests to a host that does not exist, failing the build.
+      #
+      # Do not re-gate that guard on NODE_ENV: `next build` always runs with
+      # NODE_ENV=production, including in this credential-free job and in every
+      # local `npm run build`. tests/production-guards.test.ts locks this in.
+      - name: Build
+        run: npm run build

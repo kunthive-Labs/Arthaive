@@ -2,11 +2,11 @@
 
 This is the current implementation snapshot. The detailed build log still lives in `PHASES.md`; this page is the shorter status view for contributors.
 
-Updated 2026-07-03.
+Updated 2026-08-21.
 
 ## Where We Are
 
-Arthaive is feature-complete enough to operate as a public funding-intelligence product: static fallback data, Supabase-backed live data, auth, admin workflows, reports, AI helpers, and API v1 are all present. The remaining work is mostly production hardening, data-quality loops, monitoring, and UX polish.
+Arthaive is feature-complete enough to operate as a public funding-intelligence product: Supabase-backed live data, auth, admin workflows, reports, AI helpers, and API v1 are all present. The static fixture that once backstopped the data layer has been retired — Supabase is the single runtime source of truth. The remaining work is mostly production hardening, data-quality loops, monitoring, and UX polish.
 
 ```
 Phase 0 — Frontend foundation             done
@@ -25,7 +25,7 @@ Phase 9 — Production polish & launch      in progress
 
 ### Frontend Foundation
 
-The app is a Next.js 16 App Router project with a generated 14,700+ deal static fixture. Public/static data views can build without Supabase configuration; auth-gated user/admin areas use Better Auth.
+The app is a Next.js 16 App Router project deployed on Vercel. `data/funding-data.ts` is now an intentionally empty, type-bearing placeholder rather than a 14,700-deal fixture: the app still builds without Supabase configuration, but a *deployed* environment missing those credentials fails loudly via `requireSupabaseConfigured()` instead of serving zero deals. Auth-gated user/admin areas use Better Auth.
 
 ### Supabase Live Database
 
@@ -45,7 +45,7 @@ Alias tables, fuzzy matching, and investor canonicalization are implemented. The
 
 ### Analytics & Reports
 
-Analytics pages and weekly/monthly report pages are implemented against Supabase with static fallback. Remaining polish: deeper “view underlying data” links from every chart and stronger report/share workflows.
+Analytics pages and weekly/monthly report pages are implemented against Supabase. Remaining polish: deeper “view underlying data” links from every chart and stronger report/share workflows.
 
 ### AI Layer
 
@@ -57,7 +57,7 @@ API v1 endpoints, API keys, rate-limit tiers, API docs, and direct route-handler
 
 ### Production Polish
 
-Recent hardening includes a clean lint baseline, Better Auth migration, and an OpenNext Cloudflare Worker build. Ongoing work should focus on CI, monitoring, mobile filter UX, chart prerender warnings, and source coverage disclosure.
+Recent hardening includes a clean lint baseline, the Better Auth migration, and the move from Cloudflare Workers to **Vercel** for application hosting. That move re-enabled Next.js image optimization, brought OG image rendering back in-app via `next/og`, and switched Better Auth to the Supabase Supavisor pooler (direct Supabase connections are IPv6-only and Vercel functions have no IPv6 egress). Cloudflare is now DNS + TLS only for the zone, which means no WAF in front of the app — see `SECURITY.md`. Ongoing work should focus on monitoring, mobile filter UX, chart prerender warnings, and source coverage disclosure.
 
 ## Risks Worth Tracking
 
@@ -66,8 +66,8 @@ Recent hardening includes a clean lint baseline, Better Auth migration, and an O
 | AI extraction false positives | Bad public data | Conservative confidence routing, review queue, source links |
 | Pipeline outage | Missing recent deals | `pipeline_jobs` table exists; add alerting on repeated failures |
 | Entity over-merge | Companies/investors collapse incorrectly | Conservative thresholds, alias review, admin correction loop |
-| Rate-limit fallback in serverless | API abuse across instances | Configure Upstash Redis in production |
-| Stale generated fixture | Static fallback diverges from CSV corpus | `predev`/`prebuild` regenerate `data/funding-data.ts` |
+| Rate-limit fallback in serverless | API abuse across instances — and no Cloudflare WAF now that the proxy is off | Configure Upstash Redis in production |
+| Supabase misconfigured on a deploy | Site renders zero deals while looking healthy | `requireSupabaseConfigured()` throws on deployed environments; keyed to `VERCEL_ENV` |
 | Documentation drift | Contributors deploy or extend the wrong thing | Keep README, roadmap, and phase log synchronized |
 
 ## Next Best Work

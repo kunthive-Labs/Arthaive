@@ -1,12 +1,36 @@
 /**
  * Unit tests for the chat data tools.
  *
- * `aggregateDeals` is exercised against a small inline fixture (amounts are in
- * ₹ lakh; 835 lakh = exactly $1M at the dataset's flat 83.5 rate, so expected
- * USD values stay clean). `executeTool` runs against the static `fundingData`
- * fallback since Supabase env vars are not set in CI.
+ * `aggregateDeals` is pure, so it is exercised against a small inline fixture
+ * (amounts are in ₹ lakh; 835 lakh = exactly $1M at the dataset's flat 83.5
+ * rate, so expected USD values stay clean).
+ *
+ * `executeTool` is not pure — it goes through `lib/db/deals.getDeals`. With no
+ * Supabase env vars (the case under vitest) that lands on the static
+ * `data/funding-data.ts` branch, and that file is now an intentionally EMPTY
+ * placeholder: Supabase is the single runtime source of truth. Reading it would
+ * make every row-level assertion below pass vacuously against zero rows, so the
+ * module is mocked with the deterministic 250-deal set in
+ * tests/fixtures/funding-data.ts and the expectations are derived from it.
  */
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
+
+import {
+  DEALS_PER_YEAR,
+  FIXTURE_TOTAL,
+  FIXTURE_YEARS,
+  LAKHS_PER_USD_MILLION,
+  fixtureDealsInYear,
+  fixtureTopDealByAmount,
+  syntheticFundingData,
+} from "../fixtures/funding-data"
+
+// Hoisted above the imports by vitest, so the fixture is pulled in from inside
+// the factory rather than referenced from the module body.
+vi.mock("@/data/funding-data", async () => {
+  const { syntheticFundingData: deals } = await import("../fixtures/funding-data")
+  return { fundingData: deals }
+})
 
 import {
   aggregateDeals,
@@ -145,9 +169,10 @@ describe("executeTool", () => {
       returned: number
       deals: Array<Record<string, unknown>>
     }
-    expect(parsed.returned).toBeLessThanOrEqual(3)
+    // Unfiltered, so every fixture row matches.
+    expect(parsed.totalMatches).toBe(FIXTURE_TOTAL)
+    expect(parsed.returned).toBe(3)
     expect(parsed.deals.length).toBe(parsed.returned)
-    expect(parsed.totalMatches).toBeGreaterThan(0)
     for (const row of parsed.deals) {
       expect(row).toHaveProperty("company")
       expect(row).toHaveProperty("amountUSD")
@@ -157,30 +182,58 @@ describe("executeTool", () => {
       expect(row).toHaveProperty("leadInvestor")
       expect(row).toHaveProperty("location")
     }
-    // Sorted by amount: first row must be disclosed.
-    expect(parsed.deals[0].amountUSD).toBeGreaterThan(0)
+
+    // Sorted by amount: the first row must be the fixture's single largest
+    // *disclosed* deal. The fixture deliberately contains zero-amount
+    // (undisclosed) rows, so this is a real check that they sort last rather
+    // than a tautology.
+    expect(syntheticFundingData.some((d) => d.amount === 0)).toBe(true)
+    const top = fixtureTopDealByAmount()
+    expect(parsed.deals[0].company).toBe(top.company)
+    expect(parsed.deals[0].amountUSD).toBe(top.amount / LAKHS_PER_USD_MILLION)
+    expect(parsed.deals[0].amountUSD as number).toBeGreaterThan(0)
   })
 
   it("query_deals applies year filters", async () => {
-    const result = await executeTool("query_deals", { yearFrom: 2021, yearTo: 2021, limit: 5 })
-    const parsed = JSON.parse(result.content) as { deals: Array<{ date: string }> }
+    const year = FIXTURE_YEARS[0]
+    const inYear = fixtureDealsInYear(year)
+    // The filter is only meaningful if the fixture also holds rows outside it.
+    expect(inYear.length).toBe(DEALS_PER_YEAR)
+    expect(inYear.length).toBeLessThan(FIXTURE_TOTAL)
+
+    const result = await executeTool("query_deals", { yearFrom: year, yearTo: year, limit: 5 })
+    const parsed = JSON.parse(result.content) as {
+      totalMatches: number
+      deals: Array<{ date: string }>
+    }
+    expect(parsed.totalMatches).toBe(inYear.length)
+    expect(parsed.deals.length).toBe(5)
     for (const row of parsed.deals) {
-      expect(row.date.slice(0, 4)).toBe("2021")
+      expect(row.date.slice(0, 4)).toBe(String(year))
     }
   })
 
   it("aggregate_deals aggregates the full matching set (beyond one page)", async () => {
-    // topN 25 comfortably covers every year in the 2015-2026 dataset.
+    // topN 25 comfortably covers every year in the fixture.
     const result = await executeTool("aggregate_deals", { groupBy: "year", metric: "count", topN: 25 })
     const parsed = JSON.parse(result.content) as {
       dealsMatched: number
       groups: Array<{ group: string; count: number }>
     }
-    // The static dataset has ~13.7k deals; the per-page cap is 100, so this
-    // only passes when pagination is exhausted.
+
+    // This test exists to prove `fetchAllMatchingDeals` exhausts pagination:
+    // AGGREGATE_PAGE_LIMIT in lib/ai/chat-tools.ts is 100, so a fixture of 250
+    // spans three pages. If the fixture ever shrinks below the page cap this
+    // test stops testing anything, hence the explicit guard.
+    expect(FIXTURE_TOTAL).toBeGreaterThan(100)
+
+    expect(parsed.dealsMatched).toBe(FIXTURE_TOTAL)
+    const byYear = Object.fromEntries(parsed.groups.map((g) => [g.group, g.count]))
+    expect(byYear).toEqual(
+      Object.fromEntries(FIXTURE_YEARS.map((y) => [String(y), DEALS_PER_YEAR])),
+    )
     const counted = parsed.groups.reduce((sum, g) => sum + g.count, 0)
-    expect(parsed.dealsMatched).toBeGreaterThan(1000)
-    expect(counted).toBe(parsed.dealsMatched)
+    expect(counted).toBe(FIXTURE_TOTAL)
   })
 
   it("returns a readable validation error instead of throwing on bad args", async () => {

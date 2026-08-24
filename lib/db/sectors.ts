@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { supabase, isSupabaseConfigured, requireSupabaseConfigured } from "@/lib/supabase"
 import { fundingData } from "@/data/funding-data"
 import type { Sector } from "@/lib/types"
 
@@ -9,7 +9,10 @@ function slugify(name: string): string {
 export async function getAllSectorsWithStats(): Promise<Sector[]> {
   if (isSupabaseConfigured && supabase) {
     const { data, error } = await supabase.from("sectors").select("*").order("name")
-    if (!error && data) {
+    // Configured but failing: fall through to the empty placeholder would report
+    // "0 sectors" as if that were the truth. Let the error propagate instead.
+    if (error) throw error
+    if (data) {
       return data.map((row: Record<string, unknown>) => ({
         id: row.id as string,
         name: row.name as string,
@@ -23,6 +26,7 @@ export async function getAllSectorsWithStats(): Promise<Sector[]> {
     }
   }
 
+  requireSupabaseConfigured("getAllSectorsWithStats")
   return buildSectorsFromStatic()
 }
 

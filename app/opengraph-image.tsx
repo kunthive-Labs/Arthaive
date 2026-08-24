@@ -1,7 +1,12 @@
 import { ImageResponse } from "next/og"
 
-// Branded social-share card (Open Graph + Twitter). Next.js auto-wires this file
-// to og:image and twitter:image via the metadataBase set in app/layout.tsx.
+// Branded social-share card (Open Graph + Twitter) for the site as a whole.
+// Next.js auto-wires this file to og:image and twitter:image via the
+// metadataBase set in app/layout.tsx. Rendered on the server with next/og
+// (satori + resvg) — the dark headline card with the top-level corpus stats.
+//
+// NOTE: satori requires every element with more than one child to set an
+// explicit `display: flex`, so the containers below all declare it.
 export const alt = "Arthaive — Indian Startup Funding Intelligence"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
