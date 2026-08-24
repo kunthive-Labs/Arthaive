@@ -1,5 +1,5 @@
 // Auto-generated from CSV files in funding_data/
-// Last updated: 2026-08-21T06:34:26.755Z
+// Last updated: 2026-08-24T12:41:02.937Z
 // Parsed from CSV: 14739 deals
 //
 // Total deals emitted: 0 — intentionally empty.

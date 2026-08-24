@@ -301,8 +301,13 @@ pool.on("error", (error) => {
 
 export const auth = betterAuth({
   appName: "Arthaive",
-  baseURL: process.env.BETTER_AUTH_URL ?? process.env.NEXT_PUBLIC_BASE_URL,
-  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL:
+    process.env.BETTER_AUTH_URL ??
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    (isNextBuildPhase ? "http://localhost:3000" : undefined),
+  secret:
+    process.env.BETTER_AUTH_SECRET ??
+    (isNextBuildPhase ? "build-phase-placeholder-secret-at-least-32-chars-long" : undefined),
   database: pool,
   advanced: {
     database: {
