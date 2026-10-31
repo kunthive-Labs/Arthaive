@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 from pipeline import entity_resolver, queue
 from pipeline.currency import normalize_amounts
 from pipeline.run import _new_stats, _route_record
+from pipeline.rule_extractor import rule_extract
 
 
 class IngestionTests(unittest.TestCase):
@@ -49,6 +50,46 @@ class IngestionTests(unittest.TestCase):
         result = entity_resolver.resolve("Coratia Technologies")
         self.assertIsNone(result.canonical)
         self.assertEqual(result.suggested, "Comat Technologies")
+
+    @patch("pipeline.entity_resolver.boost_score", return_value=95.0)
+    @patch("pipeline.entity_resolver._fuzzy_match", return_value=("Comat Technologies", 82.0))
+    @patch("pipeline.entity_resolver._exact_match", return_value=None)
+    def test_shared_context_cannot_auto_merge_differently_named_companies(self, exact, fuzzy, boost):
+        result = entity_resolver.resolve("Coratia Technologies", context={"sectors": ["Deeptech & AI"]})
+        self.assertIsNone(result.canonical)
+        self.assertEqual(result.suggested, "Comat Technologies")
+
+    def test_headline_round_takes_precedence_over_an_earlier_round(self):
+        result = rule_extract(
+            article_title="Coratia Technologies raises Rs 18 Cr in bridge round",
+            article_text="Coratia Technologies raises Rs 18 crore in a bridge round. It earlier raised Rs 17 crore in a pre-Series A round.",
+            source_tier="tier_1",
+        )
+        self.assertEqual(result["stage"], "Bridge")
+
+    def test_undisclosed_extension_does_not_reuse_previous_round_amount(self):
+        result = rule_extract(
+            article_title="CHOSEN raises extended Series A round",
+            article_text="CHOSEN has raised an extension of its Series A round. Prior to this, the startup had raised $5 million in a Series A round.",
+            source_tier="tier_1",
+        )
+        self.assertIsNone(result["amount_value"])
+
+    def test_current_series_a2_beats_previous_pre_series_a(self):
+        result = rule_extract(
+            article_title="Ace Blend raises $9.91 Mn",
+            article_text="Ace Blend has raised $9.91 million in a Series A2 funding round. An investor previously led its pre-Series A round.",
+            source_tier="tier_1",
+        )
+        self.assertEqual(result["stage"], "Series A")
+
+    def test_customer_acquisition_is_not_a_funding_stage(self):
+        result = rule_extract(
+            article_title="ISLAND Beauty raises Rs 2.58 Cr",
+            article_text="ISLAND Beauty has raised Rs 2.58 crore. The funds will be used for customer acquisition.",
+            source_tier="tier_1",
+        )
+        self.assertIsNone(result["stage"])
 
     @patch("pipeline.entity_resolver.get_client")
     def test_matching_can_find_company_beyond_first_database_page(self, get_client):

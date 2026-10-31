@@ -131,7 +131,7 @@ def extract_amount(text: str, title: str | None = None) -> dict[str, Any]:
 # Most-specific first: "Pre-Series A" must beat "Series A", "Pre-Seed" beats "Seed".
 _ROUND_PATTERNS: list[tuple[str, re.Pattern]] = [
     ("Pre-Series A", re.compile(r"\bpre[\s-]?series\s+a\b", re.IGNORECASE)),
-    ("Series A", re.compile(r"\bseries\s+a\b", re.IGNORECASE)),
+    ("Series A", re.compile(r"\bseries\s+a\d*\b", re.IGNORECASE)),
     ("Series B", re.compile(r"\bseries\s+b\b", re.IGNORECASE)),
     ("Series C", re.compile(r"\bseries\s+c\b", re.IGNORECASE)),
     ("Series D", re.compile(r"\bseries\s+d\b", re.IGNORECASE)),
@@ -399,8 +399,30 @@ def rule_extract(
     title = article_title or None
     combined = f"{title}\n\n{text}" if title else text
 
-    amount = extract_amount(text, title=title)
-    round_type = extract_round_type(combined)
+    # Limit body evidence to the first current funding statement. Later
+    # paragraphs often describe prior rounds, customer acquisition or other
+    # companies; those must not fill in an undisclosed amount or round type.
+    funding_statement = ""
+    for sentence in re.split(r"\n+|(?<!Rs\.)(?<=[.!?])\s+", text):
+        if sentence.strip() == title:
+            continue
+        if not _FUNDING_VERBS_RE.search(sentence):
+            continue
+        if re.search(r"\b(previous(?:ly)?|earlier|prior|had\s+raised|last\s+(?:year|month))\b", sentence, re.I):
+            continue
+        funding_statement = sentence
+        break
+
+    amount = extract_amount(funding_statement, title=title)
+    # The headline describes the current round; the body can mention older
+    # rounds with a more-specific stage that would otherwise win the regex order.
+    round_type = extract_round_type(title or "")
+    if round_type["stage"] == "Acquisition" and _FUNDING_VERBS_RE.search(title or ""):
+        round_type = {"stage": None, "confidence": 0.0}
+    if round_type["stage"] is None:
+        round_type = extract_round_type(funding_statement)
+        if round_type["stage"] == "Acquisition":
+            round_type = {"stage": None, "confidence": 0.0}
     name = extract_startup_name(text, title=title)
     investors = extract_investors(combined)
     location = extract_location(combined)

@@ -213,9 +213,12 @@ def resolve(
         return ResolutionResult(canonical=canonical, suggested=None, score=100.0)
 
     suggested, score = _fuzzy_match(name, entity_type)
+    name_score = score
     if context and suggested and score < AUTO_MATCH_THRESHOLD:
         score = boost_score(score, suggested, context)
-    if score >= AUTO_MATCH_THRESHOLD:
+    # Shared city/sector/amount are supporting evidence, not enough to merge
+    # two differently named businesses (e.g. Coratia vs Comat Technologies).
+    if name_score >= AUTO_MATCH_THRESHOLD:
         return ResolutionResult(canonical=suggested, suggested=None, score=score)
     if score >= SUGGEST_THRESHOLD:
         return ResolutionResult(canonical=None, suggested=suggested, score=score)
