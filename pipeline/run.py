@@ -57,6 +57,7 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--limit", type=int, default=None, help="Cap candidate URLs / queue items processed")
     p.add_argument("--dry-run", action="store_true", help="No DB writes, no AI calls")
     p.add_argument("--no-ai", action="store_true", help="Skip the AI fallback extractor")
+    p.add_argument("--retry-pending", action="store_true", help="Re-extract unreviewed pending items, including previously extracted records")
     p.add_argument("--progress-every", type=int, default=25)
     args = p.parse_args()
     if args.since and not args.backfill:
@@ -311,7 +312,7 @@ def _run_discover(args, deps: SimpleNamespace | None, stats: dict, error_log_lin
 
 def _run_extract(args, deps: SimpleNamespace, ai_extract, stats: dict, error_log_lines: list[str]) -> None:
     """Second pass: extract every pending queue item that has no raw_extracted_data yet."""
-    items = deps.fetch_unextracted_items(limit=args.limit or 500)
+    items = deps.fetch_unextracted_items(limit=args.limit or 500, retry_pending=args.retry_pending)
     _log("extract.start", items=len(items))
 
     for i, item in enumerate(items, start=1):
