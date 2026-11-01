@@ -3,7 +3,9 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare"
 
 // Expose locally configured Worker bindings while using the regular Next.js
 // development server. Production builds are handled by OpenNext.
-initOpenNextCloudflareForDev()
+if (process.env.NODE_ENV === "development") {
+  initOpenNextCloudflareForDev()
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

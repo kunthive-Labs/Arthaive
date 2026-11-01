@@ -60,9 +60,15 @@ Set `BETTER_AUTH_URL` as a non-secret runtime variable to the canonical HTTPS
 origin of the deployment. The checked-in production configuration uses
 `https://arthaive.kunthive.in`.
 
-`wrangler.jsonc` declares the seven secrets required for the core application.
-Wrangler warns during local builds when they are absent and validates them for
-deployment. `ANTHROPIC_API_KEY`, Upstash, and Sentry remain optional: their
+`wrangler.jsonc` declares the runtime secrets required for the core application.
+Production Better Auth uses the existing `HYPERDRIVE` binding with request-scoped
+connections and explicit `better_auth` schema qualification. `DATABASE_URL` is
+used only by the ordinary Node.js development/CLI path. The checked-in local
+Hyperdrive connection string is a development placeholder; override it with
+`CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` for your local database.
+
+Wrangler preserves dashboard secrets, and `keep_vars` preserves dashboard
+variables during deployment. `ANTHROPIC_API_KEY`, Upstash, and Sentry remain optional: their
 features degrade gracefully when those values are not configured.
 
 Public `NEXT_PUBLIC_*` values are embedded during the Next.js build and must be
@@ -133,10 +139,9 @@ runs the rule-based extractor with `--no-ai` instead of failing after discovery.
 ## Caching
 
 Static Next.js assets receive immutable cache headers from `public/_headers`.
-The initial setup deliberately uses OpenNext's default in-memory incremental
-cache. If the app begins relying on ISR or on-demand revalidation, provision R2
-(and, where applicable, a queue/tag cache) and then add those bindings and
-OpenNext cache overrides together.
+The application uses its existing `NEXT_INC_CACHE_KV` binding for OpenNext's
+incremental cache and `WORKER_SELF_REFERENCE` for revalidation. Preserve these
+bindings when deploying; the IDs in `wrangler.jsonc` match production.
 
 ## Updating the funding fixture
 
