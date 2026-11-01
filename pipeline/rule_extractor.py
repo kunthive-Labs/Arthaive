@@ -131,6 +131,11 @@ def extract_amount(text: str, title: str | None = None) -> dict[str, Any]:
 # Most-specific first: "Pre-Series A" must beat "Series A", "Pre-Seed" beats "Seed".
 _ROUND_PATTERNS: list[tuple[str, re.Pattern]] = [
     ("Pre-Series A", re.compile(r"\bpre[\s-]?series\s+a\b", re.IGNORECASE)),
+    ("Pre-Series B", re.compile(r"\bpre[\s-]?series\s+b\b", re.IGNORECASE)),
+    ("Pre-Series C", re.compile(r"\bpre[\s-]?series\s+c\b", re.IGNORECASE)),
+    ("Pre-Series D", re.compile(r"\bpre[\s-]?series\s+d\b", re.IGNORECASE)),
+    ("Pre-Series E", re.compile(r"\bpre[\s-]?series\s+e\b", re.IGNORECASE)),
+    ("Pre-Series F", re.compile(r"\bpre[\s-]?series\s+f\b", re.IGNORECASE)),
     ("Series A", re.compile(r"\bseries\s+a\d*\b", re.IGNORECASE)),
     ("Series B", re.compile(r"\bseries\s+b\b", re.IGNORECASE)),
     ("Series C", re.compile(r"\bseries\s+c\b", re.IGNORECASE)),

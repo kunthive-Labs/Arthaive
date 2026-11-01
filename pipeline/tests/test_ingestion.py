@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 from pipeline import entity_resolver, queue
 from pipeline.currency import normalize_amounts
 from pipeline.run import _new_stats, _route_record
-from pipeline.rule_extractor import rule_extract
+from pipeline.rule_extractor import extract_round_type, rule_extract
 
 
 class IngestionTests(unittest.TestCase):
@@ -90,6 +90,11 @@ class IngestionTests(unittest.TestCase):
             source_tier="tier_1",
         )
         self.assertIsNone(result["stage"])
+
+    def test_pre_series_rounds_keep_their_qualifier(self):
+        for letter in "ABCDEF":
+            with self.subTest(letter=letter):
+                self.assertEqual(extract_round_type(f"a pre-Series {letter} funding round")["stage"], f"Pre-Series {letter}")
 
     @patch("pipeline.entity_resolver.get_client")
     def test_matching_can_find_company_beyond_first_database_page(self, get_client):
