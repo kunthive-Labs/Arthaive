@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { getUser } from "@/lib/auth/server"
-import { fundingData } from "@/data/funding-data"
+import { getDeals } from "@/lib/db/deals"
 import { formatInrLakhs } from "@/lib/format"
 import { Landing, type TickerDeal } from "@/components/landing"
 
@@ -24,10 +24,8 @@ export default async function Home({
 
   // Most recent rounds, as the live tape on the gate. Kept server-side so the
   // public entry ships a tiny client bundle, not the full dataset.
-  const tickerDeals: TickerDeal[] = [...fundingData]
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
-    .slice(0, 24)
-    .map((d) => ({
+  const { deals, total } = await getDeals({ limit: 24, sortBy: "date" })
+  const tickerDeals: TickerDeal[] = deals.map((d) => ({
       company: d.company,
       amountCr: formatInrLakhs(d.amount),
       stage: d.stage,
@@ -36,7 +34,7 @@ export default async function Home({
   return (
     <Landing
       tickerDeals={tickerDeals}
-      dealCount={fundingData.length}
+      dealCount={total}
       authError={params.error === "auth"}
     />
   )
