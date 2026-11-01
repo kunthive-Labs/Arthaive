@@ -147,21 +147,24 @@ def insert_deal(
     return res.data[0]["id"]
 
 
-def fetch_unextracted_items(limit: int = 500) -> list[dict[str, Any]]:
-    """Pending review_queue rows whose raw_extracted_data is still empty, with their source row."""
+def fetch_unextracted_items(limit: int = 500, *, retry_pending: bool = False) -> list[dict[str, Any]]:
+    """Load unreviewed pending items and their sources; optionally retry extracted items."""
     client = get_client()
-    res = (
+    query = (
         client.table("review_queue")
         .select(
             "id, source_id, "
             "sources(url, title, publication_date, publisher, reliability_tier, raw_text_snapshot)"
         )
         .eq("status", "pending")
-        .filter("raw_extracted_data", "eq", "{}")
+        .is_("reviewed_at", "null")
+        .is_("reviewed_by", "null")
         .order("created_at", desc=False)
         .limit(limit)
-        .execute()
     )
+    if not retry_pending:
+        query = query.filter("raw_extracted_data", "eq", "{}")
+    res = query.execute()
     return res.data or []
 
 

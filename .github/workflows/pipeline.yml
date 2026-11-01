@@ -5,6 +5,11 @@ on:
     # 02:00 and 14:00 UTC = 7:30 AM and 7:30 PM IST
     - cron: "0 2,14 * * *"
   workflow_dispatch:
+    inputs:
+      retry_pending:
+        description: Re-extract unreviewed pending items after a pipeline repair
+        type: boolean
+        default: false
 
 concurrency:
   group: funding-pipeline
@@ -39,16 +44,22 @@ jobs:
             exit 1
           fi
 
+          args=()
+          if [[ "$RETRY_PENDING" == "true" ]]; then
+            args+=(--extract --retry-pending)
+          fi
+
           if [[ -z "$ANTHROPIC_API_KEY" ]]; then
             echo "ANTHROPIC_API_KEY is not configured; running the rule-based extractor only"
-            python -m pipeline.run --no-ai
+            python -m pipeline.run --no-ai "${args[@]}"
           else
-            python -m pipeline.run
+            python -m pipeline.run "${args[@]}"
           fi
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RETRY_PENDING: ${{ inputs.retry_pending }}
 
       # "Data is the product": a non-zero exit (crash, or a 'partial' run that
       # auto-approved nothing / had an abnormal error rate — see

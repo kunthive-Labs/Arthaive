@@ -28,7 +28,7 @@ SUGGEST_THRESHOLD = 75
 
 @dataclass
 class ResolutionResult:
-    canonical: str | None  # canonical name when score >= AUTO_MATCH_THRESHOLD
+    canonical: str | None  # confident existing match, or a distinct new name
     suggested: str | None  # best candidate when SUGGEST <= score < AUTO_MATCH
     score: float           # 0-100 (rapidfuzz scale); 100 = perfect, 50 = neutral
 
@@ -74,23 +74,33 @@ def _candidate_index(entity_type: EntityType) -> dict[str, str]:
     client = get_client()
     out: dict[str, str] = {}
 
-    res = client.table(table).select(f"{canonical_col},{alias_col}").execute()
-    for row in res.data or []:
+    for row in _all_rows(client, table, f"{canonical_col},{alias_col}"):
         canonical = row[canonical_col]
         out[canonical] = canonical
         out[row[alias_col]] = canonical
 
     if entity_type == "startup":
-        deals = client.table("deals").select("company").execute()
-        for row in deals.data or []:
+        for row in _all_rows(client, "deals", "company"):
             name = row["company"]
             out.setdefault(name, name)
     else:
-        inv = client.table("investors").select("name").execute()
-        for row in inv.data or []:
+        for row in _all_rows(client, "investors", "name"):
             name = row["name"]
             out.setdefault(name, name)
     return out
+
+
+def _all_rows(client, table: str, columns: str):
+    """Read the full entity registry beyond PostgREST's 1,000-row limit."""
+    page_size = 1000
+    offset = 0
+    while True:
+        rows = (client.table(table).select(columns).order("id")
+                .range(offset, offset + page_size - 1).execute()).data or []
+        yield from rows
+        if len(rows) < page_size:
+            return
+        offset += page_size
 
 
 def clear_index_cache() -> None:
@@ -203,13 +213,18 @@ def resolve(
         return ResolutionResult(canonical=canonical, suggested=None, score=100.0)
 
     suggested, score = _fuzzy_match(name, entity_type)
+    name_score = score
     if context and suggested and score < AUTO_MATCH_THRESHOLD:
         score = boost_score(score, suggested, context)
-    if score >= AUTO_MATCH_THRESHOLD:
+    # Shared city/sector/amount are supporting evidence, not enough to merge
+    # two differently named businesses (e.g. Coratia vs Comat Technologies).
+    if name_score >= AUTO_MATCH_THRESHOLD:
         return ResolutionResult(canonical=suggested, suggested=None, score=score)
     if score >= SUGGEST_THRESHOLD:
         return ResolutionResult(canonical=None, suggested=suggested, score=score)
-    return ResolutionResult(canonical=None, suggested=None, score=score)
+    # No plausible existing match: preserve the extracted name as a new entity
+    # (PHASES.md §5.3). Ambiguous matches above remain in human review.
+    return ResolutionResult(canonical=name, suggested=None, score=score)
 
 
 def resolve_investors(names: list[str]) -> list[str]:

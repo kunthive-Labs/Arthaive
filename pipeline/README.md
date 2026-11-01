@@ -45,11 +45,19 @@ python -m pipeline.run --source inc42 --since 2026-04-01 --limit 20   # --since 
 
 # Skip the AI fallback (rule-based only)
 python -m pipeline.run --extract --no-ai
+
+# After repairing extraction/routing, retry previously extracted pending items.
+# Human-reviewed and non-pending items are excluded.
+python -m pipeline.run --extract --retry-pending --no-ai
 ```
 
 ## Scheduled runs
 
 `.github/workflows/pipeline.yml` runs `python -m pipeline.run` at 02:00 and 14:00 UTC (7:30 AM / 7:30 PM IST). Set repo secrets: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`. Manual trigger via *Run workflow*.
+
+The manual `retry_pending` input runs extraction only over unreviewed pending
+items. Scheduled runs continue to discover and extract new articles. Normalized
+amounts use the application's storage units: INR lakhs and USD millions.
 
 ## Module map
 
