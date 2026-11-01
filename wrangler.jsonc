@@ -1,11 +1,20 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "arthaive",
+  "account_id": "5f27f8ccead6989cf87a0d8ba3858a27",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2026-07-25",
+  "compatibility_date": "2026-10-30",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
-  "preview_urls": true,
+  "preview_urls": false,
+  "keep_vars": true,
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "arthaive" }],
+  "kv_namespaces": [{ "binding": "NEXT_INC_CACHE_KV", "id": "9dc5c877c7504c99a7d1495e7a5efd50" }],
+  "hyperdrive": [{
+    "binding": "HYPERDRIVE",
+    "id": "d860dea228574e63a844e105dc310ceb",
+    "localConnectionString": "postgres://local:local@127.0.0.1:5432/arthaive"
+  }],
   "routes": [
     {
       "pattern": "arthaive.kunthive.in",
@@ -13,6 +22,7 @@
     }
   ],
   "vars": {
+    "DEPLOYMENT_PLATFORM": "cloudflare",
     "BETTER_AUTH_URL": "https://arthaive.kunthive.in",
     "NEXT_PUBLIC_APP_URL": "https://arthaive.kunthive.in",
     "NEXT_PUBLIC_BASE_URL": "https://arthaive.kunthive.in",
@@ -20,12 +30,9 @@
   },
   "secrets": {
     "required": [
-      "DATABASE_URL",
       "BETTER_AUTH_SECRET",
       "GOOGLE_CLIENT_ID",
       "GOOGLE_CLIENT_SECRET",
-      "NEXT_PUBLIC_SUPABASE_URL",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
       "SUPABASE_SERVICE_ROLE_KEY"
     ]
   },

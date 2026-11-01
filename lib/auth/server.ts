@@ -1,8 +1,9 @@
 import { headers } from "next/headers"
-import { auth, type AuthSession, type AuthUser } from "@/lib/auth"
+import { withRequestAuth, type AuthSession, type AuthUser } from "@/lib/auth"
 
 export async function getAuthSession(): Promise<AuthSession | null> {
-  return auth.api.getSession({ headers: await headers() })
+  const requestHeaders = await headers()
+  return withRequestAuth((auth) => auth.api.getSession({ headers: requestHeaders }))
 }
 
 export async function getAuthUser(): Promise<AuthUser | null> {

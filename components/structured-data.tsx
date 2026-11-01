@@ -11,7 +11,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "Arthaive",
   url: BASE_URL,
-  logo: `${BASE_URL}/icon.svg`,
+  logo: `${BASE_URL}/android-chrome-512x512.png`,
   description:
     "Arthaive is India's open startup funding intelligence platform — a continuously-maintained, sourced record of Indian startup funding from 2005 onward.",
   email: "8harath.k@gmail.com",

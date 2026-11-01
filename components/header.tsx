@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { SearchBar } from "./search-bar"
 import { HeaderAccount } from "./nav/header-account"
+import { BrandMark } from "./brand-mark"
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -26,9 +27,7 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
         <div className="flex items-center justify-between gap-4 md:gap-6 md:mb-6">
           <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-            <div className="neo-border-accent p-1.5 bg-white">
-              <div className="w-5 h-5 md:w-6 md:h-6 bg-[#1a5d1a]"></div>
-            </div>
+            <BrandMark />
             <span className="text-lg md:text-xl font-bold tracking-tight">ARTHAIVE</span>
           </Link>
 

@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react"
 import { SignInButton } from "@/components/auth/sign-in-button"
+import { BrandMark } from "@/components/brand-mark"
 
 // One ticker line: company + the round it raised, set in mono like a tape.
 export interface TickerDeal {
@@ -70,9 +71,7 @@ export function Landing({ tickerDeals, dealCount, authError }: LandingProps) {
       <header className="border-b-4 border-black bg-white px-4 py-3 md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <span className="neo-border-accent bg-white p-1.5" aria-hidden>
-              <span className="block h-4 w-4 bg-[#1A5D1A] md:h-5 md:w-5" />
-            </span>
+            <BrandMark />
             <span className="text-xl font-bold leading-none tracking-tight md:text-2xl">
               Arthaive
             </span>

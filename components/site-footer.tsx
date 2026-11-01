@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { BrandMark } from "./brand-mark"
 
 const footerSections = [
   {
@@ -36,9 +37,7 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-7xl gap-8 md:grid-cols-[1.15fr_1.85fr]">
         <div>
           <Link href="/" className="inline-flex items-center gap-2">
-            <span className="border-[3px] border-green-600 bg-white p-1.5" aria-hidden>
-              <span className="block h-4 w-4 bg-[#1A5D1A]" />
-            </span>
+            <BrandMark />
             <span className="text-xl font-bold tracking-tight">Arthaive</span>
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-gray-300">
