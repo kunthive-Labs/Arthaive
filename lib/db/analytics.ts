@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache"
-import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { supabase, isSupabaseConfigured, requireSupabaseConfigured } from "@/lib/supabase"
 import { fundingData } from "@/data/funding-data"
 import type { MonthlyFunding, SectorStat, CityFunding, StageStat, SiteStats } from "@/lib/types"
 
@@ -60,7 +60,10 @@ async function fetchDatedRows(
       .order("deal_date", { ascending: true })
       .range(from, from + PAGE - 1)
 
-    if (error) break
+    // Surface the failure rather than returning a silently truncated series —
+    // the static fallback is empty, so a swallowed error is indistinguishable
+    // from "there were no deals in this period".
+    if (error) throw error
     if (data && data.length)
       all.push(
         ...data.map((r: { deal_date: string; amount_inr: number }) => ({
@@ -92,20 +95,26 @@ interface SiteStatsRow {
 const getSiteStatsCached = cached(async (): Promise<Omit<SiteStats, "lastUpdated"> | null> => {
   if (isSupabaseConfigured && supabase) {
     const { data, error } = await supabase.rpc("get_site_stats")
+    if (error) throw error
     const row = (data as SiteStatsRow[] | null)?.[0]
-    if (!error && row) {
-      return {
-        totalDeals: Number(row.total_deals),
-        totalDisclosedFunding: Number(row.total_disclosed_funding),
-        disclosedDealsCount: Number(row.disclosed_deals_count),
-        topSector: row.top_sector || "",
-        topSectorCount: Number(row.top_sector_count) || 0,
-        largestDealCompany: row.largest_deal_company || "N/A",
-        largestDealAmount: Number(row.largest_deal_amount) || 0,
-        uniqueInvestors: Number(row.unique_investors),
-        uniqueCities: Number(row.unique_cities),
-        uniqueSectors: Number(row.unique_sectors),
-      }
+    if (!row) {
+      // get_site_stats() always returns exactly one row (see
+      // supabase/migrations/020_analytics_views.sql). No row means the RPC is
+      // missing or broken — reporting a static zero rollup instead would put
+      // fabricated numbers on the homepage.
+      throw new Error("get_site_stats() returned no rows")
+    }
+    return {
+      totalDeals: Number(row.total_deals),
+      totalDisclosedFunding: Number(row.total_disclosed_funding),
+      disclosedDealsCount: Number(row.disclosed_deals_count),
+      topSector: row.top_sector || "",
+      topSectorCount: Number(row.top_sector_count) || 0,
+      largestDealCompany: row.largest_deal_company || "N/A",
+      largestDealAmount: Number(row.largest_deal_amount) || 0,
+      uniqueInvestors: Number(row.unique_investors),
+      uniqueCities: Number(row.unique_cities),
+      uniqueSectors: Number(row.unique_sectors),
     }
   }
   return null
@@ -117,8 +126,11 @@ export async function getSiteStats(): Promise<SiteStats> {
     return { ...fromDb, lastUpdated: new Date().toISOString() }
   }
 
-  // Fallback: aggregate the bundled static dataset in JS (Supabase unconfigured
-  // or the RPC errored).
+  // Fallback: aggregate the bundled static dataset in JS. Only reachable when
+  // Supabase is unconfigured (local dev / tests) — the guard below turns that
+  // into a hard error on a deployed environment.
+  requireSupabaseConfigured("getSiteStats")
+
   const data = fundingData
   const disclosedDeals = data.filter((d) => d.amount > 0)
   const totalFunding = disclosedDeals.reduce((sum, d) => sum + d.amount, 0)
@@ -165,9 +177,13 @@ export async function getMonthlyFunding(
   const sinceStr = since.toISOString().split("T")[0]
 
   if (isSupabaseConfigured && supabase) {
-    const rows = await fetchDatedRows(sinceStr, sector)
-    if (rows.length > 0) return aggregateMonthly(rows)
+    // Zero rows is a legitimate answer (a young sector, a quiet window), so
+    // return it rather than falling through to the static path and pretending
+    // the placeholder dataset had something to say.
+    return aggregateMonthly(await fetchDatedRows(sinceStr, sector))
   }
+
+  requireSupabaseConfigured("getMonthlyFunding")
 
   const filtered = fundingData
     .filter((d) => d.date >= sinceStr && (!sector || d.sectors.includes(sector)))
@@ -203,8 +219,10 @@ async function verifiedDealCount(): Promise<number> {
       .from("deals")
       .select("*", { count: "exact", head: true })
       .eq("record_status", "verified")
-    if (!error && count != null) return count
+    if (error) throw error
+    if (count != null) return count
   }
+  requireSupabaseConfigured("verifiedDealCount")
   return fundingData.length
 }
 
@@ -228,7 +246,8 @@ const getSectorStatsCached = cached(async (): Promise<SectorStat[] | null> => {
         .limit(20),
       verifiedDealCount(),
     ])
-    if (!error && data) {
+    if (error) throw error
+    if (data) {
       return (data as SectorRow[]).map((r) => ({
         sector: r.sector,
         dealCount: Number(r.deal_count),
@@ -245,7 +264,9 @@ export async function getSectorStats(): Promise<SectorStat[]> {
   const fromDb = await getSectorStatsCached()
   if (fromDb) return fromDb
 
-  // Fallback: aggregate static dataset in JS.
+  // Fallback: aggregate static dataset in JS (local dev / tests only).
+  requireSupabaseConfigured("getSectorStats")
+
   const data = fundingData
   const total = data.length
   const sectorMap = new Map<string, { count: number; funding: number }>()
@@ -285,7 +306,8 @@ const getCityFundingCached = cached(async (limit: number): Promise<CityFunding[]
       .select("city,deal_count,total_funding")
       .order("deal_count", { ascending: false })
       .limit(limit)
-    if (!error && data) {
+    if (error) throw error
+    if (data) {
       return (data as CityRow[]).map((r) => ({
         city: r.city,
         dealCount: Number(r.deal_count),
@@ -299,6 +321,8 @@ const getCityFundingCached = cached(async (limit: number): Promise<CityFunding[]
 export async function getCityFunding(limit = 15): Promise<CityFunding[]> {
   const fromDb = await getCityFundingCached(limit)
   if (fromDb) return fromDb
+
+  requireSupabaseConfigured("getCityFunding")
 
   const data = fundingData
   const cityMap = new Map<string, { count: number; funding: number }>()
@@ -335,7 +359,8 @@ const getStageDistributionCached = cached(async (): Promise<StageStat[] | null> 
         .order("deal_count", { ascending: false }),
       verifiedDealCount(),
     ])
-    if (!error && data) {
+    if (error) throw error
+    if (data) {
       return (data as StageRow[]).map((r) => ({
         stage: r.stage,
         count: Number(r.deal_count),
@@ -350,6 +375,8 @@ const getStageDistributionCached = cached(async (): Promise<StageStat[] | null> 
 export async function getStageDistribution(): Promise<StageStat[]> {
   const fromDb = await getStageDistributionCached()
   if (fromDb) return fromDb
+
+  requireSupabaseConfigured("getStageDistribution")
 
   const data = fundingData
   const total = data.length
@@ -389,7 +416,8 @@ const getYoYComparisonCached = cached(
         .from("v_analytics_yoy")
         .select("year,deal_count,total_funding")
         .order("year", { ascending: true })
-      if (!error && data) {
+      if (error) throw error
+      if (data) {
         return (data as YoYRow[]).map((r) => ({
           year: r.year,
           totalFunding: Number(r.total_funding),
@@ -407,6 +435,8 @@ export async function getYoYComparison(): Promise<
 > {
   const fromDb = await getYoYComparisonCached()
   if (fromDb) return fromDb
+
+  requireSupabaseConfigured("getYoYComparison")
 
   const data = fundingData
   const yearMap = new Map<string, { funding: number; count: number }>()
@@ -442,7 +472,8 @@ const getTopInvestorsByActivityCached = cached(
         .select("name,deal_count,total_deployed")
         .order("deal_count", { ascending: false })
         .limit(limit)
-      if (!error && data) {
+      if (error) throw error
+      if (data) {
         return (data as InvestorRow[]).map((r) => ({
           name: r.name,
           dealCount: Number(r.deal_count),
@@ -460,6 +491,8 @@ export async function getTopInvestorsByActivity(
 ): Promise<{ name: string; dealCount: number; totalDeployed: number }[]> {
   const fromDb = await getTopInvestorsByActivityCached(limit)
   if (fromDb) return fromDb
+
+  requireSupabaseConfigured("getTopInvestorsByActivity")
 
   const data = fundingData
   const map = new Map<string, { count: number; deployed: number }>()
@@ -506,7 +539,7 @@ export async function getMonthlyFundingByYear(
         .order("deal_date", { ascending: true })
         .range(from, from + PAGE - 1)
 
-      if (error) break
+      if (error) throw error
       if (data && data.length)
         rows.push(
           ...data.map((r: { deal_date: string; amount_inr: number }) => ({
@@ -516,8 +549,12 @@ export async function getMonthlyFundingByYear(
         )
       if (!data || data.length < PAGE) break
     }
-    if (rows.length > 0) return aggregateMonthly(rows)
+    // A year with no deals is a legitimate empty result; don't fall through to
+    // the placeholder dataset for it.
+    return aggregateMonthly(rows)
   }
+
+  requireSupabaseConfigured("getMonthlyFundingByYear")
 
   return aggregateMonthly(
     fundingData
@@ -564,6 +601,12 @@ export async function getCoverageRange(): Promise<{ earliest: string; latest: st
       }
     }
   }
+
+  // NOTE: unlike the aggregations above, a Supabase error here is tolerated —
+  // `.single()` legitimately errors on an empty deals table, and this only
+  // feeds the cosmetic CoverageNotice banner. The guard still fires for the
+  // unconfigured case.
+  requireSupabaseConfigured("getCoverageRange")
 
   const dates = fundingData.map((d) => d.date).sort()
   return {

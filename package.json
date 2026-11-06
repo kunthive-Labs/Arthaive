@@ -5,14 +5,9 @@
   "packageManager": "npm@10.9.8",
   "scripts": {
     "generate-data": "node scripts/generate-funding-data.js",
+    "check-db": "node --env-file-if-exists=.env.local scripts/check-db.mjs",
     "prebuild": "npm run generate-data",
     "build": "next build",
-    "build:cloudflare": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
-    "deploy:dry-run": "opennextjs-cloudflare build && wrangler deploy --dry-run",
-    "cf-typegen": "wrangler types cloudflare-env.d.ts --env-file .dev.vars.example --include-runtime false --strict-vars false --env-interface CloudflareEnv",
     "predev": "npm run generate-data",
     "dev": "next dev",
     "lint": "eslint .",
@@ -23,7 +18,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "0.99.0",
     "@hookform/resolvers": "^3.10.0",
-    "@opennextjs/cloudflare": "^1.20.2",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -68,7 +62,6 @@
     "lucide-react": "^0.454.0",
     "next-themes": "^0.4.6",
     "pg": "^8.22.0",
-    "pg-cloudflare": "^1.4.0",
     "react": "19.2.0",
     "react-day-picker": "9.8.0",
     "react-dom": "19.2.0",
@@ -97,8 +90,7 @@
     "tw-animate-css": "1.3.3",
     "typescript": "^5",
     "vite": "8.2.0",
-    "vitest": "4.1.10",
-    "wrangler": "^4.118.0"
+    "vitest": "4.1.10"
   },
   "overrides": {
     "brace-expansion@2.0.0 - 2.1.2": "2.1.4",

@@ -20,6 +20,12 @@ Welcome. If you are new to the Arthaive (India's open startup funding intelligen
 - `PROJECT_REFERENCE.md` — the original product brief, the source of truth for the long-term vision.
 - `PHASES.md` — the detailed nine-phase implementation plan with exit criteria.
 - `README.md` — the repo's quick-start.
-- `DEPLOYMENT.md` — how Cloudflare Workers/OpenNext hosting is wired.
+- `DEPLOYMENT.md` — how Vercel hosting is wired: environment scopes, the
+  `bom1` region, function limits, and the Supavisor pooler requirement.
+- `VERCEL_CUTOVER_RUNBOOK.md` — the one-time Cloudflare Workers → Vercel
+  switch, with DNS steps, verification, and rollback.
+- `EXISTING_SUPABASE_VERCEL_MIGRATION.md` — the Supabase Auth → Better Auth
+  database migration runbook (a separate change from the hosting move).
+- `SECURITY.md` — reporting process plus the production security posture.
 
 If anything in this folder contradicts `PROJECT_REFERENCE.md`, that doc wins — it is the spec. These pages are the explanation.

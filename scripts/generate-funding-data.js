@@ -198,12 +198,39 @@ function formatDate(dateStr) {
 }
 
 // Generate TypeScript file
+//
+// The emitted `fundingData` array is INTENTIONALLY EMPTY, unconditionally.
+//
+// Supabase is the single source of truth at runtime (see lib/db/*). This file
+// exists only as a type-bearing placeholder: lib/db/deals.ts imports
+// `fundingData` and derives `(typeof fundingData)[0]` from it, and the
+// `FundingDeal` interface below is the shape the CSV pipeline produces. Baking
+// the parsed dataset (283k+ lines) back in would create a second, stale copy of
+// the data that silently diverges from Supabase the moment the pipeline runs —
+// exactly the drift this placeholder avoids. It also keeps `next build` fast.
+//
+// If a deployment has no Supabase credentials the data layer now fails loudly
+// rather than quietly serving this empty array; see requireSupabaseConfigured()
+// in lib/supabase.ts.
+//
+// The CSV parsing above is deliberately kept: funding_data/ is still the
+// upstream input for the ingestion pipeline, `--test` exercises the parser, and
+// this script is the reference implementation of the CSV -> FundingDeal
+// transform.
 function generateTypeScriptFile(deals) {
   const sortedDeals = deals.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const emittedDeals = [];
 
   const content = `// Auto-generated from CSV files in funding_data/
 // Last updated: ${new Date().toISOString()}
-// Total deals: ${sortedDeals.length}
+// Parsed from CSV: ${sortedDeals.length} deals
+//
+// Total deals emitted: 0 — intentionally empty.
+// Supabase is the single source of truth at runtime; this array exists only as
+// a type-bearing placeholder for the FundingDeal interface below. Baking the
+// parsed dataset in here would create a second, stale copy of the data.
+// Regenerate with 'npm run generate-data' (see scripts/generate-funding-data.js).
+//
 // Currency conversion: 1 USD = ₹${USD_TO_INR} INR (as of ${LAST_UPDATED})
 // To update exchange rate: Edit config/currency.js and run 'npm run generate-data'
 
@@ -222,12 +249,16 @@ export interface FundingDeal {
   weekFolder: string;
 }
 
-export const fundingData: FundingDeal[] = ${JSON.stringify(sortedDeals, null, 2)};
+export const fundingData: FundingDeal[] = ${JSON.stringify(emittedDeals, null, 2)};
 `;
 
   const outputPath = path.join(__dirname, '../data/funding-data.ts');
   fs.writeFileSync(outputPath, content, 'utf-8');
-  console.log(`✅ Generated funding-data.ts with ${sortedDeals.length} deals`);
+  console.log(
+    `✅ Generated funding-data.ts with ${emittedDeals.length} deals ` +
+      `(${sortedDeals.length} parsed from CSV; the static array is an intentional ` +
+      `placeholder — Supabase is the runtime source of truth)`
+  );
 }
 
 // Inline self-test for parseCSVLine. Run with: node scripts/generate-funding-data.js --test

@@ -43,14 +43,14 @@
 | AI | Anthropic Claude (Sonnet for prose, Haiku for parsing) |
 | Pipeline | Python (RSS discovery → rule-based + Claude extraction → entity resolution) |
 | Tests | Vitest |
-| Deployment | Cloudflare Workers (OpenNext) |
+| Deployment | Vercel (Next.js native) |
 | Error tracking | Sentry-compatible shim (`lib/sentry.ts`) |
 
 ---
 
 ## Local Development
 
-**Prerequisites:** Node.js 22+, a Supabase project, Google OAuth credentials, and an Anthropic API key for AI features. Public/static data pages still build from the generated fixture when Supabase is unavailable.
+**Prerequisites:** Node.js 22+, a Supabase project, Google OAuth credentials, and an Anthropic API key for AI features. Supabase is the single source of truth for deal data — `data/funding-data.ts` is an intentionally empty, type-bearing placeholder, so the app builds and runs without Supabase but renders zero deals locally. On a deployed Vercel environment that same condition is a hard error rather than a silent empty page.
 
 ```bash
 # 1. Clone and install
@@ -168,21 +168,26 @@ npm test           # one-shot vitest run
 npm run test:watch # watch mode
 ```
 
-The API tests in `tests/api/v1.test.ts` call route handlers directly, without spinning up a server. Without Supabase env vars set, they run against the static `data/funding-data.ts` fixture — deterministic by design.
+The API tests in `tests/api/v1.test.ts` call route handlers directly, without spinning up a server. Without Supabase env vars set they run against the empty `data/funding-data.ts` placeholder, which keeps them deterministic and offline. The fail-loud guard in `lib/supabase.ts` keys off `VERCEL_ENV`, so it stays permissive under vitest and in CI.
 
 ---
 
 ## Production checklist
 
 ```bash
-npx tsc --noEmit   # zero TypeScript errors
-npm run deploy:dry-run # build and validate the Cloudflare Worker bundle
-npm test           # all green
+npx tsc --noEmit          # zero TypeScript errors
+npm run lint              # clean
+npm test                  # all green
+npm run build             # production Next.js build
+npm run check-db -- --strict # Better Auth reaches the better_auth schema
 ```
 
-Then run `npm run deploy` (or use Workers Builds) and submit `/sitemap.xml` to
-Google Search Console. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for environment,
-preview, and deployment details.
+Deployment is Vercel's Git integration: merging to `main` ships to production,
+and any other branch gets a preview URL. Then submit `/sitemap.xml` to Google
+Search Console. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for environment variables,
+regions, and preview details, and
+[`VERCEL_CUTOVER_RUNBOOK.md`](VERCEL_CUTOVER_RUNBOOK.md) for the one-time
+Cloudflare Workers → Vercel switch.
 
 ---
 
@@ -222,7 +227,7 @@ The [`documentation/`](documentation/) folder is the full guide — read it in o
 | 9 | [09-roadmap.md](documentation/09-roadmap.md) | Built / partial / ahead |
 | 10 | [10-glossary.md](documentation/10-glossary.md) | Domain terms |
 
-Top-level references: [`PROJECT_REFERENCE.md`](PROJECT_REFERENCE.md) (product spec), [`PHASES.md`](PHASES.md) (build log), [`DEPLOYMENT.md`](DEPLOYMENT.md) (hosting), [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Top-level references: [`PROJECT_REFERENCE.md`](PROJECT_REFERENCE.md) (product spec), [`PHASES.md`](PHASES.md) (build log), [`DEPLOYMENT.md`](DEPLOYMENT.md) (hosting), [`VERCEL_CUTOVER_RUNBOOK.md`](VERCEL_CUTOVER_RUNBOOK.md) (hosting cutover), [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 

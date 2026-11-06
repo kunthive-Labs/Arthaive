@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { supabase, isSupabaseConfigured, requireSupabaseConfigured } from "@/lib/supabase"
 import { fundingData } from "@/data/funding-data"
 import type { Deal } from "@/lib/types"
 
@@ -133,7 +133,6 @@ function mapRow(row: Record<string, unknown>): Deal {
 async function fetchDealsInRange(start: string, end: string): Promise<Deal[]> {
   if (isSupabaseConfigured && supabase) {
     const rows: Record<string, unknown>[] = []
-    let ok = false
     for (let from = 0; ; from += PAGE) {
       const { data, error } = await supabase
         .from("deals")
@@ -144,13 +143,17 @@ async function fetchDealsInRange(start: string, end: string): Promise<Deal[]> {
         .order("amount_inr", { ascending: false })
         .range(from, from + PAGE - 1)
 
-      if (error) break
-      ok = true
+      // Previously a failed first page silently produced an empty report from
+      // the static dataset. Surface it instead — a period with no deals is
+      // represented by an empty `rows`, not by a swallowed error.
+      if (error) throw error
       if (data && data.length) rows.push(...(data as Record<string, unknown>[]))
       if (!data || data.length < PAGE) break
     }
-    if (ok) return rows.map(mapRow)
+    return rows.map(mapRow)
   }
+
+  requireSupabaseConfigured("getReport")
 
   return fundingData
     .filter((d) => d.date >= start && d.date <= end)
@@ -234,7 +237,6 @@ export async function getReport(period: string): Promise<FundingReport | null> {
 async function fetchAllDealDates(): Promise<{ date: string; amount: number }[]> {
   if (isSupabaseConfigured && supabase) {
     const all: { date: string; amount: number }[] = []
-    let ok = false
     for (let from = 0; ; from += PAGE) {
       const { data, error } = await supabase
         .from("deals")
@@ -242,8 +244,7 @@ async function fetchAllDealDates(): Promise<{ date: string; amount: number }[]> 
         .eq("record_status", "verified")
         .range(from, from + PAGE - 1)
 
-      if (error) break
-      ok = true
+      if (error) throw error
       if (data && data.length)
         all.push(
           ...(data as { deal_date: string; amount_inr: number }[]).map((r) => ({
@@ -253,8 +254,10 @@ async function fetchAllDealDates(): Promise<{ date: string; amount: number }[]> 
         )
       if (!data || data.length < PAGE) break
     }
-    if (ok) return all
+    return all
   }
+
+  requireSupabaseConfigured("listAvailablePeriods")
   return fundingData.map((d) => ({ date: d.date, amount: d.amount }))
 }
 
